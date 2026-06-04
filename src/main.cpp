@@ -44,12 +44,13 @@ static const wire_t *children[CHILD_COUNT] = {
 
 // ----------------------------------------------------------
 // Fast upstream scan
+// scans all upstream lines for LOW and returns index of first detected LOW line (orientation value), or -1 if no line is LOW
 // ----------------------------------------------------------
 
 static int8_t scan_upstream(void)
 {
-    for (uint8_t i = 0; i < UPSTREAM_COUNT; i++) {
-        if (!line_high(&upstream[i])) {
+    for (uint8_t i = 0; i < upstream_count; i++) {
+        if (!is_line_high(&upstream[i])) {
             return (int8_t)i;
         }
     }
@@ -63,35 +64,37 @@ static int8_t scan_upstream(void)
 
 static bool wait_for_valid_upstream_cmd(
     const wire_t **active_line,
-    uint8_t *orientation
+    uint8_t *orientation_mask
 )
 {
     while (1) {
-        int8_t ori = scan_upstream();
+        int8_t ori = scan_upstream(); // detects orientation line - 0/1/2/3 or -1 if no low is detected 
 
-        if (ori < 0) {
+        if (ori < 0) {  //if no line is low, repeat orientation scan 
             continue;
         }
 
-        const wire_t *w = &upstream[ori];
+        const wire_t *w = &upstream[ori]; //assignment (zuordnung) of detected orientation line/pin to w
 
         uint8_t b = 0;
 
-        if (!rx_byte_after_start_detected(w, &b)) {
+        if (!rx_byte_data_frame(w, &b)) { //receiving of message (sent bits) without start bit, false if no valid bits are received within timeout
             continue;
         }
 
-        if (b != CMD_STATUS) {
-            for (uint8_t i = 0; i < UPSTREAM_COUNT; i++) {
+        //checks if received byte is CMD_STATUS, if not, repeat orientation scan and go into loop
+        if (b != CMD_STATUS) {  
+            for (uint8_t i = 0; i < upstream_count; i++) { //release all upstream lines
                 wire_release(&upstream[i]);
             }
-            wire_release(&child_0);
-            wire_release(&child_1);
+            wire_release(&child_0); //release child lines, just in case
+            wire_release(&child_1); //release child lines, just in case
             continue;
         }
-
+        
+        // if correct CMD_STATUS is received, ausgabeparameter aus funktion: assign detected line to active_line and orientation value to orientation and return true
         *active_line = w;
-        *orientation = (uint8_t)ori;
+        *orientation_mask = (uint8_t)ori;
 
         return true;
     }
@@ -130,7 +133,7 @@ static bool poll_child(const wire_t *w, uint8_t *data_out)
     /*
      * 4. ACK received, now wait for child data byte.
      */
-    if (!rx_byte(w, &b, CHILD_TIMEOUT_US)) {
+    if (!rx_byte(w, &b, CHILD_TIMEOUT_US)) { //!!CHILD_TIMEOUT_US must be calculated
         return false;
     }
 
@@ -147,7 +150,7 @@ static bool poll_child(const wire_t *w, uint8_t *data_out)
 
 void setup()
 {
-    for (uint8_t i = 0; i < UPSTREAM_COUNT; i++) {
+    for (uint8_t i = 0; i < upstream_count; i++) {
     wire_release(&upstream[i]);
     }
     wire_release(&child_0);
@@ -170,13 +173,13 @@ void loop()
      */
     static bool orientation_known = false;
     static const wire_t *active_upstream = nullptr; //code merkt sich dauerhaft die Orientierungsleitung
-    static uint8_t orientation = 0;
+    static uint8_t orientation_mask = 0x00; //orientation mask,now 1 byte, later combined with child_mask to one byte 
 
     /*
      * 1. Detect orientation only once.
      */
     if (!orientation_known) {
-        wait_for_valid_upstream_cmd(&active_upstream, &orientation);
+        wait_for_valid_upstream_cmd(&active_upstream, &orientation_mask); // selects active upstream line and orientation value (orientation value must be transformed to orientation_byte for sending )
         orientation_known = true;
     }
 
@@ -199,20 +202,20 @@ void loop()
     /*
      * 3. Poll own children with retries.
      */
-    uint8_t child_mask = 0x00;
-    uint8_t child_data[CHILD_COUNT] = {0};
-    bool child_done[CHILD_COUNT] = {false};
+    uint8_t child_mask = 0x00; // 1byte to mask connected children
+    uint8_t child_data[CHILD_COUNT] = {0};  //Child_count = amount of children (in this case 2), ?child_data array stores received data from children, index in array corresponds to child index in children array
+    bool child_done[CHILD_COUNT] = {false}; //child_done array stores if child has already responded with valid data
 
-    for (uint8_t attempt = 0; attempt < CHILD_RETRIES; attempt++) {
-        for (uint8_t i = 0; i < CHILD_COUNT; i++) {
+    for (uint8_t attempt = 0; attempt < CHILD_RETRIES; attempt++) { //retry loop
+        for (uint8_t i = 0; i < CHILD_COUNT; i++) {  //child loop, iterates through children
 
-            if (child_done[i]) {
+            if (child_done[i]) { //if child[i] has already responded with valid data, skip polling and go to next child
                 continue;
             }
 
-            if (poll_child(children[i], &child_data[i])) {
-                child_done[i] = true;
-                child_mask |= (1 << i);
+            if (poll_child(children[i], &child_data[i])) { //poll child[i], if valid data is received, then ...
+                child_done[i] = true; //mark child as done -> no more polling of this child in next attempts
+                child_mask |= (1 << i); //set bit i in child_mask to note that child[i] is there (and has responded with valid data)
             }
         }
     }
@@ -234,8 +237,9 @@ void loop()
     _delay_us(TURNAROUND_US);
     tx_byte(active_upstream, DATA_BYTE);
     wire_release(active_upstream);
+
     // 5. release all lines
-    for (uint8_t i = 0; i < UPSTREAM_COUNT; i++) {
+    for (uint8_t i = 0; i < upstream_count; i++) {
         wire_release(&upstream[i]);
     }
     wire_release(&child_0);

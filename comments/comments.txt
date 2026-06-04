@@ -1,0 +1,19 @@
+v2: without orientation
+v3: with orientation detection 
+
+QUESTIONS
+- what does the time frame of the program look like? When will the main loop be repeated?
+- the upstream line/orientation is currently checked every time the main loop is repeated -> doesn´t make sense 
+    -> normally just needs to be checked when child and parent connect/communicate for the first time (bei erster kontaktaufnahme)
+    proposed solution: two states
+        typedef enum {
+        STATE_DISCOVERY,
+        STATE_CONNECTED
+        } node_state_t;
+- what if one connection (node) is defective? (e.g. orientation detection is not working) -> does everything freeze up then?
+
+
+ich darf nicht 1 child 3 mal pollen und dann das andere danach sondern muss 1 child pollen dann warten dann das andere pollen dann wieder das erste pollen etc 
+
+NEXT STEPS
+- CHILD_TIMEOUT_US must be calculated

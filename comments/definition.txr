@@ -1,0 +1,46 @@
+structure:
+- 1 parent: sends cmd_status to child and waits for ackbyte from child. If received waits and receive data package from child 
+- 3 children: 
+    detects orientation through high signal at one of its 4 orientation pins (=start bit of CMD_STATUS) -> every communication between child and its parent now takes place through this orientation pin
+    receives cmd_status from parent and sends ackByte to parent. 
+    Afterwards it transisions into parent role for its children (transmits cmd_status to own children and waits for ack_busy. Saves information about connected children (child_mask) and sends data package to parent (already defined)), 
+    combines the received data and sends them back to its own parent 
+
+
+
+Difference child_v2 and child_v3 in this prototype: child_v3 additionally indentifies the orientation (pin) of the block 
+
+Transaction:
+    1. idle: child waits for CMD_STATUS from parent on PA1
+    1. idle: parent releases line
+    2. parent: send CMD_STATUS -> reset
+    3. parent: releases line
+
+    4. child: receive CMD_STATUS (at one of its 4 orientation pins)
+    4.1 v_2_2: every communication between child and its parent now takes place through this orientation pin 
+    5. child: send ACK_BUSY upstream on PA1 -> presence
+    6. poll children (3x retries): 
+          for each retry round:
+           for each child i:
+               if child already sent data byte -> skip
+                send CMD_STATUS
+                wait for ACK_BUSY
+                if no ACK -> next child
+                if ACK received -> wait for DATA_BYTE
+
+    7. child: record child_mask (v2c: computed but not yet sent upstream)
+    9. child: send predefined DATA_BYTE upstream on PA1
+    9. child: release all lines, return to idle
+
+    10. parent: receives predefined DATA_BYTE
+    11: Parent validates SYNC, LEN and CRC
+    12: Parent compares payload with expected test payload
+
+Pin assignment:
+    PA1 = upstream data line (orientation 0)
+    PA3 = upstream port 1 (orientation 1)
+    PA4 = upstream port 2 (orientation 2)
+    PA5 = upstream port 3 (orientation 3)
+    PB0 = downstream child port 0
+    PB1 = downstream child port 1
+    PA2 = LED
