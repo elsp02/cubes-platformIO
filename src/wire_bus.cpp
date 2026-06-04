@@ -42,14 +42,17 @@ void wire_low(const wire_t *w)
     w->port->DIRSET = w->pin_bm;
 }
 
-//suggestion: rename to is_line_high() to make it more clear that it returns a boolean value
-bool line_high(const wire_t *w)
+bool is_line_high(const wire_t *w)
+    /**
+     * checks if the line is high (returns true if high)
+     */
 {
     return (w->port->IN & w->pin_bm) != 0;
 }
 
 // ----------------------------------------------------------
 // Byte transmit
+// transmission of data frame (start bit, data bits, stop bit)
 // ----------------------------------------------------------
 
 void tx_byte(const wire_t *w, uint8_t b)
@@ -84,6 +87,8 @@ void tx_byte(const wire_t *w, uint8_t b)
 
 // ----------------------------------------------------------
 // Normal byte receive
+// Detection of start bit and then reception of data frame (data bits and stop bit)
+// brauch ich bei rx_byte definition das uint8_t *out?
 // ----------------------------------------------------------
 
 bool rx_byte(const wire_t *w, uint8_t *out, uint16_t timeout_us)
@@ -92,7 +97,7 @@ bool rx_byte(const wire_t *w, uint8_t *out, uint16_t timeout_us)
      * Wait for falling edge.
      * One loop iteration waits 10 µs.
      */
-    while (line_high(w)) {
+    while (is_line_high(w)) {
         if (timeout_us < 10) {
             return false;
         }
@@ -101,60 +106,23 @@ bool rx_byte(const wire_t *w, uint8_t *out, uint16_t timeout_us)
         _delay_us(10);
     }
 
-    /*
-     * Validate start bit in the middle of the start bit.
-     */
-    _delay_us(BAUD_US / 2);
-
-    if (line_high(w)) {
-        return false;
-    }
-
-    //suggestion: call rx_byte_after_start_detected() here to avoid code duplication
-
-    /*
-     * Move to middle of data bit 0.
-     */
-    _delay_us(BAUD_US);
-
-    uint8_t b = 0;
-
-    for (uint8_t i = 0; i < 8; i++) {
-        if (line_high(w)) {
-            b |= (1 << i);
-        }
-
-        _delay_us(BAUD_US);
-    }
-
-    /*
-     * Stop bit must be HIGH.
-     */
-    if (!line_high(w)) {
-        return false;
-    }
-
-    _delay_us(BAUD_US);
-
-
-    *out = b;
-    return true;
+    rx_byte_data_frame(w, out);
 }
 
 // ----------------------------------------------------------
 // Receive byte after start bit was already detected
 // ----------------------------------------------------------
 
-bool rx_byte_after_start_detected(const wire_t *w, uint8_t *out)
+bool rx_byte_data_frame(const wire_t *w, uint8_t *out)
 {
     /*
      * scan_upstream() has already detected LOW.
-     * This should be the start bit.
+     * double check if line is low -> if so, this should be the start bit.
      */
 
     _delay_us(BAUD_US / 2);
 
-    if (line_high(w)) {
+    if (is_line_high(w)) {
         return false;
     }
 
@@ -166,7 +134,7 @@ bool rx_byte_after_start_detected(const wire_t *w, uint8_t *out)
     uint8_t b = 0;
 
     for (uint8_t i = 0; i < 8; i++) {
-        if (line_high(w)) {
+        if (is_line_high(w)) {
             b |= (1 << i);
         }
 
@@ -176,12 +144,11 @@ bool rx_byte_after_start_detected(const wire_t *w, uint8_t *out)
     /*
      * Stop bit must be HIGH.
      */
-    bool stop_ok = line_high(w);
-    _delay_us(BAUD_US / 2);
-
-    if (!stop_ok) {
+    if (!is_line_high(w)) {
         return false;
     }
+
+    _delay_us(BAUD_US); // vlt _delay_us(BAUD_US/2) oder stop bit wie start bit zweimal abfragen?
 
     *out = b;
     return true;

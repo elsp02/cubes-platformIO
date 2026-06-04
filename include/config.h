@@ -25,7 +25,6 @@
 // ----------------------------------------------------------
 #define CHILD_COUNT              2
 #define CHILD_RETRIES            3
-#define UPSTREAM_COUNT           4
 #define UPSTREAM_FAIL_LIMIT      3
 
 // ----------------------------------------------------------
