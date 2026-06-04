@@ -106,7 +106,7 @@ bool rx_byte(const wire_t *w, uint8_t *out, uint16_t timeout_us)
         _delay_us(10);
     }
 
-    rx_byte_data_frame(w, out);
+    return rx_byte_data_frame(w, out);
 }
 
 // ----------------------------------------------------------

@@ -32,7 +32,7 @@ static const wire_t upstream[] = {
 };
 
 //suggestion: replace UPSTREAM_COUNT with upstream_count to avoid hardcoding the count
-static int upstream_count = sizeof(upstream) / sizeof(upstream[0]);
+static const uint8_t upstream_count = sizeof(upstream) / sizeof(upstream[0]);
 
 static const wire_t child_0 = { &PORTB, PIN0_bm, 0 };  // PB0 — child port 0
 static const wire_t child_1 = { &PORTB, PIN1_bm, 1 };  // PB1 — child port 1
@@ -137,6 +137,19 @@ static bool poll_child(const wire_t *w, uint8_t *data_out)
         return false;
     }
 
+    /// SYNC  byte check
+    /// receive sync byte and check for validity, if not valid, break 
+
+    /// LEN  byte
+    /// receive LEN Data byte from child -> LEN_gesamt += LEN_byte and LEN_loop_child = LEN_byte
+
+    /// Payload Bytes 
+    /// for LEN_loop_child times: receive payload byte from child and childrens children (ID BYTE, Orientation BYTE, Child_mask BYTE -> always 8 data bits and 1 stop bit)
+
+    /// Store received payload data in child_data array? - or maybe stored differently
+
+    /// CRC byte
+    /// receive CRC byte at the end and check for validity, if not valid, trash everything received from this child and break
     /*
      * 5. Store received data.
      */
@@ -174,6 +187,7 @@ void loop()
     static bool orientation_known = false;
     static const wire_t *active_upstream = nullptr; //code merkt sich dauerhaft die Orientierungsleitung
     static uint8_t orientation_mask = 0x00; //orientation mask,now 1 byte, later combined with child_mask to one byte 
+    /// create variables (LEN_gesamt, LEN_Loop child etc.)
 
     /*
      * 1. Detect orientation only once.
@@ -197,7 +211,7 @@ void loop()
      */
     _delay_us(TURNAROUND_US);
     tx_byte(active_upstream, ACK_BUSY);
-    /*wire_release(active_upstream);
+    //wire_release(active_upstream);
 
     /*
      * 3. Poll own children with retries.
@@ -217,8 +231,12 @@ void loop()
                 child_done[i] = true; //mark child as done -> no more polling of this child in next attempts
                 child_mask |= (1 << i); //set bit i in child_mask to note that child[i] is there (and has responded with valid data)
             }
+            /// maybe here LEN_gesamt += LEN_byte calculatioon?
         }
     }
+
+    /// if every child is done, create the total array own data (own LEN, ID, orientation and child mask) and  all received data from children, which will be sent upstream after the loop
+    /// then create total data frame which will be sent upstream, consisting of SYNC byte, LEN byte (total), Payload bytes (total), CRC byte
 
     /*
      * 4. Print/debug result.
@@ -231,9 +249,10 @@ void loop()
 
     Serial.println(child_mask, BIN);
 
-    /*
-     * 5. Send predefined DATA_BYTE upstream.
-     */
+    
+    /// 5. Send the created Data frame upstream.
+    /// for LEN byte gesamt times: send SYNC byte, LEN byte (total), Payload bytes (total), CRC byte
+    
     _delay_us(TURNAROUND_US);
     tx_byte(active_upstream, DATA_BYTE);
     wire_release(active_upstream);
