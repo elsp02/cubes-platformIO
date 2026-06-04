@@ -3,38 +3,54 @@ structure:
 - 3 children: 
     detects orientation through high signal at one of its 4 orientation pins (=start bit of CMD_STATUS) -> every communication between child and its parent now takes place through this orientation pin
     receives cmd_status from parent and sends ackByte to parent. 
-    Afterwards it transisions into parent role for its children (transmits cmd_status to own children and waits for ack_busy. Saves information about connected children (child_mask) and sends data package to parent (already defined)), 
-    combines the received data and sends them back to its own parent 
+    Afterwards it transitions into parent role (node) for its children -> transmits cmd_status to own children and waits for ack_busy -> Receives DATA FRAME from children (inlcuding SYNC, LEN, Payload, CRC) and saves information about connected children (child_mask) and
+    combines it´s own data with the received data (SYNC, LEN (total), PAYLOAD (total), CRC) and sends them back to its own parent (upstream)
+    => receive child frames, combine them with the node’s own data, and send one complete frame upstream.
 
+PAYLOAD STRUCTURE
+  NODE_ID ORIENTATION CHILD_MASK CHILD_PAYLOAD (=child frame without sync, len and crc)  
 
-
-Difference child_v2 and child_v3 in this prototype: child_v3 additionally indentifies the orientation (pin) of the block 
-
-Transaction:
+Sequence:
     1. idle: child waits for CMD_STATUS from parent on PA1
     1. idle: parent releases line
     2. parent: send CMD_STATUS -> reset
     3. parent: releases line
 
-    4. child: receive CMD_STATUS (at one of its 4 orientation pins)
-    4.1 v_2_2: every communication between child and its parent now takes place through this orientation pin 
-    5. child: send ACK_BUSY upstream on PA1 -> presence
-    6. poll children (3x retries): 
-          for each retry round:
-           for each child i:
-               if child already sent data byte -> skip
-                send CMD_STATUS
+    4. Child/node scans upstream orientation pins.
+    5. LOW detected on one upstream pin.
+    6. Node receives CMD_STATUS on that pin.
+    7. If byte != CMD_STATUS: discard event and return to idle.
+    8. If byte == CMD_STATUS:
+        active_upstream = detected pin
+        orientation = detected pin index
+    9. child/Node: sends ACK_BUSY upstream on active_upstream.
+    10. Child/node polls own children with retries:
+        for each retry round:
+            for each child i:
+                if child already responded successfully:
+                    skip
+                send CMD_STATUS on child line i
+                release child line i
                 wait for ACK_BUSY
-                if no ACK -> next child
-                if ACK received -> wait for DATA_BYTE
+                if no ACK:
+                    continue
+                wait for DATA_FRAME
+                validate child frame (CRC)
+                store child frame
+                set bit i in child_mask
+    11. Child/Node builds own payload:
+        NODE_ID
+        ORIENTATION
+        CHILD_MASK
+        stored child payloads
+    12. Child/Node sends own DATA_FRAME upstream:
+        SYNC LEN PAYLOAD CRC
 
-    7. child: record child_mask (v2c: computed but not yet sent upstream)
-    9. child: send predefined DATA_BYTE upstream on PA1
-    9. child: release all lines, return to idle
+    13. Child/Node releases all lines and returns to idle.
 
-    10. parent: receives predefined DATA_BYTE
-    11: Parent validates SYNC, LEN and CRC
-    12: Parent compares payload with expected test payload
+    14. parent: receives DATA_FRAME
+    15: Parent validates SYNC, LEN and CRC
+    16: Parent compares payload with expected test payload
 
 Pin assignment:
     PA1 = upstream data line (orientation 0)

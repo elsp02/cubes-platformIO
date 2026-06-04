@@ -8,7 +8,7 @@
 #include <stdbool.h>
 
 #ifndef F_CPU
-#define F_CPU 20000000UL
+#define F_CPU 20000000UL    // better to define in .ini file: build_flags = -DF_CPU=20000000UL/board_build.f_cpu = 20000000L
 #endif
 
 // ----------------------------------------------------------
