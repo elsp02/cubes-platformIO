@@ -153,3 +153,105 @@ bool rx_byte_data_frame(const wire_t *w, uint8_t *out)
     *out = b;
     return true;
 }
+
+// ----------------------------------------------------------
+// Frame checksum
+// ----------------------------------------------------------
+
+uint8_t calc_checksum(uint8_t payload_len, const uint8_t *payload)
+{
+    /*
+     * Simple XOR checksum for prototype_v3.
+     * Protected fields:
+     * LEN + PAYLOAD
+     *
+     * SYNC is not included.
+     */
+    uint8_t checksum = payload_len;
+
+    for (uint8_t i = 0; i < payload_len; i++) {
+        checksum ^= payload[i];
+    }
+
+    return checksum;
+}
+
+// ----------------------------------------------------------
+// Frame transmit
+// Frame format:
+// SYNC LEN PAYLOAD CHECKSUM
+// ----------------------------------------------------------
+
+void tx_frame(const wire_t *w, const uint8_t *payload, uint8_t payload_len)
+{
+    uint8_t checksum = calc_checksum(payload_len, payload);
+
+    tx_byte(w, SYNC_BYTE);
+    tx_byte(w, payload_len);
+
+    for (uint8_t i = 0; i < payload_len; i++) {  //repeat this loop for payload_len times
+        tx_byte(w, payload[i]);
+    }
+
+    tx_byte(w, checksum);
+    wire_release(w);
+}
+
+// ----------------------------------------------------------
+// Frame receive
+// Receives and validates:
+// SYNC LEN PAYLOAD CHECKSUM
+//
+// Returns only:
+// PAYLOAD and payload_len
+// ----------------------------------------------------------
+
+bool rx_frame(
+    const wire_t *w,
+    uint8_t *payload,
+    uint8_t max_payload_len,
+    uint8_t *payload_len,
+    uint16_t timeout_us
+)
+{
+    uint8_t sync = 0;
+
+    if (!rx_byte(w, &sync, timeout_us)) {
+        return false;
+    }
+
+    if (sync != SYNC_BYTE) {
+        return false;
+    }
+
+    uint8_t len = 0;
+
+    if (!rx_byte(w, &len, timeout_us)) {
+        return false;
+    }
+
+    if (len > max_payload_len) {
+        return false;
+    }
+
+    for (uint8_t i = 0; i < len; i++) {
+        if (!rx_byte(w, &payload[i], timeout_us)) {
+            return false;
+        }
+    }
+
+    uint8_t received_checksum = 0;
+
+    if (!rx_byte(w, &received_checksum, timeout_us)) {
+        return false;
+    }
+
+    uint8_t calculated_checksum = calc_checksum(len, payload);
+
+    if (received_checksum != calculated_checksum) {
+        return false;
+    }
+
+    *payload_len = len;
+    return true;
+}

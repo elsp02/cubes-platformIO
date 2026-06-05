@@ -49,4 +49,30 @@ bool rx_byte_data_frame(                   //receiving of message (sent bits) wi
     uint8_t *out
 );
 
+//------------------------------------------------------------
+// Frame transfer
+// Frame format: 
+// SYNC LEN PAYLOAD CHECKSUM
+//-------------------------------------------------------------
+
+
+uint8_t calc_checksum(         //crc check
+    uint8_t payload_len,
+    const uint8_t *payload
+);
+
+void tx_frame(                  // transmitting data frame
+    const wire_t *w,
+    const uint8_t *payload,
+    uint8_t payload_len
+);
+
+bool rx_frame(                  // receiving data frame
+    const wire_t *w,
+    uint8_t *payload,
+    uint8_t max_payload_len,
+    uint8_t *payload_len,
+    uint16_t timeout_us
+);
+
 #endif
