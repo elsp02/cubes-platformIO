@@ -59,4 +59,4 @@ Pin assignment:
     PA5 = upstream port 3 (orientation 3)
     PB0 = downstream child port 0
     PB1 = downstream child port 1
-    PA2 = LED
+    PB4 = LED
