@@ -1,5 +1,5 @@
 // ============================================================
-// Prototype v2_2 - child Node
+// Prototype v3 - child Node - not tested yet
 // ATtiny1616
 //
 // PlatformIO structure:
@@ -128,20 +128,15 @@ static bool poll_child(
 {
     uint8_t b = 0;
 
-    /*
-     * 1. Send CMD_STATUS to child.
-     */
+    //1. Send CMD_STATUS to child.
+
     tx_byte(w, CMD_STATUS);
 
-    /*
-     * 2. Switch direction / wait before receiving.
-     */
+    // 2. Switch direction / wait before receiving/ 
     _delay_us(TURNAROUND_US);
     // wire_release(w);  redundant
 
-    /*
-     * 3. Wait for ACK_BUSY.
-     */
+    // 3. Wait for ACK_BUSY/ 
     if (!rx_byte(w, &b, CHILD_TIMEOUT_US)) {
         return false;
     }
@@ -196,9 +191,7 @@ void loop()
     static uint8_t orientation_mask = 0x00; //orientation mask,now 1 byte, later combined with child_mask to one byte 
     /// create variables (LEN_gesamt, LEN_Loop child etc.)
 
-    /*
-     * 1. Detect orientation only once.
-     */
+    // Detect orientation only once
     if (!orientation_known) {
         wait_for_valid_upstream_cmd(&active_upstream, &orientation_mask); // selects active upstream line and orientation value (orientation value must be transformed to orientation_byte for sending )
         orientation_known = true;
@@ -228,18 +221,14 @@ void loop()
         return (b == CMD_STATUS);
     }*/
 
-    /*
-     * Safety check.
-     * Should normally never be true after orientation_known == true.
-     */
+    // Safety check. Should normally never be true after orientation_known == true.
     if (active_upstream == nullptr) {
         orientation_known = false;
         return;
     }
 
-    /*
-     * 2. Send ACK_BUSY upstream on the detected active line.
-     */
+    // Send ACK_BUSY upstream on the detected active line.
+     
     _delay_us(TURNAROUND_US); 
     tx_byte(active_upstream, ACK_BUSY);
     //wire_release(active_upstream);
@@ -248,10 +237,13 @@ void loop()
      * 3. Poll own children with retries.
      *
      * Child payloads are stored separately first.
-     * This keeps the final payload order correct:
-     * child 0 payload first, then child 1 payload.
+     * child_payload_len[i] tells how long child i's payload is.
+     * child_done[i] tells whether child i has valid stored payload.
      */
-    uint8_t child_payloads[CHILD_COUNT][MAX_CHILD_PAYLOAD_LEN];   //temporary storage (2d array) for child payload results -> child_payloads[child_index][payload_index] = byte received from child
+    uint8_t child_payload_buf[MAX_PAYLOAD_LEN];                   // stores all received child payloads compactly - in no correct order
+    uint8_t child_payload_buf_len = 0;                            //tells how many bytes child has sent
+
+    uint8_t child_payload_offset[CHILD_COUNT] = {0};               // tells where child[i] payload starts inside shared buffer
     uint8_t child_payload_len[CHILD_COUNT] = {0};                 // temporary storage for child payload lengths -> child_payload_len[child_index] = length of payload received from child
     bool child_done[CHILD_COUNT] = {false};                       // stores if child has already responded and can be skipped
 
@@ -262,16 +254,39 @@ void loop()
             if (child_done[i]) {   // if child[i] has already responded -> true -> skip
                 continue;
             }
+            /*
+             * Temporary receive buffer for one child.
+             * The child frame is received here first.
+             */
+            uint8_t temp_payload[MAX_CHILD_PAYLOAD_LEN];        //temporary payload of children is written in the temp_payload
+            uint8_t temp_payload_len = 0;
 
-            //receives childs payload and payload length and stores it in temporary storages 
-            if (poll_child(                //poll child[i] 
-                    children[i],           //with wire/pin of child[i]
-                    child_payloads[i],     //and receive and store the payload in child_payloads[i]
-                    MAX_CHILD_PAYLOAD_LEN, //with max length of MAX_CHILD_PAYLOAD_LEN to avoid overflow
-                    &child_payload_len[i]  //and stores the received payload length from child[i]
+            if (!poll_child(                //polls children
+                    children[i],             //wire/pin of current child
+                    temp_payload,            // where received payload should be stored temporarily      
+                    MAX_CHILD_PAYLOAD_LEN,   //max payload bytes child is allowed to send
+                    &temp_payload_len        // adress of variable where poll_child() writes actual received payload length
                 )) {
-                child_done[i] = true;      //if everything correct sets child_done[i] to true -> this child will be skipped in next attempts
+                continue;
             }
+
+            // Check if this child payload still fits into the shared flat buffer.
+
+            if ((uint16_t)child_payload_buf_len + temp_payload_len > MAX_PAYLOAD_LEN) {
+                continue;
+            }
+
+            // Store start position and length for this child.
+            child_payload_offset[i] = child_payload_buf_len;             //says where child payload should be stored to be in the correct order
+            child_payload_len[i] = temp_payload_len;
+
+            // Copy temporary payload into the shared flat buffer 
+            for (uint8_t j = 0; j < temp_payload_len; j++) {
+                child_payload_buf[child_payload_buf_len++] = temp_payload[j];
+            }
+
+            // Mark this child as done
+            child_done[i] = true;
         }
     }
 
@@ -299,43 +314,38 @@ void loop()
             continue;
         }
 
+        uint8_t offset = child_payload_offset[i];
+        uint8_t len = child_payload_len[i];
+
         /*
-         * Check whether this child payload still fits.
-         * If not, do not set the child bit because the payload is not included.
+         * Check whether this child payload still fits into the final payload.
+         * If it does not fit, do not set the child bit.
          */
-        if ((uint16_t)payload_len + child_payload_len[i] > MAX_PAYLOAD_LEN) {
+        if ((uint16_t)payload_len + len > MAX_PAYLOAD_LEN) {
             continue;
         }
 
         //create child_mask
         child_mask |= (1 << i);   //set bit for child[i]n in child_mask (LSB = child 0)
 
-        //copy child payload into final payload
-        for (uint8_t j = 0; j < child_payload_len[i]; j++) {
-            payload[payload_len++] = child_payloads[i][j];  //copies stored payload into final payload and increases payload_len for next byte
+        // Copy child i's payload from the flat buffer into the final payload 
+        for (uint8_t j = 0; j < len; j++) {
+            payload[payload_len++] = child_payload_buf[offset + j]; //copies stored payload into final payload and increases payload_len for next byte
         }
     }
 
-    /*
-     * Now write final child_mask into own node header.
-     */
+    // Now write final child_mask into own node header 
     payload[2] = child_mask;  //before was in payload[2] the placeholder 0x00
 
-    /*
-     * 5. Send complete frame upstream.
-     */
+    // Send complete frame upstream
     _delay_us(TURNAROUND_US);
     tx_frame(active_upstream, payload, payload_len);
     wire_release(active_upstream);
 
-    /*
-     * 6. Release all lines.
-     */
+    // Release all lines
     release_all_lines();
 
-    /*
-     * 7. Debug output.
-     */
+    // Debug output
     Serial.print("Sent payload_len = ");
     Serial.println(payload_len);
 

@@ -1,4 +1,5 @@
-// Schnittstelle der Bus-/Leitungsfunktionen
+//define interface for wire bus functions
+
 #ifndef WIRE_BUS_H
 #define WIRE_BUS_H
 
@@ -10,9 +11,9 @@
 // ----------------------------------------------------------
 // wire_t — single-wire open-drain line descriptor
 // each wire_t stores 3 infos 
-// port    : pointer to the AVR PORT struct (e.g. &PORTA, &PORTB)
+//  port    : pointer to the AVR PORT struct (e.g. &PORTA, &PORTB)
 //  pin_bm  : bitmask of the pin  (e.g. PIN1_bm)
-//  pin_idx : numeric index 0-7, used to select PINnCTRL for pull-up
+//  pin_idx : numeric index 0-7 
 // ----------------------------------------------------------
 
 typedef struct {
