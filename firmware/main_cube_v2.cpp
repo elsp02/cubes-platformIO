@@ -1,5 +1,7 @@
 // ============================================================
 // Prototype v3_2 - child Node
+// child polling: children in a loop 
+// payload stored in 2D array -> always fixed length -> not RAM efficient 
 // ATtiny1616
 //
 // PlatformIO structure:
@@ -203,6 +205,11 @@ void loop()
         wait_for_valid_upstream_cmd(&active_upstream, &orientation_mask); // selects active upstream line and orientation value (orientation value must be transformed to orientation_byte for sending )
         orientation_known = true;
     }  else {
+        // Safety check. Should normally never be true after orientation_known == true.
+        if (active_upstream == nullptr) {
+            orientation_known = false;
+            return;
+        }
         // if orientation is already known, no need to check orientation just receive CMD_STATUS
         uint8_t b = 0;
 
@@ -216,26 +223,7 @@ void loop()
             return;
         }
     }
-    /* you can also do create a own function instead:
-        static bool wait_for_cmd_on_known_upstream(const wire_t *w)
-    {
-        uint8_t b = 0;
-
-        if (!rx_byte(w, &b, PARENT_TIMEOUT_US)) {
-            return false;
-        }
-
-        return (b == CMD_STATUS);
-    }*/
-
-    /*
-     * Safety check.
-     * Should normally never be true after orientation_known == true.
-     */
-    if (active_upstream == nullptr) {
-        orientation_known = false;
-        return;
-    }
+   
 
     /*
      * 2. Send ACK_BUSY upstream on the detected active line.
@@ -252,6 +240,7 @@ void loop()
      * child 0 payload first, then child 1 payload.
      */
     uint8_t child_payloads[CHILD_COUNT][MAX_CHILD_PAYLOAD_LEN];   //temporary storage (2d array) for child payload results -> child_payloads[child_index][payload_index] = byte received from child
+     // problem of child_payload: always MAX_CHILD_PAYLOAD_LEN long even if e.g actual payload is just 3 bytes long -> not RAM efficient 
     uint8_t child_payload_len[CHILD_COUNT] = {0};                 // temporary storage for child payload lengths -> child_payload_len[child_index] = length of payload received from child
     bool child_done[CHILD_COUNT] = {false};                       // stores if child has already responded and can be skipped
 
@@ -277,11 +266,7 @@ void loop()
 
     /*
      * 4. Build own/nodes payload:
-     *
-     * Payload format:
-     *   NODE_ID ORIENTATION CHILD_MASK CHILD_PAYLOADS...
-     *
-     * The parser later expects child payloads in child-port order.
+     * Payload format: NODE_ID ORIENTATION CHILD_MASK CHILD_PAYLOADS...
      */
     uint8_t payload[MAX_PAYLOAD_LEN]; //final payload to be sent upstream
     uint8_t payload_len = 0;          //length of final payload
@@ -299,13 +284,11 @@ void loop()
             continue;
         }
 
-        /*
-         * Check whether this child payload still fits.
-         * If not, do not set the child bit because the payload is not included.
-         */
-        if ((uint16_t)payload_len + child_payload_len[i] > MAX_PAYLOAD_LEN) {
-            continue;
-        }
+        // Check whether this child payload still fits. If not, do not set the child bit because the payload is not included.
+
+        //if ((uint16_t)payload_len + child_payload_len[i] > MAX_PAYLOAD_LEN) {
+            //continue;
+        //}
 
         //create child_mask
         child_mask |= (1 << i);   //set bit for child[i]n in child_mask (LSB = child 0)
@@ -316,10 +299,8 @@ void loop()
         }
     }
 
-    /*
-     * Now write final child_mask into own node header.
-     */
-    payload[2] = child_mask;  //before was in payload[2] the placeholder 0x00
+    // Now write final child_mask into own node header.
+    payload[2] = child_mask;  //before was the placeholder 0x00 in payload[2] 
 
     /*
      * 5. Send complete frame upstream.
