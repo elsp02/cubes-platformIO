@@ -34,6 +34,7 @@
 // notiz an mich: macht so nicht so viel sinn, weil letztes child in upstream reihe ja eigentliche alle payloads von allen anderen bekommt -> child payload lenght kann nicht einfach so mit max_length durch anzahl kinder berechnet werden 
 #define MAX_PAYLOAD_LEN          128 // must be <256 for 1 byte LEN field, but should also be limited to avoid long transmission times and large buffers. For prototype_v3, we can set it to 128 as a reasonable limit for testing.
 #define MAX_CHILD_PAYLOAD_LEN    128  //I don´t need this 
+#define MAX_NODES                 CHILD_COUNT * 5 +1 //= child_count * amount of cubes +1(baseplate node)
 
 // ----------------------------------------------------------
 //  Protocol bytes
