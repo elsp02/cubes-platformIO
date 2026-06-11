@@ -48,9 +48,9 @@ Sequence:
 
     13. Child/Node releases all lines and returns to idle.
 
-    14. parent: receives DATA_FRAME
-    15: Parent validates SYNC, LEN and CRC
-    16: Parent compares payload with expected test payload
+    14. parent: receives DATA_FRAME and validates SYNC, LEN and CRC
+    15. parent: transmits complete payload via upstream data line to its parent  
+    16: baseplate: parses complete payload to deserialized n ary payload tree again 
 
 Pin assignment:
     PA1 = upstream data line (orientation 0)

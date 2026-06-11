@@ -13,6 +13,10 @@ struct Node {
     int8_t children[CHILD_COUNT];   // -1 = no child at this port
 };
 
+// Global parser storage, defined in parser.cpp
+extern Node deserialized_nodes_array[MAX_NODES];
+extern uint8_t node_count;
+
 int8_t parse_node(
     const uint8_t *ordered_payload,
     uint8_t ordered_payload_len,

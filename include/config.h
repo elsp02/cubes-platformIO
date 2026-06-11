@@ -28,13 +28,14 @@
 // defined in .ini #define CHILD_COUNT              2     //amount of children of cube
 #define CHILD_RETRIES            3     //amount of retries if polling one child didn´t work out
 #define UPSTREAM_FAIL_LIMIT      3     //currently not in use
+#define CUBES_AMOUNT             5 
 
 // ???????????
 #define NODE_HEADER_LEN          3     //currently not in use
 // notiz an mich: macht so nicht so viel sinn, weil letztes child in upstream reihe ja eigentliche alle payloads von allen anderen bekommt -> child payload lenght kann nicht einfach so mit max_length durch anzahl kinder berechnet werden 
 #define MAX_PAYLOAD_LEN          128 // must be <256 for 1 byte LEN field, but should also be limited to avoid long transmission times and large buffers. For prototype_v3, we can set it to 128 as a reasonable limit for testing.
 #define MAX_CHILD_PAYLOAD_LEN    128  //I don´t need this 
-#define MAX_NODES                 CHILD_COUNT * 5 +1 //= child_count * amount of cubes +1(baseplate node)
+#define MAX_NODES                 CHILD_COUNT * CUBES_AMOUNT//= child_count * amount of cubes +1(baseplate node)
 
 // ----------------------------------------------------------
 //  Protocol bytes

@@ -47,7 +47,7 @@ uint8_t node_count = 0;             // tells how many node slots of array are al
     // payload_read_index = point to the current position inside the serialized paylaod array and moves forward through the serialized byte stream  
     // node_count = how many nodes have been already stored in the deserialized node array + points to the next free node slot
     // current_node_storage_index = tells where the specific node is stored in nodes[] -> gives node in nodes[] an index e.g nodes[0]
-    // child_index = current_index
+    // child_index = current_node_storage_index
     // after Node 1 header:
         // index = 3        // next unread byte is byte 3 in serialized oayload array
         // node_count = 1   // one node has been created in nodes[]

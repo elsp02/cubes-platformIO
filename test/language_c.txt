@@ -10,6 +10,7 @@ bool                                : true/false value/ function return true/fal
 const                               : constant -> wert ändert sich nicht
 int                                 : zahlenwert der sich ändern kann 
 uint8_t                             : usigned 8 bit integer, 0-255 (also 16/32 etc integer)
+int8_t                              : signed 
 static bool fct ()                  : private functin which returns true/false
 
 nullptr                             : pointer to nothing
@@ -33,16 +34,28 @@ fct(&x)                             : pass adress of x (parameter for function)
 
 ------------------------------------------------
 
-TYPEDEF STRUCT                      : define custom struct type
+STRUCT                      : define custom struct type
+dann kann man mehrere objekte von diesem datentyp erstellen: datentyp_name objektname;
 -> struct type = data type that groups severasl related variables into one unit
+  TYPEDEF -> man kann einem datentyp gleichzeitig mehrere Typnamen (Aliase) geben 
     EXAMPLE
       // typedef struct {
       //   PORT_t  *port;       // data type PORT_t (avr defined) with pointer *port to individual Port (A,B,C)
       //   uint8_t  pin_bm;     // pin bit mask for individual pin of selected Port (e.g Pin1_bm =  00000010 = pin 1)
       //   uint8_t  pin_idx;    // pin index stores pin number as normal integer (e.g. 1)
-      // } wire_t;
+      // } wire_t wire_x;       //typname wire_t und wire_x
          --> data type name wire_t with 3 data parameters
          --> can be called later in e.g. function: wire_t *w 
+    
+  STRUCT -> man kann nur einen Typnamen vergeben
+    EXAMPLE
+      //struct Node {
+      //uint8_t node_id;
+      //uint8_t orientation;
+      //uint8_t child_mask;
+      //int8_t children[CHILD_COUNT];   // -1 = no child at this port
+      //};
+
 
 WIRE DESCRIPTORS                    : assignment of data type wire_t
     EXAMPLES
@@ -88,16 +101,18 @@ b&1                                 : checks the lowest bit of b
                    ------------
                    0b00000001
 for (uint8_t i = 0; i < b; i++)     : Start with i = 0. Repeat the loop while i < 8. After each loop cycle, increase i by 1.
-
 i++                                 : increment i 
-b |= (1 << i)                       : sets bit i in b to 1
-^=                                  : xor          
+b |= (1 << i)                       : set bit i in b to 1 
+    (1 <<i) Wert 1 wird binär als 0000 0001 dargestellt. Durch den Shift-Operator << wird dieses einzelne Bit um i Stellen nach links verschoben
+^=                                  : (bitwise?) xor          
 ==                                  : compare for equality
 !=                                  : not equal
 &upstream[i]                        : address of the array element upstream[i]  
 *orientation_mask = (uint8_t)ori    : rites the value of ori into the variable that orientation_mask points to
-
-
+&: (0x03 & 0x01) != 0               : bitwise AND Operator where 0x01 acts as a bitmask to see if first bit of 0x03 is set (1)
+|                                   : bitwise OR
+/                                   : Division
+*                                   : Multiplikation
 ------------------------------------------------          
 continue                            : Stop the current loop iteration immediately and jump back to the beginning of the loop.
 break                               : stop the whole loop and go to the next function
