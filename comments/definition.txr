@@ -24,7 +24,7 @@ Sequence:
         active_upstream = detected pin
         orientation = detected pin index
     9. child/Node: sends ACK_BUSY upstream on active_upstream.
-    10. Child/node polls own children with retries:
+    10. Child/node polls own children with retries: (differences in v3, v2 and main)
         for each retry round:
             for each child i:
                 if child already responded successfully:
