@@ -146,7 +146,7 @@ bool rx_byte_data_frame(const wire_t *w, uint8_t *out)
 }
 
 // ----------------------------------------------------------
-// Frame checksum
+// Frame Rolling checksum
 // ----------------------------------------------------------
 
 uint8_t calc_checksum(uint8_t payload_len, const uint8_t *payload)
