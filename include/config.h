@@ -25,7 +25,7 @@
 // ----------------------------------------------------------
 // Counts / Limits
 // ----------------------------------------------------------
-#define CHILD_COUNT              2     //amount of children of cube
+// defined in .ini #define CHILD_COUNT              2     //amount of children of cube
 #define CHILD_RETRIES            3     //amount of retries if polling one child didn´t work out
 #define UPSTREAM_FAIL_LIMIT      3     //currently not in use
 
@@ -44,6 +44,12 @@
 #define ACK_BUSY            0x55
 #define DATA_BYTE           0x42
 #define SYNC_BYTE           0xA5
+
+//-----------------------------------------------------------
+// FEEDBACK SYSTEM
+//-----------------------------------------------------------
+
+#define LED_PIN             PIN4_bm
 
 // ----------------------------------------------------------
 // Node data

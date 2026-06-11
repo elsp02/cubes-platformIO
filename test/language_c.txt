@@ -1,0 +1,132 @@
+#define:                            : create macro/constant replacement
+#ifndef:                            : if not defined define it (e.g. clock)
+#include                            : same as import in python (for libraries)
+#endif                              : end preprocessor condition -> every ...if must be closed with endif
+
+void                                : returns no value
+function(void)                      : function takes no properties 
+static                              : private only visible in this function/file (depending on placement)
+bool                                : true/false value/ function return true/false
+const                               : constant -> wert ändert sich nicht
+int                                 : zahlenwert der sich ändern kann 
+uint8_t                             : usigned 8 bit integer, 0-255 (also 16/32 etc integer)
+static bool fct ()                  : private functin which returns true/false
+
+nullptr                             : pointer to nothing
+x                                   : value
+    a = 5                           : variable a has value 5 (but only local, not stored anywhere)
+*x                                  : pointer: go to adress stored in x (adresse von x) and acess the variable there
+*x = value                          : write value to pointed variable
+    *x = 10                         : go to the address stored in x and write 10 there
+&x                                  : adress of value                   
+fct(&x)                             : pass adress of x (parameter for function)
+    change(&a)                      : give the function the address of a
+    EXAMPLE
+        //void change(uint8_t *x)
+        //{
+        //    *x = 10;
+        //}
+
+        //uint8_t a = 5;
+        //change(&a);
+            --> give the function the adress of a (change(&a)) and go to that adresss and store 10 (*x=10)
+
+------------------------------------------------
+
+TYPEDEF STRUCT                      : define custom struct type
+-> struct type = data type that groups severasl related variables into one unit
+    EXAMPLE
+      // typedef struct {
+      //   PORT_t  *port;       // data type PORT_t (avr defined) with pointer *port to individual Port (A,B,C)
+      //   uint8_t  pin_bm;     // pin bit mask for individual pin of selected Port (e.g Pin1_bm =  00000010 = pin 1)
+      //   uint8_t  pin_idx;    // pin index stores pin number as normal integer (e.g. 1)
+      // } wire_t;
+         --> data type name wire_t with 3 data parameters
+         --> can be called later in e.g. function: wire_t *w 
+
+WIRE DESCRIPTORS                    : assignment of data type wire_t
+    EXAMPLES
+      //wire_t upstream = {
+      //    &PORTA,
+      //    PIN1_bm,
+      //    1
+      //};
+         -->  wire_t with name upstream is PortA pin 1
+    
+      //static const wire_t *children[CHILD_COUNT] = {    array = list with CHILD_COUNT elements 
+      //    &child_0,              // element 1
+      //    &child_1               // element 2
+      //};
+         --> array of pointers to wire_t objects (same as wire_t *w but with a list now)-> you can loop through all ob children objects instead of calling them separately
+------------------------------------------------
+
+PORT CONFIGURATIONS
+PORTA.OUTCLR = PIN1_bm;             : clear pin 1 of PortA 
+PORTA.DIRSET = PIN1_bm;             : define pin1 of PortA as output
+PORTA.DIRCLR = PIN1_bm;             : define pin1 of PortA as input
+  -> same also possible with wire_t data type
+    w -> port -> OUTCLR = w ->pin_bm 
+    => w -> port -> OUTCLR == PORTA.OUTCLR
+    => w ->pin_bm          == PIN1_bm
+
+PORTA.PIN1CTRL = PORT_PULLUP_BM     : register for PA -> config pin1 of PortA so that its internal pull up resistor is enabled
+  -> same also possible with wire_t data type
+    w->port->PIN0CTRL = PORT_PULLUPEN_bm
+
+also possible with VARIABLES:
+#define LED_PIN PIN1_bm             : LED_PIN variable == PIN1_bm
+PORTA.DIRSET = LED_PIN;
+
+PORTB.OUTTGL = LED_PIN              : Toggle the output state of the pin defined by LED_PIN on PORTB
+------------------------------------------------
+
+->                                  : when you have a pointer to a struct and want to access a member inside it
+b>>=1 / b = b>>1;                   : shifts all bits in b one position to the right (often used when sendings bits one after another)
+b&1                                 : checks the lowest bit of b
+    explanation:   0b10110101
+                 & 0b00000001
+                   ------------
+                   0b00000001
+for (uint8_t i = 0; i < b; i++)     : Start with i = 0. Repeat the loop while i < 8. After each loop cycle, increase i by 1.
+
+i++                                 : increment i 
+b |= (1 << i)                       : sets bit i in b to 1
+^=                                  : xor          
+==                                  : compare for equality
+!=                                  : not equal
+&upstream[i]                        : address of the array element upstream[i]  
+*orientation_mask = (uint8_t)ori    : rites the value of ori into the variable that orientation_mask points to
+
+
+------------------------------------------------          
+continue                            : Stop the current loop iteration immediately and jump back to the beginning of the loop.
+break                               : stop the whole loop and go to the next function
+return                              : stop the function/ and go to beginning of void loop again
+return x                            : return a value/variable -> later when calling fct: x=fct()
+
+
+------------------------------------------------
+// binary print
+Serial.println(child_mask, BIN)
+// hex print
+Serial.print("Node 0x");
+if (node->node_id < 0x10) {
+    Serial.print("0");
+}
+Serial.print(node->node_id, HEX);
+//
+
+
+
+
+
+libraries
+- <avr/io.h>                  // AVR register definitions for PORTA, DIRSET, OUTCLR, etc.
+- <util/delay.h>              // Blocking delay functions _delay_us() and _delay_ms()
+- <stdint.h>                  // Fixed-width integer types like uint8_t
+
+Code 
+- Output latch clearen: PORTAOUTCKR = PIN1_bm (zur sicherheit, danach ist output value 0)
+- config as Output Pin: PORTA.DIRSET = PIN1_bm
+- config as Input Pin: PORTA.DIRCLR = PIN1_bm
+- main function: int main(void){}
