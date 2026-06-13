@@ -12,5 +12,6 @@ ich darf nicht 1 child 3 mal pollen und dann das andere danach sondern muss 1 ch
 
 NEXT STEPS
 - change node infos into node coordinates -> coordinate/orientation interpreter
+- import them in meshcat/three.js -> transformations 
 
 - CHILD_TIMEOUT_US must be calculated
