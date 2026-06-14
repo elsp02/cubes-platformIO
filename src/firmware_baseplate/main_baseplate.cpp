@@ -19,6 +19,8 @@
 #include "wire_bus.h"
 #include "tree_parser.h"
 
+#define SERIAL_WRITING 0
+
 // ----------------------------------------------------------
 // Wire descriptors
 // ----------------------------------------------------------
@@ -162,27 +164,34 @@ void loop()
     _delay_us(TURNAROUND_US);
     release_all_lines();
 
-    // parser = descent recursive parser (=deserialization) for the preorder serialized n-ary tree payload
-    // ------------------------------------------------------------
-    uint8_t payload_read_index = 0;
+    #if not SERIAL_WRITING
 
-    int8_t root_node_storage_index = parse_node(ordered_payload, ordered_payload_len, &payload_read_index);  //&...index because its defined as a real variable -> need to pass its adress to the function
+        // parser = descent recursive parser (=deserialization) for the preorder serialized n-ary tree payload
+        // ------------------------------------------------------------
+        uint8_t payload_read_index = 0;
 
-    // failed safety checks 
-    if (root_node_storage_index < 0){
-        Serial.println("parser error");
-        return;
-    }
+        int8_t root_node_storage_index = parse_node(ordered_payload, ordered_payload_len, &payload_read_index);  //&...index because its defined as a real variable -> need to pass its adress to the function
 
-    //check if the final payload_read_index is the same as payload_len to see if parser consumed all bytes from ordered_payload
-    if (payload_read_index != ordered_payload_len){
-        Serial.println("unused payload bytes left");
-        return;
-    }
+        // failed safety checks 
+        if (root_node_storage_index < 0){
+            Serial.println("parser error");
+            return;
+        }
 
-    Serial.println("tree parsed sucessfully");
+        //check if the final payload_read_index is the same as payload_len to see if parser consumed all bytes from ordered_payload
+        if (payload_read_index != ordered_payload_len){
+            Serial.println("unused payload bytes left");
+            return;
+        }
 
-    //prints deserialized tree
-    print_tree(root_node_storage_index,0);   
-    
+        Serial.println("tree parsed sucessfully");
+
+        //prints deserialized tree
+        print_tree(root_node_storage_index,0);  
+
+    #endif 
+
+    #if SERIAL_WRITING
+        send_payload(ordered_payload, ordered_payload_len)
+    #endif 
 }
