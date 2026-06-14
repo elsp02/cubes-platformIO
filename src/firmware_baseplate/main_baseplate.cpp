@@ -38,6 +38,27 @@ static void release_all_lines(void)
     }
 }
 
+static void print_payload_hex(const uint8_t *payload, uint8_t len)
+{
+    Serial.print("ordered_payload_len = ");
+    Serial.println(len);
+
+    Serial.print("ordered_payload = ");
+
+    for (uint8_t i = 0; i < len; i++) {
+        if (payload[i] < 0x10) {
+            Serial.print("0");
+        }
+
+        Serial.print(payload[i], HEX);
+
+        if (i < len - 1) {
+            Serial.print(" ");
+        }
+    }
+
+    Serial.println();
+}
 
 //----------------------------------------------------------
 // Poll one child port
@@ -66,8 +87,11 @@ static bool poll_child(
     * 3. wait for ACK_BUSY
     */
    if (!rx_byte(w, &b, CHILD_TIMEOUT_US)) {
+    Serial.println("no ack from child");
     return false;
    }
+
+   Serial.println("ack from child received");
 
    if (b != ACK_BUSY) {   //maybe could be merged together -> proof of correctness already in rx_byte
     return false;
@@ -95,8 +119,10 @@ void setup()
     PORTB.DIRSET = LED_PIN;     //define as output pin for led
     PORTB.OUTCLR = LED_PIN; 
 
-    Serial.begin(9600);
-    Serial.println("Prototype v3 baseplate started");
+    #if not SERIAL_WRITING
+        Serial.begin(9600);
+        Serial.println("Prototype v3 baseplate started");
+    #endif
 }
 
 // ----------------------------------------------------------
@@ -157,12 +183,26 @@ void loop()
     * Write final child_mask into placeholder.
     */
     ordered_payload[2] = child_mask;
+    print_payload_hex(ordered_payload, ordered_payload_len);
+
+    #if SERIAL_WRITING
+        //send_payload(ordered_payload, ordered_payload_len);
+        uint8_t checksum = calc_checksum(ordered_payload_len, ordered_payload);
+
+        Serial.write(SYNC_BYTE);
+        Serial.write(ordered_payload_len);
+        Serial.write(ordered_payload, ordered_payload_len);
+        Serial.write(checksum);
+
+    #endif 
 
     /*
      * 5. Send complete frame upstream.
      */
     _delay_us(TURNAROUND_US);
     release_all_lines();
+
+   // _delay_us(500);
 
     #if not SERIAL_WRITING
 
@@ -189,9 +229,5 @@ void loop()
         //prints deserialized tree
         print_tree(root_node_storage_index,0);  
 
-    #endif 
-
-    #if SERIAL_WRITING
-        send_payload(ordered_payload, ordered_payload_len)
     #endif 
 }

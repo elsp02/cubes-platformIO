@@ -20,7 +20,7 @@
 #define TURNAROUND_US       (BAUD_US * 3)  //delay time for cubes between transactions (always before transmitting something)
 #define CHILD_TIMEOUT_US    15000          // timeout for own child incorrect communication/not answering (ACK_BUSY)
 #define PARENT_TIMEOUT_US   15000          // timeout for parent incorrect communication/not sending bits (CMD_STATUS)
-#define FRAME_TIMEOUT_US    15000      //timeout for own child incorrect communication/sending bits (DATA FRAME) 
+#define FRAME_TIMEOUT_US    1000000      //timeout for own child incorrect communication/sending bits (DATA FRAME) - increased from 150000 to 1000000 (1s) to allow time for cube child polling 
 
 // ----------------------------------------------------------
 // Counts / Limits

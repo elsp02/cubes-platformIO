@@ -136,6 +136,7 @@ static bool poll_child(
 
     // 3. Wait for ACK_BUSY/ 
     if (!rx_byte(w, &b, CHILD_TIMEOUT_US)) {
+        Serial.println("no ack byte");
         return false;
     }
 
