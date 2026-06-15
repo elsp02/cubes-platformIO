@@ -1,3 +1,4 @@
+# Cheat sheet programming language C++ 
 #define:                            : create macro/constant replacement
 #ifndef:                            : if not defined define it (e.g. clock)
 #include                            : same as import in python (for libraries)

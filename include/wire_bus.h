@@ -1,4 +1,7 @@
 //define interface for wire bus functions
+/*
+*datenübertragung, wie wird byte über eine leitung gesendet/empfangen
+*/
 
 #ifndef WIRE_BUS_H
 #define WIRE_BUS_H

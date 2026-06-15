@@ -1,4 +1,7 @@
 // Define configuration constants for the project
+/*
+*Pinbelegung cubes und baseplate
+*/
 #ifndef CONFIG_H
 #define CONFIG_H
 
