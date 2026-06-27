@@ -26,11 +26,11 @@ CHILD_COUNT, CUBES_AMOUNT, CHILD_RETRIES
             => if child sends ACK_BUSY at the 3. retry round: [(MAX_RETRIES -1) x failed_attempt] + CMD-ACK process + BUILD_FRAME_TIME FRAME_TIME 
 
     - succeeded attempt - child answers with ACK and DATA FRAME [SYNC | LEN | PAYLOAD | CRC]:
-        - DATA_FRAME_TIME: 3x BYTE_US + max CUBES_AMOUNT x(3x transmitted byte)
+        - DATA_FRAME_TIME: 3x (BYTE_US + INTER_FRAME_US) + max CUBES_AMOUNT x(3x (transmitted byte + INTER_FRAME_US))
         - oder FRAME_TIME: (payload_len + 3) × BYTE_US
 
 
-    - **FRAME_TIMEOUT_US:** child polls child polls child ... -> CUBES_AMOUNT x CHILD_COUNT x ([(MAX_RETRIES -1) x failed_attempt] + CMD-ACK process + DATA_FRAME_TIME + TURNAROUND) 
+    - **FRAME_TIMEOUT_US:** child polls child polls child ... -> CUBES_AMOUNT x CHILD_COUNT x ([(MAX_RETRIES -1) x failed_attempt] + CMD-ACK process + DATA_FRAME_TIME + TURNAROUND)
 
-- **INTER_BYTE_US:** if process is valid, there should be no timeout needed -> maybe 2x TURNAROUND_US
+- **INTER_FRAME_US:** if process is valid, there should be no timeout needed -> maybe 2x TURNAROUND_US
 - **PARENT_TIMEOUT_US:** same period of time as FRAME_TIMEOUT_US/ same principle as orientation detection 

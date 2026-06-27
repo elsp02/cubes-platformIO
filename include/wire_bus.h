@@ -76,7 +76,9 @@ bool rx_frame(                  // receiving data frame
     uint8_t *payload,
     uint8_t max_payload_len,
     uint8_t *payload_len,
-    uint16_t timeout_us
+    uint32_t timeout_us,
+    uint32_t inter_frame_timeout_us
+
 );
 
 #endif

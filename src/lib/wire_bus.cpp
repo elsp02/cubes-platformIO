@@ -93,11 +93,11 @@ bool rx_byte(const wire_t *w, uint8_t *out, uint16_t timeout_us)
     // wait for falling edge (start bit)
     while (is_line_high(w)) {            // Wait while bus is idle high; start bit begins with a falling edge
         if (timeout_us-- == 0) {     // Decrement timeout once per millisecond while waiting
-            Serial.println("took too long");
+            Serial.println("timeout");
             return false;            // No start bit arrived before timeout expired
         }
 
-        _delay_us(10);                // Poll line quickly to not miss an edge
+        _delay_us(1);                // Poll line quickly to not miss an edge
     }
 
     return rx_byte_data_frame(w, out);
@@ -204,13 +204,14 @@ bool rx_frame(
     uint8_t *payload,
     uint8_t max_payload_len,
     uint8_t *payload_len,
-    uint16_t timeout_us
+    uint32_t frame_timeout_us,
+    uint32_t inter_frame_timeout_us
 )
 {
     uint8_t sync = 0;
 
     // Receive SYNC byte and check if it matches the expected one
-    if (!rx_byte(w, &sync, timeout_us)) {
+    if (!rx_byte(w, &sync, frame_timeout_us)) {
         return false;
     }
 
@@ -221,7 +222,7 @@ bool rx_frame(
     // Receive LEN byte and check if it is within the allowed range
     uint8_t len = 0;
 
-    if (!rx_byte(w, &len, timeout_us)) {
+    if (!rx_byte(w, &len, inter_frame_timeout_us)) {
         return false;
     }
 
@@ -231,7 +232,7 @@ bool rx_frame(
 
     // Receive PAYLOAD bytes
     for (uint8_t i = 0; i < len; i++) {   //repeat this loop for len times
-        if (!rx_byte(w, &payload[i], timeout_us)) {
+        if (!rx_byte(w, &payload[i], inter_frame_timeout_us)) {
             return false;
         }
     }
@@ -239,7 +240,7 @@ bool rx_frame(
     //receive CHECKSUM byte and validate it against the calculated checksum
     uint8_t received_checksum = 0;
 
-    if (!rx_byte(w, &received_checksum, timeout_us)) {
+    if (!rx_byte(w, &received_checksum, inter_frame_timeout_us)) {
         return false;
     }
 

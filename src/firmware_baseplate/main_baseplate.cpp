@@ -84,7 +84,7 @@ static bool poll_child(
     _delay_us(TURNAROUND_US);
 
     /*
-    * 3. wait for ACK_BUSY
+    * 3. wait for ACK_BUSYF
     */
    if (!rx_byte(w, &b, CHILD_TIMEOUT_US)) {
     Serial.println("no ack from child");
@@ -102,7 +102,8 @@ static bool poll_child(
     child_payload,
     max_child_payload_len,
     child_payload_len,
-    FRAME_TIMEOUT_US
+    FRAME_TIMEOUT_US,
+    INTER_FRAME_TIMEOUT_US
    )) {
     return false;
    }
@@ -158,7 +159,8 @@ void loop()
                 )) {
                 child_received = true;
                 break;
-            }   
+            }
+            Serial.println(" frame error");   
         }
         // if child didn´t respond -> no child at port -> end with loop and poll next child
         if (!child_received){

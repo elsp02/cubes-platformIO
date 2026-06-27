@@ -161,7 +161,8 @@ static bool poll_child(
             child_payload,
             max_child_payload_len,
             child_payload_len,
-            FRAME_TIMEOUT_US
+            FRAME_TIMEOUT_US,
+            INTER_FRAME_TIMEOUT_US
         )) {
         return false;
     }
@@ -304,15 +305,15 @@ void loop()
     /*
      * 7. Debug output.
      */
-    Serial.print("Sent payload_len = ");
-    Serial.println(payload_len);
+    /*Serial.print("Sent payload_len = ");
+    *Serial.println(payload_len);
 
-    Serial.print("orientation = ");
-    Serial.println(orientation_mask);
+    *Serial.print("orientation = ");
+    *Serial.println(orientation_mask);*/
 
     Serial.print("child_mask = 0b");
     if ((child_mask & 0b10) == 0) {
         Serial.print("0");
     }
-    Serial.println(child_mask, BIN);
+    //Serial.println(child_mask, BIN);
 }
