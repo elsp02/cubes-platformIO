@@ -18,7 +18,7 @@ Each cube contains an ATtiny1616 microcontroller, which is responsible for:
 ???
 
 - each cube contains an ATtiny1616
-- Baseplate contains a gateway/controller (pico?) as an interface between the cubes and the hardware auf dem cubes visualiziert werden -> VERBESSERN!
+- Baseplate contains a gateway/controller (pico?) as an interface between the cubes and the hardware auf dem cubes visualiziert werden + die spannungsquelle fürs system -> VERBESSERN!
 ### Baseplate
 ---
 
@@ -111,6 +111,13 @@ PB1 = child port 1
 ### baseplate?
 acts just as a parent &rarr; no upstream orientation lines, just child ports
 
+## technische anforderungen ans design
+- keine externe hardware (kalibirierung nötig oder so die es lehrern erschwert system sofort zu nutzen) bzw wo man perfekte umgebungsbedingungen braucht
+- Die Bausteine sollen ohne eigene Batterie oder individuellen Akku betrieben werden.
+- Die Energieversorgung der Bausteine soll zentral, beispielsweise über eine Basisstation oder ein extern erzeugtes Feld, erfolgen.
+- Die Bausteine sollen möglichst einfach aufgebaut sein, um Kosten, Fehleranfälligkeit und Baugröße gering zu halten.
+- Die Bausteine sollen dreidimensional angeordnet bzw. gestapelt werden können + bei der Verbindung in unterschiedlichen Rotationen zueinander positioniert werden können.
+
 ### Power Distribution Concept
 
 The power supply is distributed centrally from the baseplate (noch genauer definieren) through the connected cube structure.
@@ -125,8 +132,44 @@ Inside the cube, `VCC` and `GND` are distributed to:
 - the local electronics (feedback led)
 - the output contacts for the child sides
 
+grund dafür: die bausteine sollten möglichst einfach aufgebaut sein und so dass man an ihnen nicht rum arbeiten muss/sie nicht öfnen muss, also auch nicht batterie austauschen. das ganze system soll so gebaut sein, dass mans herausräumt und sofort benutzen kann (fachbegriff? x- ready?)
 
 ### cube block diagram
+
+### cube aussehen verbindungen (angelehnt an bedürfnisse und anforderungen vpn special need kindern) geometrie
+anforderungen: 
+- Es dürfen sich keine gefährlichen Kleinteile lösen und das Innenleben der Bausteine sollte nicht leicht zugänglich sein
+- Bausteine sollen auch in den Mund genommen werden können ohne dass dabei eine Gefahr ausgeht
+- !!Die Bausteine sollen so gestaltet sein, dass sie leicht mit einer Hand greifbar und einfach miteinander verbindbar sind.
+- ! Das Verbinden der Bausteine soll mit geringem Kraftaufwand möglich sein.
+- ! Die Verbindungspunkte sollen die Nutzung durch Personen mit eingeschränkter Feinmotorik unterstützen.
+
+
+steckprinzip und anordnung der stecker
+4 orientierungsverbindungen (child seite) bzw data pin (parent seite) in den ecken, 1 gnd verbindung in der mitte und ein vcc kreisverbinder ausenrum -> symmetrische anordnung notwenig weil baustein verschiedene orientierungs connect möglichkeiten haben soll (freiheitsgrad?)
+
+wie verbinden sich die blöcke (formschluss, mechanisch, magnetisch)
+- child seite hat erhebungen und parent seiten vertiefungen, damit sich die bausteine auch mechanisch verbinden können (art lego prinzip)
+- plus so ist sichergestellt dass man nicht in kontakt mit den stellen treten kann, weil die seite die erhebungen hat angesteckt wird sobald sie strom bekommt und durch die vertiefungen kann man nicht einfach reinlangen oder mit der zunge berühren die kontakte die dann ja strom haben, sobald der cube verbunden ist. 
+- physische verbindung geschieht über federbelastete niederohmige pogo pin stecker
+
+- das stecken wird auch nochmal mit magneten erleichtert -> easier attachment for people with physical dissabilities und schon leichte vorgabe wie der cube positioniert sein muss damit er sich verbinden kann 
+
+geometrie und größe und material
+- aufgrund der anordnung der stecler und dem steckprinzip muss der cube eine symmetrische/quaderförmige grundfläche haben 
+- sind x *x cm groß, sodass sie  leicht mit einer Hand greifbar und einfach miteinander verbindbar
+- material 3d druck ppa
+
+physische representation der steine/abstrakheit
+- die bausteine schauen physisch als auch visualiziert gleich aus
+
+### baseplate aussehen
+die baseplate besteht quasi aus einer parent seite (also vertiefungen). das grundprinzip ist, dass es eine main parent andockmöglichkeitsplatte gibt, an dem sich ein cube verbinden kann. (zukunft: an diese parent platte kann man dann noch andere parent platten anstecken, sodass man dann auf der ersten ebene nicht nur einen cube hat sondern mehrere. wobei man die eigentlich nicht braucht, weil man ja die cubes auch einfach an den ersten cube anstecken kann) 
+
+die baseplate enthält auch die Spannungsquelle, die in der main parent baseplate platte integriert ist
+
+## visualization interface aussehen?
+??
 ---
 
 ## Electrical Principle

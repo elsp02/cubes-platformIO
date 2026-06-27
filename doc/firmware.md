@@ -80,3 +80,26 @@ stateDiagram-v2
 
 ### pseudo code
 
+```mermaid
+sequenceDiagram
+    participant P as Parent Cube / Baseplate
+    participant C as Cube Node
+    participant CC as Child Cubes
+
+    P->>C: CMD_STATUS
+    P-->>C: Release line
+
+    C->>C: Detect active upstream pin
+    C->>C: Store orientation
+    C->>P: ACK_BUSY
+
+    loop For each retry round and child port
+        C->>CC: CMD_STATUS
+        CC->>C: ACK_BUSY
+        CC->>C: DATA_FRAME
+        C->>C: Store child payload
+    end
+
+    C->>C: Build own payload
+    C->>P: DATA_FRAME<br/>SYNC | LEN | PAYLOAD | CHECKSUM
+```

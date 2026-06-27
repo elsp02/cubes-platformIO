@@ -15,6 +15,16 @@
 #endif
 
 // ----------------------------------------------------------
+// Counts / Limits
+// ----------------------------------------------------------
+// defined in .ini #define CHILD_COUNT              2     //amount of children of cube
+#define CHILD_RETRIES            3     //amount of retries if polling one child didn´t work out
+#define UPSTREAM_FAIL_LIMIT      3     //currently not in use
+#define CUBES_AMOUNT             5 
+#ifndef CHILD_COUNT              5
+#endif
+
+// ----------------------------------------------------------
 //  Timing
 // Timeout constants have wrong values -> need to be calculated
 // ----------------------------------------------------------
@@ -24,14 +34,7 @@
 #define CHILD_TIMEOUT_US    15000          // timeout for own child incorrect communication/not answering (ACK_BUSY)
 #define PARENT_TIMEOUT_US   15000          // timeout for parent incorrect communication/not sending bits (CMD_STATUS)
 #define FRAME_TIMEOUT_US    1000000      //timeout for own child incorrect communication/sending bits (DATA FRAME) - increased from 150000 to 1000000 (1s) to allow time for cube child polling 
-
-// ----------------------------------------------------------
-// Counts / Limits
-// ----------------------------------------------------------
-// defined in .ini #define CHILD_COUNT              2     //amount of children of cube
-#define CHILD_RETRIES            3     //amount of retries if polling one child didn´t work out
-#define UPSTREAM_FAIL_LIMIT      3     //currently not in use
-#define CUBES_AMOUNT             5 
+//--------------------------------------------
 
 // ???????????
 #define NODE_HEADER_LEN          3     //currently not in use

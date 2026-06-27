@@ -1,0 +1,39 @@
+{
+  "name": "cubes_platformio",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "doc": "doc",
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/elsp02/cubes-platformIO.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/elsp02/cubes-platformIO/issues"
+  },
+  "homepage": "https://github.com/elsp02/cubes-platformIO#readme",
+  "devDependencies": {
+    "wavedrom-cli": "^3.2.0"
+  },
+  "scripts": {
+  "wavedrom:byte": "wavedrom-cli -i doc/diagrams/wavedrom/Single_wire_byte.json5 -s doc/diagrams/generated/Single_wire_byte.svg" 
+  },
+  "scripts": {
+  "wavedrom:byte": "wavedrom-cli -i doc/diagrams/wavedrom/v1_Single-wire_parent_child_communication.json5 -s doc/diagrams/generated/v1_Single-wire_parent_child_communication.svg" 
+  },
+  "scripts": {
+  "wavedrom:byte": "wavedrom-cli -i doc/diagrams/wavedrom/v2_Single-wire_parent_child_communication.json5 -s doc/diagrams/generated/v2_Single-wire_parent_child_communication.svg" 
+  }
+
+}

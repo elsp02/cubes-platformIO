@@ -1,4 +1,5 @@
 # Communication Protocol
+paper: custom uart one wire 
 
 ## Physical Communication Principle
 bereits in hardware.md enthalten??
