@@ -45,7 +45,7 @@ void tx_byte(const wire_t *w, uint8_t b);  //transmission of byte
 bool rx_byte(                              // receiving of byte
     const wire_t *w,
     uint8_t *out,
-    uint16_t timeout_us
+    uint32_t timeout_us
 );
 
 bool rx_byte_data_frame(                   //receiving of message (sent bits) without start bit

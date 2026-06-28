@@ -88,7 +88,7 @@ void tx_byte(const wire_t *w, uint8_t b)
 // brauch ich bei rx_byte definition das uint8_t *out?
 // ----------------------------------------------------------
 
-bool rx_byte(const wire_t *w, uint8_t *out, uint16_t timeout_us)
+bool rx_byte(const wire_t *w, uint8_t *out, uint32_t timeout_us)
 {
     // wait for falling edge (start bit)
     while (is_line_high(w)) {            // Wait while bus is idle high; start bit begins with a falling edge
@@ -140,7 +140,13 @@ bool rx_byte_data_frame(const wire_t *w, uint8_t *out)
         return false;
     }
 
-    _delay_us(BAUD_US); // notiz an mich: vlt _delay_us(BAUD_US/2) oder stop bit wie start bit zweimal abfragen?
+    // NOTE: no extra _delay_us(BAUD_US) here anymore.
+    // We're at the midpoint of the stop bit (line still high).
+    // The next rx_byte() call's edge-wait loop will correctly
+    // wait out the remaining ~52us and catch the *real* falling
+    // edge of the next byte's start bit, instead of assuming
+    // back-to-back timing.
+    //_delay_us(BAUD_US); // notiz an mich: vlt _delay_us(BAUD_US/2) oder stop bit wie start bit zweimal abfragen?
 
     *out = b;  // Write the value of b (stored bits) into the variable that out points to
     return true;

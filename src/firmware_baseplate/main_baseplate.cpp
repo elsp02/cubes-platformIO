@@ -87,15 +87,18 @@ static bool poll_child(
     * 3. wait for ACK_BUSYF
     */
    if (!rx_byte(w, &b, CHILD_TIMEOUT_US)) {
-    Serial.println("no ack from child");
+    Serial.println("no ack from child- no child there");
     return false;
    }
 
-   Serial.println("ack from child received");
+
 
    if (b != ACK_BUSY) {   //maybe could be merged together -> proof of correctness already in rx_byte
+    Serial.println(" wrong ack from child");
     return false;
    }
+
+    Serial.println("correct Ack from child received");
 
    if (!rx_frame(
     w,
@@ -105,6 +108,7 @@ static bool poll_child(
     FRAME_TIMEOUT_US,
     INTER_FRAME_TIMEOUT_US
    )) {
+    Serial.println("invalid data frame from child");
     return false;
    }
 
@@ -143,6 +147,8 @@ void loop()
     ordered_payload[ordered_payload_len++] = 0x00;   //baseplate has no orientation
     ordered_payload[ordered_payload_len++] = child_mask; 
 
+    _delay_us(BYTE_US);
+    
    // Poll children and its payload one after another in a fixed child-port order (currently just 1 child)
    for (uint8_t i=0; i < CHILD_COUNT; i++) {
         uint8_t child_payload[MAX_CHILD_PAYLOAD_LEN];
@@ -151,6 +157,8 @@ void loop()
 
         //retry same child[i] before moving to next child
         for (uint8_t attempt = 0; attempt < CHILD_RETRIES; attempt ++){
+            Serial.print("retry: ");
+            Serial.println(attempt);
             if (poll_child(
                     children[i],
                     child_payload,
@@ -158,9 +166,10 @@ void loop()
                     &child_payload_len
                 )) {
                 child_received = true;
+                Serial.println("child is valid");
                 break;
             }
-            Serial.println(" frame error");   
+  
         }
         // if child didn´t respond -> no child at port -> end with loop and poll next child
         if (!child_received){
@@ -185,7 +194,8 @@ void loop()
     * Write final child_mask into placeholder.
     */
     ordered_payload[2] = child_mask;
-    print_payload_hex(ordered_payload, ordered_payload_len);
+    Serial.println("valid");
+    //print_payload_hex(ordered_payload, ordered_payload_len);
 
     #if SERIAL_WRITING
         //send_payload(ordered_payload, ordered_payload_len);
@@ -204,9 +214,10 @@ void loop()
     _delay_us(TURNAROUND_US);
     release_all_lines();
 
+
    // _delay_us(500);
 
-    #if not SERIAL_WRITING
+    #if  SERIAL_WRITING
 
         // parser = descent recursive parser (=deserialization) for the preorder serialized n-ary tree payload
         // ------------------------------------------------------------
@@ -229,7 +240,7 @@ void loop()
         Serial.println("tree parsed sucessfully");
 
         //prints deserialized tree
-        print_tree(root_node_storage_index,0);  
+        //print_tree(root_node_storage_index,0);  
 
     #endif 
 }
