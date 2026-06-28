@@ -93,7 +93,7 @@ bool rx_byte(const wire_t *w, uint8_t *out, uint32_t timeout_us)
     // wait for falling edge (start bit)
     while (is_line_high(w)) {            // Wait while bus is idle high; start bit begins with a falling edge
         if (timeout_us-- == 0) {     // Decrement timeout once per millisecond while waiting
-            Serial.println("timeout");
+            //Serial.println("timeout");
             return false;            // No start bit arrived before timeout expired
         }
 
