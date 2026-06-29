@@ -25,7 +25,7 @@
 // Wire descriptors
 // ----------------------------------------------------------
 
-static const wire_t child_0 = { &PORTB, PIN0_bm, 0 };  // PB0 — child port 0 (only child port of baseplate)
+static const wire_t child_0 = { &PORTB, PIN1_bm, 0 };  // PB0 — child port 0 (only child port of baseplate)
 
 static const wire_t *children[CHILD_COUNT] ={
     &child_0,
@@ -87,7 +87,7 @@ static bool poll_child(
     * 3. wait for ACK_BUSYF
     */
    if (!rx_byte(w, &b, CHILD_TIMEOUT_US)) {
-    //Serial.println("no ack from child- no child there");
+    Serial.println("no ack from child- no child there");
     return false;
    }
 
@@ -98,7 +98,7 @@ static bool poll_child(
     return false;
    }
 
-    //Serial.println("correct Ack from child received");
+    Serial.println("correct Ack from child received");
 
    if (!rx_frame(
     w,
@@ -108,7 +108,7 @@ static bool poll_child(
     FRAME_TIMEOUT_US,
     INTER_FRAME_TIMEOUT_US
    )) {
-    //Serial.println("invalid data frame from child");
+    Serial.println("invalid data frame from child");
     return false;
    }
 
@@ -157,8 +157,8 @@ void loop()
 
         //retry same child[i] before moving to next child
         for (uint8_t attempt = 0; attempt < CHILD_RETRIES; attempt ++){
-            //Serial.print("retry: ");
-            //Serial.println(attempt);
+            Serial.print("retry: ");
+            Serial.println(attempt);
             if (poll_child(
                     children[i],
                     child_payload,
@@ -194,7 +194,7 @@ void loop()
     * Write final child_mask into placeholder.
     */
     ordered_payload[2] = child_mask;
-    //Serial.println("valid");
+    Serial.println("valid");
     print_payload_hex(ordered_payload, ordered_payload_len);
 
     #if SERIAL_WRITING

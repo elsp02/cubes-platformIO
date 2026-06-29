@@ -154,7 +154,8 @@ static bool poll_child(
             child_payload,
             max_child_payload_len,
             child_payload_len,
-            FRAME_TIMEOUT_US
+            FRAME_TIMEOUT_US,
+            INTER_FRAME_TIMEOUT_US
         )) {
         return false;
     }

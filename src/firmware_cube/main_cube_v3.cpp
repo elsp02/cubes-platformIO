@@ -144,15 +144,15 @@ static bool poll_child(
      * 3. Wait for ACK_BUSY.
      */
     if (!rx_byte(w, &b, CHILD_TIMEOUT_US)) {
-        //Serial.println("no ack from child-no child there");
+        Serial.println("no ack from child-no child there");
         return false;
     }
 
     if (b != ACK_BUSY) {
-        //Serial.println("wrong Ack from child");
+        Serial.println("wrong Ack from child");
         return false;
     }
-    //Serial.println("correct Ack from child received");
+    Serial.println("correct Ack from child received");
 
     /*
      * 4. ACK received, now receive full DATA_FRAME.
@@ -214,12 +214,12 @@ void loop()
         uint8_t b = 0;
 
         if (!rx_byte(active_upstream, &b, PARENT_TIMEOUT_US)) {
-            //Serial.println("Timeout: no cmd byte from parent received");
+            Serial.println("Timeout: no cmd byte from parent received");
             return;
         }
 
         if (b != CMD_STATUS) {
-            //Serial.println("wrong cmd byte from parent received");
+            Serial.println("wrong cmd byte from parent received");
             return;
         }
     }
@@ -259,10 +259,10 @@ void loop()
 
         // Retry same child[i] before moving to next child
         for (uint8_t attempt = 0; attempt < CHILD_RETRIES; attempt++) {
-        //Serial.print("Polling child index: ");
-        //Serial.print(i);
-        //Serial.print(" attempt: ");
-        //Serial.println(attempt);
+        Serial.print("Polling child index: ");
+        Serial.print(i);
+        Serial.print(" attempt: ");
+        Serial.println(attempt);
             if (poll_child(
                     children[i],
                     child_payload,
