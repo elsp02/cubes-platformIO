@@ -1,3 +1,5 @@
+V4 IS CURRENTLY NOT WORKING BECAUSE OF DESYNCHRONIZATION - THEREFORE GO TO V2_2 or V5
+
 structure:
 - 1 parent: sends cmd_status to child and waits for ackbyte from child. If received waits and receive data package from child 
 - 3 children: 
