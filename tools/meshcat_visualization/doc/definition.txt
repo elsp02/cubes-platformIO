@@ -1,0 +1,8 @@
+venv: local Python environment for one project. 
+It keeps packages like meshcat, numpy, and pyserial separate from your global Python installation.
+-> my repository has c++ and python system - so good if separated
+
+code ausführen:
+python visualizer/main.py --port COM4 --baud 9600
+
+pycache

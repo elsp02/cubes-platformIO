@@ -1,12 +1,10 @@
 // ============================================================
-// Prototype v3_2 - baseplate Node
+// Prototype 5 - baseplate Node
 // ATtiny1616
 //
-// PlatformIO structure:
-//   include/config.h
-//   include/wire_bus.h
-//   src/wire_bus.cpp
-//   src/main.cpp
+// Function:
+// initiates and receives complete cube topology
+// sends serialized topology via serial to PC for visualization
 // ============================================================
 
 #include <Arduino.h>
@@ -17,9 +15,9 @@
 
 #include "config.h"
 #include "wire_bus.h"
-#include "tree_parser.h"
+#include "serial_writing.h"
+#include "poll_child.h"
 
-#define SERIAL_WRITING 0
 
 // ----------------------------------------------------------
 // Wire descriptors
@@ -31,13 +29,18 @@ static const wire_t *children[CHILD_COUNT] ={
     &child_0,
 };
 
-static void release_all_lines(void)
-{
-    for (uint8_t i = 0; i < CHILD_COUNT; i++){
-        wire_release(children[i]);
+//----------------------------------------------------------
+// release all lines
+//---------------------------------------------------------
+static void release_all_lines(void){
+    for (uint8_t line = 0; line < CHILD_COUNT; line ++){
+        wire_release(children[line]);
     }
 }
 
+//-----------------------------------------------------------
+// payload print
+//-----------------------------------------------------------
 static void print_payload_hex(const uint8_t *payload, uint8_t len)
 {
     Serial.print("ordered_payload_len = ");
@@ -50,7 +53,7 @@ static void print_payload_hex(const uint8_t *payload, uint8_t len)
             Serial.print("0");
         }
 
-        Serial.print(payload[i], HEX);
+        Serial.println(payload[i], HEX);
 
         if (i < len - 1) {
             Serial.print(" ");
@@ -60,74 +63,17 @@ static void print_payload_hex(const uint8_t *payload, uint8_t len)
     Serial.println();
 }
 
-//----------------------------------------------------------
-// Poll one child port
-//----------------------------------------------------------
-
-static bool poll_child(
-    const wire_t *w,
-    uint8_t *child_payload,
-    uint8_t max_child_payload_len,
-    uint8_t *child_payload_len
-)
-{
-    uint8_t b= 0;
-
-    /*
-    * 1. Send CMD_STATUS to child, *w = wire for child[i]
-    */
-   tx_byte(w,CMD_STATUS);
-
-   /*
-   *2. Switch direction / wait before waiting
-   */
-    _delay_us(TURNAROUND_US);
-
-    /*
-    * 3. wait for ACK_BUSYF
-    */
-   if (!rx_byte(w, &b, CHILD_TIMEOUT_US)) {
-    Serial.println("no ack from child- no child there");
-    return false;
-   }
-
-
-
-   if (b != ACK_BUSY) {   //maybe could be merged together -> proof of correctness already in rx_byte
-    //Serial.println(" wrong ack from child");
-    return false;
-   }
-
-    Serial.println("correct Ack from child received");
-
-   if (!rx_frame(
-    w,
-    child_payload,
-    max_child_payload_len,
-    child_payload_len,
-    FRAME_TIMEOUT_US,
-    INTER_FRAME_TIMEOUT_US
-   )) {
-    Serial.println("invalid data frame from child");
-    return false;
-   }
-
-   return true;
-
-}
 // ----------------------------------------------------------
 // Arduino setup
 // ----------------------------------------------------------
 void setup()
 {
-    release_all_lines();
+    wire_release(&child_0);
     PORTB.DIRSET = LED_PIN;     //define as output pin for led
     PORTB.OUTCLR = LED_PIN; 
 
-    #if not SERIAL_WRITING
-        Serial.begin(9600);
-        Serial.println("Prototype v3 baseplate started");
-    #endif
+    Serial.begin(9600);
+    SER_PRINT("Prototype v2_2 parent started");
 }
 
 // ----------------------------------------------------------
@@ -135,112 +81,82 @@ void setup()
 // ----------------------------------------------------------
 void loop()
 {
-    /*
-    *1. Poll own children with retries -> one after another (currently just 1 child port in baseplate)
-    */
-   uint8_t ordered_payload[MAX_CHILD_PAYLOAD_LEN];          //also payload array with fixed length??
-   uint8_t ordered_payload_len = 0;
-   uint8_t child_mask = 0x00;  //placeholder for child_mask
+        // 0. make sure line is idle / give child time to get back to listening
+    wire_release(&child_0);
+    _delay_us(TURNAROUND_US);
 
-       // Own node data first
-    ordered_payload[ordered_payload_len++] = NODE_ID;
-    ordered_payload[ordered_payload_len++] = 0x00;   //baseplate has no orientation
-    ordered_payload[ordered_payload_len++] = child_mask; 
+    // 1. send CMD_STATUS to child
+    //tx_byte(&child_0, CMD_STATUS);
+    // wire_release(&child_0); 
 
-    _delay_us(BYTE_US);
+    uint8_t child_payload[CHILD_COUNT][MAX_CHILD_PAYLOAD_LEN];   //temporary storage (2d array) for child payload results -> child_payloads[child_index][payload_index] = byte received from child
+    uint8_t child_payload_len[CHILD_COUNT] = {0};                // temporary storage for child payload lengths -> child_payload_len[child_index] = length of payload received from child
+    bool child_done[CHILD_COUNT] = {false};
 
-   // Poll children and its payload one after another in a fixed child-port order (currently just 1 child)
-   for (uint8_t i=0; i < CHILD_COUNT; i++) {
-        uint8_t child_payload[MAX_CHILD_PAYLOAD_LEN];
-        uint8_t child_payload_len = 0;
-        bool child_received = false;
+    for (uint8_t attempt = 0; attempt < CHILD_RETRIES; attempt ++){
+        for (uint8_t child = 0; child < CHILD_COUNT; child ++){
+            //Serial.print("attempt ");
+            //Serial.print(attempt);
 
-        //retry same child[i] before moving to next child
-        for (uint8_t attempt = 0; attempt < CHILD_RETRIES; attempt ++){
-            Serial.print("retry: ");
-            Serial.println(attempt);
-            if (poll_child(
-                    children[i],
-                    child_payload,
-                    MAX_CHILD_PAYLOAD_LEN,
-                    &child_payload_len
-                )) {
-                child_received = true;
-                Serial.println("v");
-                break;
+            if (child_done[child]) {
+                continue;
             }
-  
-        }
-        // if child didn´t respond -> no child at port -> end with loop and poll next child
-        if (!child_received){
-            continue;
-        }
 
-                // if child responed, check if child payload fits into final payload
-        if ((uint16_t)ordered_payload_len + child_payload_len > MAX_PAYLOAD_LEN) {
-            continue;
+            if (poll_child(
+                children[child], 
+                child_payload[child],
+                MAX_CHILD_PAYLOAD_LEN,
+                &child_payload_len[child]
+            )){
+                SER_PRINT("CV");
+                child_done[child] = true; //mark child as done -> no more polling of this child in next attempts               
+            }
         }
-
-        // Child is valid and fits. Set child bit
-        child_mask |= (1 << i);
-
-        //append child[i]s payload (bytewise) directly in child-port order to ordered_payload array
-        for (int8_t j = 0; j< child_payload_len; j++){
-            ordered_payload[ordered_payload_len++] = child_payload[j]; //???? warum kein append? wird das nicht hinzugefügt?
-        }
-   }
+    }
 
     /*
-    * Write final child_mask into placeholder.
-    */
-    ordered_payload[2] = child_mask;
-    Serial.println("valid");
-    print_payload_hex(ordered_payload, ordered_payload_len);
+     * 4. Build own/nodes payload:
+     * Payload format: NODE_ID ORIENTATION CHILD_MASK CHILD_PAYLOADS...
+     */
+    uint8_t payload[MAX_PAYLOAD_LEN]; //final payload to be sent upstream
+    uint8_t payload_len = 0;          //length of final payload
+    
 
-    #if SERIAL_WRITING
-        //send_payload(ordered_payload, ordered_payload_len);
-        uint8_t checksum = calc_checksum(ordered_payload_len, ordered_payload);
+    //in a loop add children payloads to the final payload 
+    for (uint8_t child = 0; child < CHILD_COUNT; child++) {
+        if (!child_done[child]) {  //if child[i] didn´t respond, skip it
+            continue;
+        }
+
+        // Check whether this child payload still fits. If not, do not set the child bit because the payload is not included.
+
+        if ((uint16_t)payload_len + child_payload_len[child] > MAX_PAYLOAD_LEN) {
+            continue;
+        }
+
+        //copy child payload into final payload
+        for (uint8_t j = 0; j < child_payload_len[child]; j++) {
+            payload[payload_len++] = child_payload[child][j];  //copies stored payload into final payload and increases payload_len for next byte
+        }
+    }
+
+    //PORTB.OUTTGL = LED_PIN;               // PB4 as LED output
+    release_all_lines();
+    //print_payload_hex(payload, payload_len);
+    log_flush();
+
+    #if SERIAL_WRITING 
+
+    if (payload_changed(payload, payload_len)) {
+        uint8_t checksum = calc_checksum(payload_len, payload);
 
         Serial.write(SYNC_BYTE);
-        Serial.write(ordered_payload_len);
-        Serial.write(ordered_payload, ordered_payload_len);
+        Serial.write(payload_len);
+        Serial.write(payload, payload_len);
         Serial.write(checksum);
 
-    #endif 
-
-    /*
-     * 5. Send complete frame upstream.
-     */
-    _delay_us(TURNAROUND_US);
-    release_all_lines();
-
-
-   // _delay_us(500);
-
-    #if  SERIAL_WRITING
-
-        // parser = descent recursive parser (=deserialization) for the preorder serialized n-ary tree payload
-        // ------------------------------------------------------------
-        uint8_t payload_read_index = 0;
-
-        int8_t root_node_storage_index = parse_node(ordered_payload, ordered_payload_len, &payload_read_index);  //&...index because its defined as a real variable -> need to pass its adress to the function
-
-        // failed safety checks 
-        if (root_node_storage_index < 0){
-            Serial.println("parser error");
-            return;
-        }
-
-        //check if the final payload_read_index is the same as payload_len to see if parser consumed all bytes from ordered_payload
-        if (payload_read_index != ordered_payload_len){
-            Serial.println("unused payload bytes left");
-            return;
-        }
-
-        Serial.println("tree parsed sucessfully");
-
-        //prints deserialized tree
-        //print_tree(root_node_storage_index,0);  
+        remember_sent_payload(payload, payload_len);
+    }
 
     #endif 
 }

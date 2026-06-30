@@ -1,4 +1,4 @@
-// notiz an mich: enthält allgemeinen Bus Treiber und keine konkrete Hardwarebelegung (damit die Funktionen von allen Modulen genutzt werden können)
+// enthält allgemeinen Bus Treiber und keine konkrete Hardwarebelegung (damit die Funktionen von allen Modulen genutzt werden können)
 // -> wie art schablone bzw lückentext und das spezielle wird dann in den Modulen definiert
 
 #include "config.h"
@@ -88,26 +88,26 @@ void tx_byte(const wire_t *w, uint8_t b)
 // brauch ich bei rx_byte definition das uint8_t *out?
 // ----------------------------------------------------------
 
-bool rx_byte(const wire_t *w, uint8_t *out, uint32_t timeout_us)
+bool rx_byte(const wire_t *w, uint8_t *out, uint64_t timeout_us)
 {
     // wait for falling edge (start bit)
     while (is_line_high(w)) {            // Wait while bus is idle high; start bit begins with a falling edge
         if (timeout_us-- == 0) {     // Decrement timeout once per millisecond while waiting
-            //Serial.println("timeout");
             return false;            // No start bit arrived before timeout expired
         }
 
         _delay_us(1);                // Poll line quickly to not miss an edge
     }
 
-    return rx_byte_data_frame(w, out);
+    return rx_byte_frame(w, out);
 }
+
 
 // ----------------------------------------------------------
 // Receive byte after start bit was already detected
 // ----------------------------------------------------------
 
-bool rx_byte_data_frame(const wire_t *w, uint8_t *out)
+bool rx_byte_frame(const wire_t *w, uint8_t *out)
 {
     /*
      * scan_upstream() has already detected LOW.
@@ -120,8 +120,9 @@ bool rx_byte_data_frame(const wire_t *w, uint8_t *out)
         return false;
     }
 
-    // Move to middle of data bit 0, read 8 bits and store it in b
-
+    /*
+     * Move to middle of data bit 0.
+     */
     _delay_us(BAUD_US);
 
     uint8_t b = 0;
@@ -135,20 +136,13 @@ bool rx_byte_data_frame(const wire_t *w, uint8_t *out)
     }
 
     // Stop bit check -> must be HIGH.
-
     if (!is_line_high(w)) {
         return false;
     }
 
-    // NOTE: no extra _delay_us(BAUD_US) here anymore.
-    // We're at the midpoint of the stop bit (line still high).
-    // The next rx_byte() call's edge-wait loop will correctly
-    // wait out the remaining ~52us and catch the *real* falling
-    // edge of the next byte's start bit, instead of assuming
-    // back-to-back timing.
-    //_delay_us(BAUD_US); // notiz an mich: vlt _delay_us(BAUD_US/2) oder stop bit wie start bit zweimal abfragen?
+    _delay_us(BAUD_US/2); // notiz an mich: vlt _delay_us(BAUD_US/2) oder stop bit wie start bit zweimal abfragen?
 
-    *out = b;  // Write the value of b (stored bits) into the variable that out points to
+    *out = b;   // Write the value of b (stored bits) into the variable that out points to
     return true;
 }
 
@@ -171,24 +165,23 @@ uint8_t calc_checksum(uint8_t payload_len, const uint8_t *payload)
     return checksum;
 }
 
-// ----------------------------------------------------------
+//----------------------------------------------------
 // Frame transmit
 // Frame format:
-// SYNC LEN PAYLOAD CHECKSUM
-// ----------------------------------------------------------
+// SYNC LEN PAYLOAD CRC
+//----------------------------------------------------
+void tx_frame(const wire_t *w, const uint8_t *payload, uint8_t payload_len){
 
-void tx_frame(const wire_t *w, const uint8_t *payload, uint8_t payload_len)
-{
     //calculate checksum for payload and payload_len
     uint8_t checksum = calc_checksum(payload_len, payload);
 
-    //transmit SYNC, LEN, 
     tx_byte(w, SYNC_BYTE);
-    tx_byte(w, payload_len);
+    tx_byte (w, payload_len);
 
-    //transmit PAYLOAD
-    for (uint8_t i = 0; i < payload_len; i++) {  //repeat this loop for payload_len times
+    //transmit payload
+    for (uint8_t i = 0; i < payload_len; i ++){
         tx_byte(w, payload[i]);
+        //do i need here a delay for the parent to prove the data_frame?
     }
 
     //transmit CHECKSUM
@@ -196,67 +189,99 @@ void tx_frame(const wire_t *w, const uint8_t *payload, uint8_t payload_len)
     wire_release(w);
 }
 
-// ----------------------------------------------------------
-// Frame receive
-// Receives and validates:
-// SYNC LEN PAYLOAD CHECKSUM
+//----------------------------------------------------
+// Frame Receive
+// Receives SYNC LEN PAYLOAD CRC
 //
-// Returns only:
-// PAYLOAD and payload_len
-// ----------------------------------------------------------
+// returns only:
+// PAYLOAD and PAYLOAD_len
+//----------------------------------------------------
 
 bool rx_frame(
     const wire_t *w,
     uint8_t *payload,
     uint8_t max_payload_len,
     uint8_t *payload_len,
-    uint32_t frame_timeout_us,
-    uint32_t inter_frame_timeout_us
+    uint64_t frame_timeout_us,
+    uint64_t inter_frame_timeout_us
 )
 {
     uint8_t sync = 0;
 
     // Receive SYNC byte and check if it matches the expected one
     if (!rx_byte(w, &sync, frame_timeout_us)) {
+        Serial.print("NS");
         return false;
     }
 
     if (sync != SYNC_BYTE) {
+        Serial.println("WS");
         return false;
     }
+
 
     // Receive LEN byte and check if it is within the allowed range
     uint8_t len = 0;
 
-    if (!rx_byte(w, &len, inter_frame_timeout_us)) {
+    if (!rx_byte(w, &len, frame_timeout_us)) {
+        Serial.println("TD");
         return false;
     }
 
     if (len > max_payload_len) {
+        Serial.println("PL");
         return false;
     }
 
     // Receive PAYLOAD bytes
     for (uint8_t i = 0; i < len; i++) {   //repeat this loop for len times
         if (!rx_byte(w, &payload[i], inter_frame_timeout_us)) {
+            Serial.println("WP");
             return false;
-        }
+        }  
     }
 
     //receive CHECKSUM byte and validate it against the calculated checksum
     uint8_t received_checksum = 0;
 
     if (!rx_byte(w, &received_checksum, inter_frame_timeout_us)) {
+        Serial.println("NCS");
         return false;
     }
 
     uint8_t calculated_checksum = calc_checksum(len, payload);
 
     if (received_checksum != calculated_checksum) {
+        Serial.println("WCS");
         return false;
     }
 
 
     *payload_len = len; // write value of len to the variable tha payload_len points to
     return true;
+}
+
+//----------------------------------------------------
+// for serial writing 
+//----------------------------------------------------
+static char log_buf[LOG_BUF_SIZE];
+static uint8_t log_len = 0;
+
+static void log_line(const char *msg)
+{
+    uint8_t i = 0;
+    while (msg[i] != '\0' && log_len < LOG_BUF_SIZE - 2) {
+        log_buf[log_len++] = msg[i++];
+    }
+    if (log_len < LOG_BUF_SIZE - 1) {
+        log_buf[log_len++] = '\n';
+    }
+}
+
+static void log_flush(void)
+{
+    if (log_len > 0) {
+        Serial.write((const uint8_t *)log_buf, log_len);
+        log_len = 0;
+    }
 }

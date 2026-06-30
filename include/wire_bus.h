@@ -1,8 +1,4 @@
-//define interface for wire bus functions
-/*
-*datenübertragung, wie wird byte über eine leitung gesendet/empfangen
-*/
-
+// Definition of functions for wire/bus
 #ifndef WIRE_BUS_H
 #define WIRE_BUS_H
 
@@ -14,9 +10,9 @@
 // ----------------------------------------------------------
 // wire_t — single-wire open-drain line descriptor
 // each wire_t stores 3 infos 
-//  port    : pointer to the AVR PORT struct (e.g. &PORTA, &PORTB)
+// port    : pointer to the AVR PORT struct (e.g. &PORTA, &PORTB)
 //  pin_bm  : bitmask of the pin  (e.g. PIN1_bm)
-//  pin_idx : numeric index 0-7 
+//  pin_idx : numeric index 0-7
 // ----------------------------------------------------------
 
 typedef struct {
@@ -45,24 +41,12 @@ void tx_byte(const wire_t *w, uint8_t b);  //transmission of byte
 bool rx_byte(                              // receiving of byte
     const wire_t *w,
     uint8_t *out,
-    uint32_t timeout_us
+    uint64_t timeout_us
 );
 
-bool rx_byte_data_frame(                   //receiving of message (sent bits) without start bit
+bool rx_byte_frame(                   //receiving of message (sent bits) without start bit
     const wire_t *w,
     uint8_t *out
-);
-
-//------------------------------------------------------------
-// Frame transfer
-// Frame format: 
-// SYNC LEN PAYLOAD CHECKSUM
-//-------------------------------------------------------------
-
-
-uint8_t calc_checksum(         //crc check
-    uint8_t payload_len,
-    const uint8_t *payload
 );
 
 void tx_frame(                  // transmitting data frame
@@ -76,9 +60,19 @@ bool rx_frame(                  // receiving data frame
     uint8_t *payload,
     uint8_t max_payload_len,
     uint8_t *payload_len,
-    uint32_t timeout_us,
-    uint32_t inter_frame_timeout_us
+    uint64_t timeout_us,
+    uint64_t inter_frame_timeout_us
 
 );
+
+uint8_t calc_checksum(
+    uint8_t payload_len,
+    const uint8_t *payload
+);
+//---------------------------------------------------------
+// feedback system
+//---------------------------------------------------------
+void log_line(const char *msg);
+void log_flush(void);
 
 #endif

@@ -1,14 +1,11 @@
 // ============================================================
-// Prototype v3 - child Node - not tested yet
-// child polling: children in a loop 
-// payload first stored in a flat-buffer to minimize the memory use
+// Prototype v5 - child Node
 // ATtiny1616
 //
-// PlatformIO structure:
-//   include/config.h
-//   include/wire_bus.h
-//   src/wire_bus.cpp
-//   src/main.cpp
+// function:
+// receives cube topology? request from parent
+// polls all its children for their subtree cube data
+// sends aggregated cube tree data to its parent
 // ============================================================
 
 #include <Arduino.h>
@@ -21,7 +18,7 @@
 #include "wire_bus.h"
 
 // ----------------------------------------------------------
-// Wire descriptors
+// Wire descriptors- same as v4
 // ----------------------------------------------------------
 
 // Upstream orientation ports.
@@ -34,7 +31,7 @@ static const wire_t upstream[] = {
 };
 
 //suggestion: replace UPSTREAM_COUNT with upstream_count to avoid hardcoding the count
-static const uint8_t upstream_count = sizeof(upstream) / sizeof(upstream[0]);
+static int upstream_count = sizeof(upstream) / sizeof(upstream[0]);
 
 static const wire_t child_0 = { &PORTB, PIN0_bm, 0 };  // PB0 — child port 0
 static const wire_t child_1 = { &PORTB, PIN1_bm, 1 };  // PB1 — child port 1
@@ -44,23 +41,22 @@ static const wire_t *children[CHILD_COUNT] = {
     &child_1
 };
 
-// ----------------------------------------------------------
-// Release all communication lines
-// ----------------------------------------------------------
-
-static void release_all_lines(void)
-{
-    for (uint8_t i = 0; i < upstream_count; i++) {
-        wire_release(&upstream[i]);
+//---------------------------------------------------------
+// release all lines
+//---------------------------------------------------------
+static void release_all_lines(void){
+    for (uint8_t line= 0; line < upstream_count; line ++){
+        wire_release(&upstream[line]);
     }
 
-    for (uint8_t i = 0; i < CHILD_COUNT; i++) {
-        wire_release(children[i]);
+    for (uint8_t line = 0; line < CHILD_COUNT; line ++){
+        wire_release(children[line]);
     }
 }
 
+
 // ----------------------------------------------------------
-// Fast upstream scan
+// Fast upstream scan - same as v4
 // scans all upstream lines for LOW and returns index of first detected LOW line (orientation value), or -1 if no line is LOW
 // ----------------------------------------------------------
 
@@ -76,7 +72,7 @@ static int8_t scan_upstream(void)
 }
 
 // ----------------------------------------------------------
-// Wait for upstream command
+// Wait for upstream command - same as v4 despite from release all lines
 // ----------------------------------------------------------
 
 static bool wait_for_valid_upstream_cmd(
@@ -95,12 +91,12 @@ static bool wait_for_valid_upstream_cmd(
 
         uint8_t b = 0;
 
-        if (!rx_byte_data_frame(w, &b)) { //receiving of message (sent bits) without start bit, false if no valid bits are received within timeout
+        if (!rx_byte_frame(w, &b)) { //receiving of message (sent bits) without start bit, false if no valid bits are received within timeout
             continue;
         }
 
         //checks if received byte is CMD_STATUS, if not, repeat orientation scan and go into loop
-        if (b != CMD_STATUS) {
+        if (b != CMD_STATUS) {  
             release_all_lines();
             continue;
         }
@@ -112,46 +108,66 @@ static bool wait_for_valid_upstream_cmd(
         return true;
     }
 }
+//-----------------------------------------------------------
+// Converts a uint8_t (0-255) to a decimal string. buf must be at least 4 bytes.
+static void format_u8(uint8_t value, char *buf)
+{
+    if (value >= 100) {
+        buf[0] = '0' + (value / 100);
+        value %= 100;
+        buf[1] = '0' + (value / 10);
+        buf[2] = '0' + (value % 10);
+        buf[3] = '\0';
+    } else if (value >= 10) {
+        buf[0] = '0' + (value / 10);
+        buf[1] = '0' + (value % 10);
+        buf[2] = '\0';
+    } else {
+        buf[0] = '0' + value;
+        buf[1] = '\0';
+    }
+}
 
 // ----------------------------------------------------------
-// Poll one child port
+// Poll one child port- rx frame  is missing
 // ----------------------------------------------------------
 
-static bool poll_child(
-    const wire_t *w,
-    uint8_t *child_payload,
-    uint8_t max_child_payload_len,
-    uint8_t *child_payload_len
-)
+static bool poll_child(const wire_t *w, uint8_t *data_out, uint8_t max_child_payload_len, uint8_t *child_payload_len)
 {
     uint8_t b = 0;
 
-    //1. Send CMD_STATUS to child.
-
+    /*
+     * 1. Send CMD_STATUS to child.
+     */
     tx_byte(w, CMD_STATUS);
 
-    // 2. Switch direction / wait before receiving/ 
+    /*
+     * 2. Switch direction / wait before receiving.
+     */
     _delay_us(TURNAROUND_US);
-    // wire_release(w);  redundant
+    wire_release(w);
 
-    // 3. Wait for ACK_BUSY/ 
+    /*
+     * 3. Wait for ACK_BUSY.
+     */
     if (!rx_byte(w, &b, CHILD_TIMEOUT_US)) {
-        Serial.println("no ack byte");
+        Serial.println("NA");
         return false;
     }
 
     if (b != ACK_BUSY) {
+        Serial.println("WA");
         return false;
     }
 
+    Serial.println("CA");
     /*
-     * 4. ACK received, now receive full DATA_FRAME.
-     *    rx_frame validates SYNC, LEN and CHECKSUM.
-     *    It returns only the child payload.
+     * 4. ACK received, now wait for child data byte.
      */
+
     if (!rx_frame(
             w,
-            child_payload,
+            data_out,
             max_child_payload_len,
             child_payload_len,
             FRAME_TIMEOUT_US,
@@ -164,7 +180,7 @@ static bool poll_child(
 }
 
 // ----------------------------------------------------------
-// Arduino setup
+// Arduino setup - release all lines
 // ----------------------------------------------------------
 
 void setup()
@@ -172,7 +188,7 @@ void setup()
     release_all_lines();
 
     Serial.begin(9600);
-    Serial.println("Prototype v3 recursive node started");
+    Serial.println("Prototype v2 child started");
 }
 
 // ----------------------------------------------------------
@@ -185,96 +201,84 @@ void loop()
      * These variables must be static because orientation detection
      * should only happen once, but the detected active upstream line
      * must still be available in later loop() iterations.
+     * same as v4
      */
     static bool orientation_known = false;
     static const wire_t *active_upstream = nullptr; //code merkt sich dauerhaft die Orientierungsleitung
     static uint8_t orientation_mask = 0x00; //orientation mask,now 1 byte, later combined with child_mask to one byte 
-    /// create variables (LEN_gesamt, LEN_Loop child etc.)
 
-    // Detect orientation only once
+    /*
+     * 1. Detect orientation only once.
+     */
     if (!orientation_known) {
         wait_for_valid_upstream_cmd(&active_upstream, &orientation_mask); // selects active upstream line and orientation value (orientation value must be transformed to orientation_byte for sending )
         orientation_known = true;
     }  else {
 
-            // Safety check. Should normally never be true after orientation_known == true.
-        if (active_upstream == nullptr) {
-            orientation_known = false;
-            return;
-        }
         // if orientation is already known, no need to check orientation just receive CMD_STATUS
         uint8_t b = 0;
 
         if (!rx_byte(active_upstream, &b, PARENT_TIMEOUT_US)) {
-            Serial.println("Timeout: no byte received");
+            Serial.println("NC");
             return;
         }
 
         if (b != CMD_STATUS) {
-            Serial.println("Unexpected byte received");
+            Serial.println("WC");
             return;
         }
     }
 
-    // Send ACK_BUSY upstream on the detected active line.
-     
-    _delay_us(TURNAROUND_US); 
+    /*
+     * Safety check.
+     * Should normally never be true after orientation_known == true.
+     */
+    if (active_upstream == nullptr) {
+        orientation_known = false;
+        return;
+    }
+
+    /*
+     * 2. Send ACK_BUSY upstream on the detected active line.
+     */
+    _delay_us(TURNAROUND_US);
     tx_byte(active_upstream, ACK_BUSY);
-    //wire_release(active_upstream);
+    /*wire_release(active_upstream);
+
 
      /*
      * 3. Poll own children with retries.
-        flat buffer "disordered_child_payload" used for adding childrens payload in the correct order
+     *
+     * Child payloads are stored separately first.
+     * This keeps the final payload order correct:
+     * child 0 payload first, then child 1 payload.
      */
-
-    // disordered array of all children payloads
-    uint8_t disordered_child_payload[MAX_PAYLOAD_LEN];                   // stores all received child payloads compactly - in no correct order
-    uint8_t disordered_child_payload_len = 0;                            //tells how many bytes all children has sent
-
-    // position of childs payload (2d array -> info of every child stored here)-> where does it start in the disordered_child_payload_buf array and how long is the childs payload
-    uint8_t child_payload_offset[CHILD_COUNT] = {0};               // tells where child[i] payload starts inside shared buffer
+    uint8_t child_payload[CHILD_COUNT][MAX_CHILD_PAYLOAD_LEN];   //temporary storage (2d array) for child payload results -> child_payloads[child_index][payload_index] = byte received from child
+     // problem of child_payload: always MAX_CHILD_PAYLOAD_LEN long even if e.g actual payload is just 3 bytes long -> not RAM efficient 
     uint8_t child_payload_len[CHILD_COUNT] = {0};                 // temporary storage for child payload lengths -> child_payload_len[child_index] = length of payload received from child
     bool child_done[CHILD_COUNT] = {false};                       // stores if child has already responded and can be skipped
 
-    // poll children with retries
-    for (uint8_t attempt = 0; attempt < CHILD_RETRIES; attempt++) { //loop for every retry
-        for (uint8_t i = 0; i < CHILD_COUNT; i++) { //loop for every child
+    for (uint8_t attempt = 0; attempt < CHILD_RETRIES; attempt++) { //retry loop
+        for (uint8_t i = 0; i < CHILD_COUNT; i++) {  //child loop, iterates through children
 
-            if (child_done[i]) {   // if child[i] has already responded -> true -> skip
+            if (child_done[i]) {
                 continue;
             }
 
-            // temporary array and length for the just now polled childs payload
-
-            uint8_t temp_payload[MAX_CHILD_PAYLOAD_LEN];        //temporary payload of child is written in the temp_payload
-            uint8_t temp_payload_len = 0;
-
-            if (!poll_child(                //polls children
-                    children[i],             //wire/pin of current child
-                    temp_payload,            // where received payload should be stored temporarily      
-                    MAX_CHILD_PAYLOAD_LEN,   //max payload bytes child is allowed to send
-                    &temp_payload_len        // adress of variable where poll_child() writes actual received payload length
-                )) {
-                continue;
+            if (poll_child(
+                    children[i],           //with wire/pin of child[i]
+                    child_payload[i],     //and receive and store the payload in child_payloads[i]
+                    MAX_CHILD_PAYLOAD_LEN, //with max length of MAX_CHILD_PAYLOAD_LEN to avoid overflow
+                    &child_payload_len[i]  //and stores the received payload length from child[i])) {
+            )){
+                char num_buf[4];
+                char line[32];
+                format_u8(i, num_buf);
+                strcpy(line, "CV");
+                strcat(line, num_buf);   // i hasn't changed, num_buf is still valid
+                log_line(line);
+                child_done[i] = true; //mark child as done -> no more polling of this child in next attempts
             }
-
-            // Check if this child payload still fits into the shared flat buffer.
-
-            if ((uint16_t)disordered_child_payload_len + temp_payload_len > MAX_PAYLOAD_LEN) {
-                continue;
-            }
-
-            // stores information about just now polled child (i) in 2d arrays
-            child_payload_offset[i] = disordered_child_payload_len;             //where does childs payload start (= current payload length value of all children)
-            child_payload_len[i] = temp_payload_len;                            // how long payload of child is ( = current temporary payload length of child i)
-
-            // Copy temporary payload into the shared disordered_child_payload array -> DISORDERED  
-            for (uint8_t j = 0; j < temp_payload_len; j++) {
-                disordered_child_payload[disordered_child_payload_len++] = temp_payload[j];
-            }
-
-            // Mark this child as done
-            child_done[i] = true;
         }
     }
 
@@ -282,64 +286,58 @@ void loop()
      * 4. Build own/nodes payload:
      * Payload format: NODE_ID ORIENTATION CHILD_MASK CHILD_PAYLOADS...
      */
-    uint8_t ordered_payload[MAX_PAYLOAD_LEN]; //final payload to be sent upstream
-    uint8_t ordered_payload_len = 0;          //length of final payload
+    uint8_t payload[MAX_PAYLOAD_LEN]; //final payload to be sent upstream
+    uint8_t payload_len = 0;          //length of final payload
     uint8_t child_mask = 0x00;        //child_mask to be sent in final payload
 
-    //stores own payload into the first payload position, ++ = incresas payload_len after writing, so next byte will be written on the next position
-    ordered_payload[ordered_payload_len++] = NODE_ID; //writes NODE_ID into the first free payload position
-    ordered_payload[ordered_payload_len++] = orientation_mask; //writes orientation mask byte into the next free payload position
-    ordered_payload[ordered_payload_len++] = child_mask;   // placeholder for child_mask
-    // e.g payload[0] = NODE_ID, payload[2]= 0x00; payload_len = 3
+    //add own payload to payload array
+    payload[payload_len++] = NODE_ID;
+    payload[payload_len++] = orientation_mask; 
+    payload[payload_len++] = 0x00;  //placeholder for child_mask
 
-    //starting at child[0] add every childs payload to the ordered_payload array -> since its starting at child[0], the payload becomes ordered again 
-    for (uint8_t i = 0; i < CHILD_COUNT; i++) {
-        if (!child_done[i]) {  //if child[i] didn´t respond, skip it
+    //in a loop add children payloads to the final payload 
+    for (uint8_t child = 0; child < CHILD_COUNT; child ++) {
+        if (!child_done[child]) {  //if child[i] didn´t respond, skip it
             continue;
         }
 
-        // offset and length of child[i]
-        uint8_t offset = child_payload_offset[i]; 
-        uint8_t len = child_payload_len[i];
+        // Check whether this child payload still fits. If not, do not set the child bit because the payload is not included.
 
-        /*
-         * Check whether this child payload still fits into the final payload.
-         * If it does not fit, do not set the child bit.
-         */
-        if ((uint16_t)ordered_payload_len + len > MAX_PAYLOAD_LEN) {
+        if ((uint16_t)payload_len + child_payload_len[child] > MAX_PAYLOAD_LEN) {
             continue;
         }
 
         //create child_mask
-        child_mask |= (1 << i);   //set bit for child[i]n in child_mask (LSB = child 0)
+        child_mask |= (1 << child);   //set bit for child[i]n in child_mask (LSB = child 0)
 
-        // Copy child i's payload from the flat buffer into the final payload store child [i] payload (bytewise) in the final payload array (aus disordered_child_payload wird das payload beginnend an der offset stelle vom child aufgerufen)
-        for (uint8_t j = 0; j < len; j++) {
-            ordered_payload[ordered_payload_len++] = disordered_child_payload[offset + j]; //copies stored payload into final payload and increases payload_len for next byte
+        //copy child payload into final payload
+        for (uint8_t j = 0; j < child_payload_len[child]; j++) {
+            payload[payload_len++] = child_payload[child][j];  //copies stored payload into final payload and increases payload_len for next byte
         }
     }
 
-    // Now write final child_mask into own node header 
-    ordered_payload[2] = child_mask;  //before was in payload[2] the placeholder 0x00
+    payload[2] = child_mask;
 
-    // Send complete frame upstream
-    _delay_us(TURNAROUND_US);
-    tx_frame(active_upstream, ordered_payload, ordered_payload_len);
-    wire_release(active_upstream);
+    /*
+     * 4. Print/debug childmask
+     */
+    Serial.print("CM");
 
-    // Release all lines
-    release_all_lines();
-
-    // Debug output
-    Serial.print("Sent payload_len = ");
-    Serial.println(ordered_payload_len);
-
-    Serial.print("orientation = ");
-    Serial.println(orientation_mask);
-
-    Serial.print("child_mask = 0b");
     if ((child_mask & 0b10) == 0) {
         Serial.print("0");
     }
     Serial.println(child_mask, BIN);
+
+    /*
+     * 5. Send predefined DATA_BYTE upstream.
+     */
+    _delay_us(TURNAROUND_US);
+    
+    //log_lineln("data byte gesendet, loop von neu");
+    tx_frame(active_upstream, payload, payload_len);
+    wire_release(active_upstream);
+    
+    release_all_lines();
+    //log_flush();
+   
 }
