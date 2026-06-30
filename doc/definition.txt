@@ -1,4 +1,4 @@
-V4 IS CURRENTLY NOT WORKING BECAUSE OF DESYNCHRONIZATION - THEREFORE GO TO V2_2 or V5
+V5 IS BASED ON BRANCH V2_2
 
 structure:
 - 1 parent: sends cmd_status to child and waits for ackbyte from child. If received waits and receive data package from child 
@@ -26,7 +26,7 @@ Sequence:
         active_upstream = detected pin
         orientation = detected pin index
     9. child/Node: sends ACK_BUSY upstream on active_upstream.
-    10. Child/node polls own children with retries: (differences in v3, v2 and main)
+    10. Child/node polls own children with retries:
         for each retry round:
             for each child i:
                 if child already responded successfully:
@@ -52,7 +52,8 @@ Sequence:
 
     14. parent: receives DATA_FRAME and validates SYNC, LEN and CRC
     15. parent: transmits complete payload via upstream data line to its parent  
-    16: baseplate: parses complete payload to deserialized n ary payload tree again 
+    16: baseplate: receives complete payload and sends DATA_FRAME (SYNC LEN PAYLOAD CRC) if changed via serial to the PC 
+    17. PC: receives DATA FRAME, parses payload and visualizes structure with meshcat
 
 Pin assignment:
     PA1 = upstream data line (orientation 0)
