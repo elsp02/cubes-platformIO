@@ -41,3 +41,28 @@ void remember_sent_payload(const uint8_t *payload, uint8_t payload_len)
     last_sent_payload_len = payload_len;
     have_sent_before = true;
 }
+
+//----------------------------------------------------
+// for log_line
+//----------------------------------------------------
+static char log_buf[LOG_BUF_SIZE];
+static uint8_t log_len = 0;
+
+static void log_line(const char *msg)
+{
+    uint8_t i = 0;
+    while (msg[i] != '\0' && log_len < LOG_BUF_SIZE - 2) {
+        log_buf[log_len++] = msg[i++];
+    }
+    if (log_len < LOG_BUF_SIZE - 1) {
+        log_buf[log_len++] = '\n';
+    }
+}
+
+static void log_flush(void)
+{
+    if (log_len > 0) {
+        Serial.write((const uint8_t *)log_buf, log_len);
+        log_len = 0;
+    }
+}

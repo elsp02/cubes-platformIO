@@ -6,3 +6,18 @@ code ausführen:
 python visualizer/main.py --port COM4 --baud 9600
 
 pycache
+
+verbose = debug flag
+port:str = name of port where baselate/pico is connected, type is a string
+
+ser.reset_input_buffer(): clears all bytes that are curently waotongon the receove buffer
+ser.read(1) = reads 1 byte
+
+data flow:
+parsed CubeNode tree
+        ↓
+layout.py
+compute 3D transforms
+        ↓
+meshcat_scene.py
+draw colored cubes in Meshcat

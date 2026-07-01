@@ -1,3 +1,5 @@
+from typing import Optional
+
 import serial
 
 from cube_node import CubeNode
@@ -7,7 +9,7 @@ from payload_parser import parse_tree
 SYNC = 0xA5
 
 #checksum validation
-def checksum_xor(payload_len: int, payload: bytes) -> int:
+def calc_checksum(payload_len: int, payload: bytes) -> int:
     checksum = payload_len
 
     for byte in payload:
@@ -16,7 +18,7 @@ def checksum_xor(payload_len: int, payload: bytes) -> int:
     return checksum
 
 """ for reading DATA_FRAME after valid SYNC appeared"""
-def rx_frame(ser:serial.Serial) ->bytes:
+def rx_frame(ser:serial.Serial) ->Optional[bytes]:
 
         payload_len = ser.read(1)[0]
 
@@ -30,7 +32,7 @@ def rx_frame(ser:serial.Serial) ->bytes:
         received_checksum = ser.read(1)[0]
             
         #check checksum
-        calculated_checksum = checksum_xor(payload_len, payload) 
+        calculated_checksum = calc_checksum(payload_len, payload) 
 
         if received_checksum != calculated_checksum:
             print("Checksum error. Frame ignored.")
