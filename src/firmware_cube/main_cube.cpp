@@ -71,6 +71,11 @@ static int8_t scan_upstream(void)
     return -1;
 }
 
+//-----------------------------------------------------------
+// wait for CMD byte from parent
+//-----------------------------------------------------------
+// auch auf falling edge warten (rx_byte) aber ohne timeout
+
 // ----------------------------------------------------------
 // Wait for upstream command - same as v4 despite from release all lines
 // ----------------------------------------------------------
@@ -106,6 +111,29 @@ static bool wait_for_valid_upstream_cmd(
         *orientation_mask = (uint8_t)ori;
 
         return true;
+    }
+}
+
+// Scans the upstream line for CMD_STATUS, discarding any stray bytes until  CMD_STATUS arrives or the line stays idle for
+// Returns true if CMD_STATUS found, false on idle timeout.
+static bool wait_for_cmd_status(const wire_t *w)
+{
+    while (true) {
+        uint8_t b = 0;
+
+        // Wait up to PARENT_TIMEOUT_US for any byte to arrive at all.
+        if (!rx_byte(w, &b, PARENT_TIMEOUT_US)) {
+            return false;   // genuine idle -- nothing sent at all
+        }
+
+        // A byte arrived. Is it what we wanted?
+        if (b == CMD_STATUS) {
+            return true;    // found it, done
+        }
+
+        // Wrong byte -- discard and keep scanning,
+        // same as find_sync_byte discarding non-SYNC bytes.
+        log_line("WC");
     }
 }
 //-----------------------------------------------------------
@@ -215,9 +243,15 @@ void loop()
         orientation_known = true;
     }  else {
 
+        // instead of function underneath it 
+        //if (!wait_for_cmd_status(active_upstream)) {
+        //    log_line("NC");
+        //    return;
+        // }
+        //}
+        
         // if orientation is already known, no need to check orientation just receive CMD_STATUS
         uint8_t b = 0;
-
         if (!rx_byte(active_upstream, &b, PARENT_TIMEOUT_US)) {
             Serial.println("NC");
             return;
