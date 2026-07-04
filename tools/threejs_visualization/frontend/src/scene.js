@@ -7,6 +7,14 @@ import {
     localPoseForChild,
 } from "./layout.js";
 
+// ------------------------------------------------------------
+// Configuration
+// ------------------------------------------------------------
+
+const CUBE_MODEL_URL = "/assets/cube_model.glb";
+
+// Change this only if your exported cube model is not 1 x 1 x 1 units.
+const MODEL_SCALE = 1.0;
 
 // ------------------------------------------------------------
 // Three.js globals
@@ -21,6 +29,10 @@ let cubeGroup;
 
 // Use Z as the vertical axis, similar to your Meshcat / NumPy logic.
 THREE.Object3D.DEFAULT_UP.set(0, 0, 1);
+
+
+
+
 
 
 // ------------------------------------------------------------
@@ -117,6 +129,7 @@ function animate() {
     requestAnimationFrame(animate);
 
     controls.update();
+    //scene rendering 
     renderer.render(scene, camera);
 }
 
@@ -174,7 +187,7 @@ function createCubeObject(node) {
 // ------------------------------------------------------------
 // Nested tree rendering
 // ------------------------------------------------------------
-
+// called from main.js and redraws tree
 export function redrawTree(rootNode) {
     cubeGroup.clear();
 
@@ -186,16 +199,17 @@ function addCubeRecursive(node, parentObject, isRoot) {
     const cubeObject = createCubeObject(node);
 
     const pose = isRoot
-        ? localPoseForRoot(node)
-        : localPoseForChild(node);
+        ? localPoseForRoot(node) // in layout.js
+        : localPoseForChild(node); // in layout.js
 
     cubeObject.position.copy(pose.position);
     cubeObject.quaternion.copy(pose.quaternion);
 
-    parentObject.add(cubeObject); // Parent-child nesting happens here.
+    parentObject.add(cubeObject); // adds cubeObject to scene (places it in the scene graph)
 
     const children = node.children ?? [];
 
+    //recursive child drawing
     for (const child of children) {
         addCubeRecursive(child, cubeObject, false);
     }

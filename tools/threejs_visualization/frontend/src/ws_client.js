@@ -1,18 +1,21 @@
 const WEBSOCKET_URL = "ws://localhost:8765";
 
-
+// function is called in main.js to connect to the websocket server and receive tree data
 export function connectWebSocket(onTreeReceived) {
     const socket = new WebSocket(WEBSOCKET_URL);
 
+    // if connection is opened succesfully
     socket.onopen = () => {
         console.log("WebSocket connected:", WEBSOCKET_URL);
 
+        // update status element in index.html
         const statusElement = document.getElementById("status");
         if (statusElement) {
             statusElement.textContent = "WebSocket connected";
         }
     };
 
+    // if message is received from the server 
     socket.onmessage = (event) => {
         try {
             const message = JSON.parse(event.data);
@@ -28,6 +31,7 @@ export function connectWebSocket(onTreeReceived) {
             }
 
             onTreeReceived(message.tree);
+            
 
         } catch (error) {
             console.error("Could not parse WebSocket message:", error);
@@ -35,18 +39,22 @@ export function connectWebSocket(onTreeReceived) {
         }
     };
 
+    // if the connection is closed
     socket.onclose = () => {
         console.log("WebSocket disconnected.");
 
+        // update status element in index.html
         const statusElement = document.getElementById("status");
         if (statusElement) {
             statusElement.textContent = "WebSocket disconnected";
         }
     };
 
+    // if error occurs 
     socket.onerror = (error) => {
         console.error("WebSocket error:", error);
 
+        // update status element in index.html
         const statusElement = document.getElementById("status");
         if (statusElement) {
             statusElement.textContent = "WebSocket error";

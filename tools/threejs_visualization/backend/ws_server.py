@@ -61,7 +61,7 @@ async def handler(websocket) -> None:
                 "type": "tree",
                 "tree": tree,
             }
-
+            # send tree to websocket client (browser)
             await websocket.send(json.dumps(payload))
             #print(message)
 

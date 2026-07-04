@@ -15,3 +15,4 @@ ich darf nicht 1 child 3 mal pollen und dann das andere danach sondern muss 1 ch
 
 NEXT STEPS
 - individual payload/sync for mehscat if error in baseplate 
+- error messages/message window also in browser
