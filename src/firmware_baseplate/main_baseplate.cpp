@@ -73,7 +73,7 @@ void setup()
     PORTB.OUTCLR = LED_PIN; 
 
     Serial.begin(9600);
-    SER_PRINT("Prototype v2_2 parent started");
+    SER_PRINT("Prototype v5 parent started");
 }
 
 // ----------------------------------------------------------
@@ -142,8 +142,12 @@ void loop()
 
     //PORTB.OUTTGL = LED_PIN;               // PB4 as LED output
     release_all_lines();
-    //print_payload_hex(payload, payload_len);
-    log_flush();
+    //if (payload_changed(payload, payload_len)) {
+    //    print_payload_hex(payload, payload_len);
+
+    //    remember_sent_payload(payload, payload_len);
+    //}
+    //log_flush();
 
     #if SERIAL_WRITING 
 

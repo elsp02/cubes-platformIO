@@ -1,13 +1,44 @@
 <!doctype html>
-<html lang="de">
+<!doctype html>
+<html lang="en">
 <head>
-    <meta charset="utf-8">
-    <title>Three.js Visualization</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Cube Visualization</title>
+
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            background: #f2f2f2;
+        }
+
+        #status {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            z-index: 10;
+
+            padding: 6px 10px;
+            border-radius: 4px;
+
+            background: rgba(255, 255, 255, 0.85);
+            color: #222;
+
+            font-size: 14px;
+        }
+
+        canvas {
+            display: block;
+        }
+    </style>
 </head>
 
 <body>
-    <h1>WebSocket Test</h1>
-    <pre id="output">Connecting...</pre>
-    
-    <script src="src/ws_client.js"></script>
+    <div id="status">WebSocket not connected</div>
+
+    <script type="module" src="/src/main.js"></script>
 </body>
+</html>

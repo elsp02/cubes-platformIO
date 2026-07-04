@@ -1,20 +1,57 @@
-const output = document.getElementById("output");
+const WEBSOCKET_URL = "ws://localhost:8765";
 
-const socket = new WebSocket("ws://localhost:8765");
 
-socket.onopen = () => {
-    output.textContent = "Connected to WebSocket server.";
-};
+export function connectWebSocket(onTreeReceived) {
+    const socket = new WebSocket(WEBSOCKET_URL);
 
-socket.onmessage = (event) => {
-    const message = JSON.parse(event.data);
-    output.textContent = JSON.stringify(message, null, 2);
-};
+    socket.onopen = () => {
+        console.log("WebSocket connected:", WEBSOCKET_URL);
 
-socket.onclose = () => {
-    output.textContent = "WebSocket closed.";
-};
+        const statusElement = document.getElementById("status");
+        if (statusElement) {
+            statusElement.textContent = "WebSocket connected";
+        }
+    };
 
-socket.onerror = () => {
-    output.textContent = "WebSocket error.";
-};
+    socket.onmessage = (event) => {
+        try {
+            const message = JSON.parse(event.data);
+
+            if (message.type !== "tree") {
+                console.warn("Ignored unknown WebSocket message:", message);
+                return;
+            }
+
+            if (!message.tree) {
+                console.warn("Received tree message without tree data:", message);
+                return;
+            }
+
+            onTreeReceived(message.tree);
+
+        } catch (error) {
+            console.error("Could not parse WebSocket message:", error);
+            console.error("Raw message:", event.data);
+        }
+    };
+
+    socket.onclose = () => {
+        console.log("WebSocket disconnected.");
+
+        const statusElement = document.getElementById("status");
+        if (statusElement) {
+            statusElement.textContent = "WebSocket disconnected";
+        }
+    };
+
+    socket.onerror = (error) => {
+        console.error("WebSocket error:", error);
+
+        const statusElement = document.getElementById("status");
+        if (statusElement) {
+            statusElement.textContent = "WebSocket error";
+        }
+    };
+
+    return socket;
+}

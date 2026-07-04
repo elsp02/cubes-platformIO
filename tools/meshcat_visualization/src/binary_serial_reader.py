@@ -84,7 +84,7 @@ def wait_for_valid_sync_cmd(ser: serial.Serial, verbose: bool) -> bool:
 def iter_trees_from_binary_serial(
     port: str,  #?
     baudrate: int = 9600,  
-    verbose: bool = False,
+    verbose: bool = True,
 ):
 
 
