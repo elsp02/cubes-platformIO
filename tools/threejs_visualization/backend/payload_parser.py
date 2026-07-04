@@ -16,14 +16,14 @@ def parse_node(payload: bytes, index: int, port: int | None) -> tuple[CubeNode, 
     if index + 3 > len(payload):
         raise ValueError("Payload too short while parsing node header.")
 
-    cube_id = payload[index]
+    id = payload[index]
     orientation = payload[index + 1]
     child_mask = payload[index + 2]
     index += 3
 
     #same as alloc node
     node = CubeNode(
-        cube_id=cube_id,
+        id=id,
         orientation=orientation,
         port=port,
         child_mask= child_mask,
@@ -67,7 +67,7 @@ def print_tree(node, depth: int = 0):
         port_text = f"port {node.port}"
 
     print(
-        f"{indent}- cube 0x{node.cube_id:02X}, "   #hex zahl mit mind 2 stellen
+        f"{indent}- cube 0x{node.id:02X}, "   #hex zahl mit mind 2 stellen
         f"child_mask= 0x{node.child_mask:02X}, "     
         f"orientation={node.orientation}, "
         f"{port_text}"

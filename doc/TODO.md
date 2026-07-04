@@ -14,7 +14,4 @@ QUESTIONS
 ich darf nicht 1 child 3 mal pollen und dann das andere danach sondern muss 1 child pollen dann warten dann das andere pollen dann wieder das erste pollen etc 
 
 NEXT STEPS
-- change node infos into node coordinates -> coordinate/orientation interpreter
-- import them in meshcat/three.js -> transformations 
-
-- CHILD_TIMEOUT_US must be calculated
+- individual payload/sync for mehscat if error in baseplate 

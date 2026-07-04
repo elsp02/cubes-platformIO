@@ -91,7 +91,9 @@ def iter_trees_from_binary_serial(
     with serial.Serial(port, baudrate, timeout=1) as ser:
         ser.reset_input_buffer()   #?
 
-        print(f"Connected to {port} at {baudrate} baud.") 
+        print(f"Connected to {port} at {baudrate} baud.")
+
+        last_payload: Optional[bytes] = None   # snapshot of last yielded payload 
 
         while True:
             #like 
@@ -105,6 +107,15 @@ def iter_trees_from_binary_serial(
             payload = rx_frame(ser)
             if payload is None:
                 continue
+
+            #compare payload to last payload, if same (heartbeat payload), ignore, if different, parse to tree and yield tree
+            if payload == last_payload:
+                if verbose:
+                    print("Heartbeat")
+                continue
+
+            last_payload = payload   # update snapshot before yielding
+            print(f"DEBUG payload: {payload.hex(' ')} (len={len(payload)})")
             
             #parse payload to tree
             try:

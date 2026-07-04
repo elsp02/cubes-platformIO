@@ -4,7 +4,7 @@ from typing import Optional
 
 @dataclass
 class CubeNode:
-    cube_id: int
+    id: int
     orientation: int
     port: Optional[int]
     child_mask: int = 0
@@ -13,7 +13,7 @@ class CubeNode:
 """Converts a CubeNode tree to a dictionary representation"""
 def tree_to_dict(node: CubeNode) -> dict:
     return {
-        "cube_id": node.cube_id,
+        "id": node.id,
         "orientation": node.orientation,
         "port": node.port,
         "child_mask": node.child_mask,

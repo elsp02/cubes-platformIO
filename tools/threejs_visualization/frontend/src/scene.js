@@ -1,21 +1,11 @@
 import * as THREE from "three";
-import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
 import {
+    CUBE_SIZE,
     localPoseForRoot,
     localPoseForChild,
 } from "./layout.js";
-
-
-// ------------------------------------------------------------
-// Configuration
-// ------------------------------------------------------------
-
-const CUBE_MODEL_URL = "/assets/cube_model.glb";
-
-// Change this only if your exported cube model is not 1 x 1 x 1 units.
-const MODEL_SCALE = 1.0;
 
 
 // ------------------------------------------------------------
@@ -27,9 +17,6 @@ let camera;
 let renderer;
 let controls;
 let cubeGroup;
-
-let cubeTemplate = null;
-let latestTree = null;
 
 
 // Use Z as the vertical axis, similar to your Meshcat / NumPy logic.
@@ -61,6 +48,7 @@ export function initScene() {
 
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(window.devicePixelRatio);
+
     document.body.appendChild(renderer.domElement);
 
     controls = new OrbitControls(camera, renderer.domElement);
@@ -74,13 +62,15 @@ export function initScene() {
     cubeGroup.name = "cubeGroup";
     scene.add(cubeGroup);
 
-    loadCubeModel();
-
     window.addEventListener("resize", onWindowResize);
 
     animate();
 }
 
+
+// ------------------------------------------------------------
+// Lights and helpers
+// ------------------------------------------------------------
 
 function addLights() {
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
@@ -107,6 +97,10 @@ function addHelpers() {
 }
 
 
+// ------------------------------------------------------------
+// Window resize handling
+// ------------------------------------------------------------
+
 function onWindowResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
@@ -115,48 +109,15 @@ function onWindowResize() {
 }
 
 
+// ------------------------------------------------------------
+// Render loop
+// ------------------------------------------------------------
+
 function animate() {
     requestAnimationFrame(animate);
 
     controls.update();
     renderer.render(scene, camera);
-}
-
-
-// ------------------------------------------------------------
-// GLB / GLTF loading
-// ------------------------------------------------------------
-
-function loadCubeModel() {
-    const loader = new GLTFLoader();
-
-    loader.load(
-        CUBE_MODEL_URL,
-
-        (gltf) => {
-            cubeTemplate = gltf.scene;
-
-            cubeTemplate.traverse((object) => {
-                if (object.isMesh) {
-                    object.castShadow = true;
-                    object.receiveShadow = true;
-                }
-            });
-
-            console.log("Cube model loaded:", CUBE_MODEL_URL);
-
-            // If a tree arrived before the model finished loading, draw it now.
-            if (latestTree !== null) {
-                redrawTree(latestTree);
-            }
-        },
-
-        undefined,
-
-        (error) => {
-            console.error("Could not load cube model:", error);
-        }
-    );
 }
 
 
@@ -168,7 +129,7 @@ function createCubeObject(node) {
     /*
      * This group represents one logical cube node.
      *
-     * The GLB model is added as a visual child.
+     * The generated cube mesh is added as a visual child.
      * Other cube nodes can then be added as children of this group.
      */
 
@@ -179,14 +140,32 @@ function createCubeObject(node) {
     cubeObject.userData.orientation = node.orientation;
     cubeObject.userData.port = node.port;
 
-    if (cubeTemplate === null) {
-        throw new Error("Cube model is not loaded yet.");
-    }
+    const geometry = new THREE.BoxGeometry(
+        CUBE_SIZE,
+        CUBE_SIZE,
+        CUBE_SIZE
+    );
 
-    const visualModel = cubeTemplate.clone(true);
-    visualModel.scale.setScalar(MODEL_SCALE);
+    const material = new THREE.MeshStandardMaterial({
+        color: 0x808080,
+        roughness: 0.6,
+        metalness: 0.0,
+    });
 
-    cubeObject.add(visualModel);
+    const cubeMesh = new THREE.Mesh(geometry, material);
+    cubeObject.add(cubeMesh);
+
+    /*
+     * Optional black outline.
+     * This makes the cube borders easier to see.
+     */
+    const edges = new THREE.EdgesGeometry(geometry);
+    const edgeMaterial = new THREE.LineBasicMaterial({
+        color: 0x000000,
+    });
+
+    const edgeLines = new THREE.LineSegments(edges, edgeMaterial);
+    cubeObject.add(edgeLines);
 
     return cubeObject;
 }
@@ -197,13 +176,6 @@ function createCubeObject(node) {
 // ------------------------------------------------------------
 
 export function redrawTree(rootNode) {
-    latestTree = rootNode;
-
-    if (cubeTemplate === null) {
-        console.warn("Cube model not loaded yet. Tree will be drawn after loading.");
-        return;
-    }
-
     cubeGroup.clear();
 
     addCubeRecursive(rootNode, cubeGroup, true);
@@ -220,7 +192,7 @@ function addCubeRecursive(node, parentObject, isRoot) {
     cubeObject.position.copy(pose.position);
     cubeObject.quaternion.copy(pose.quaternion);
 
-    parentObject.add(cubeObject); //this is where nesting and child parent relationship happens
+    parentObject.add(cubeObject); // Parent-child nesting happens here.
 
     const children = node.children ?? [];
 

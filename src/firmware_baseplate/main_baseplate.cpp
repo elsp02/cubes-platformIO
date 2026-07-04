@@ -18,7 +18,8 @@
 #include "serial_writing.h"
 #include "poll_child.h"
 
-
+#define HEARTBEAT_INTERVAL_CYCLE 50 // after 50 cycles payload is sent again even if it hasn´t changed
+static uint16_t cycles_since_last_send = 0;
 // ----------------------------------------------------------
 // Wire descriptors
 // ----------------------------------------------------------
@@ -92,6 +93,7 @@ void loop()
     uint8_t child_payload[CHILD_COUNT][MAX_CHILD_PAYLOAD_LEN];   //temporary storage (2d array) for child payload results -> child_payloads[child_index][payload_index] = byte received from child
     uint8_t child_payload_len[CHILD_COUNT] = {0};                // temporary storage for child payload lengths -> child_payload_len[child_index] = length of payload received from child
     bool child_done[CHILD_COUNT] = {false};
+    bool all_done = false; //flag to check if all children have responded
 
     for (uint8_t attempt = 0; attempt < CHILD_RETRIES; attempt ++){
         for (uint8_t child = 0; child < CHILD_COUNT; child ++){
@@ -109,8 +111,12 @@ void loop()
                 &child_payload_len[child]
             )){
                 SER_PRINT("CV");
-                child_done[child] = true; //mark child as done -> no more polling of this child in next attempts               
+                child_done[child] = true; //mark child as done -> no more polling of this child in next attempts
+                all_done = true;    // works correctly only for CHILD_COUNT = 1          
             }
+        }
+        if (all_done) {
+            break;
         }
     }
 
@@ -142,16 +148,15 @@ void loop()
 
     //PORTB.OUTTGL = LED_PIN;               // PB4 as LED output
     release_all_lines();
-    //if (payload_changed(payload, payload_len)) {
-    //    print_payload_hex(payload, payload_len);
-
-    //    remember_sent_payload(payload, payload_len);
-    //}
     //log_flush();
 
-    #if SERIAL_WRITING 
+    //Heartbeat sending
+    bool changed = payload_changed (payload, payload_len);
+    cycles_since_last_send ++;
+    
+    if (changed || cycles_since_last_send>= HEARTBEAT_INTERVAL_CYCLE) {
 
-    if (payload_changed(payload, payload_len)) {
+        #if SERIAL_WRITING 
         uint8_t checksum = calc_checksum(payload_len, payload);
 
         Serial.write(SYNC_BYTE);
@@ -159,8 +164,16 @@ void loop()
         Serial.write(payload, payload_len);
         Serial.write(checksum);
 
+        #endif
+
+        #if not SERIAL_WRITING
+        print_payload_hex(payload, payload_len);
+        #endif
+
         remember_sent_payload(payload, payload_len);
+        cycles_since_last_send = 0;
     }
 
-    #endif 
 }
+
+//payload if tree didn´t work 
