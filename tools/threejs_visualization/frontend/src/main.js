@@ -1,4 +1,4 @@
-import { initScene, redrawTree } from "./scene.js";
+import { initScene, redrawTree } from "./scene_glb.js";
 import { connectWebSocket } from "./ws_client.js";
 
 

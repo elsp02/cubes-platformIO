@@ -1,3 +1,4 @@
+//main ruft zuerst initScene auf, dann redraw_tree
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
@@ -6,15 +7,6 @@ import {
     localPoseForRoot,
     localPoseForChild,
 } from "./layout.js";
-
-// ------------------------------------------------------------
-// Configuration
-// ------------------------------------------------------------
-
-const CUBE_MODEL_URL = "/assets/cube_model.glb";
-
-// Change this only if your exported cube model is not 1 x 1 x 1 units.
-const MODEL_SCALE = 1.0;
 
 // ------------------------------------------------------------
 // Three.js globals
@@ -30,101 +22,82 @@ let cubeGroup;
 // Use Z as the vertical axis, similar to your Meshcat / NumPy logic.
 THREE.Object3D.DEFAULT_UP.set(0, 0, 1);
 
-
-
-
-
-
-// ------------------------------------------------------------
-// Scene initialization
-// ------------------------------------------------------------
-
-export function initScene() {
-    scene = new THREE.Scene();
-    scene.background = new THREE.Color(0xf2f2f2);
-
-    camera = new THREE.PerspectiveCamera(
-        60,
-        window.innerWidth / window.innerHeight,
-        0.1,
-        100
-    );
-
-    camera.up.set(0, 0, 1);
+//-----------------------------------------------------------
+// function definitions 
+//-----------------------------------------------------------
+// add camera - 
+function addCamera(){
+    //create a new camera with positions and angles - fov, aspect, closest visible distance from camera, farest ...
+    const camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 1, 100 );
+    
+    //set how far the camera will be from the 3D model - should depend on the construction size, always all cubes in scene visible
     camera.position.set(4, -6, 4);
-    camera.lookAt(0, 0, 0);
+    
+    //where the camera should look at
+    camera.lookAt(0,0,0);
 
-    renderer = new THREE.WebGLRenderer({
-        antialias: true,
-    });
-
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(window.devicePixelRatio);
-
-    document.body.appendChild(renderer.domElement);
-
-    controls = new OrbitControls(camera, renderer.domElement);
-    controls.target.set(0, 0, 0);
-    controls.update();
-
-    addLights();
-    addHelpers();
-
-    cubeGroup = new THREE.Group();
-    cubeGroup.name = "cubeGroup";
-    scene.add(cubeGroup);
-
-    window.addEventListener("resize", onWindowResize);
-
-    animate();
+    //z is vertikal -> camera also z as upward direction
+    camera.up.set(0, 0, 1);
 }
 
+//add renderer
+function addRenderer(){
+    //instantiate a new renderer and set its size 
+    // parameters: alpha: transparent background, antialias: Kantenglättung
+    //https://threejs.org/docs/#Renderer
+    const renderer = new THREE.WebGLRender({alpha: true, antialias:true});
+    renderer.setSize(window.innerWidth, window.innerHeight);
 
-// ------------------------------------------------------------
-// Lights and helpers
-// ------------------------------------------------------------
+    //to match the render resolution with the device screen's physical pixel density
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); //maybe not needed
 
+    //Add the renderert o the DOM - complete screen and not within a container
+    document.body.appendChild(renderer.domElement);
+    // if scene should be in a container: document.getElementById("container").appendChild(renderer.domElement)
+
+}
+
+// add light
 function addLights() {
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+    //illuminates every surface equally from all directions, providing a flat base brightness
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.7); //color, intensity
     scene.add(ambientLight);
 
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 1.2);
-    directionalLight.position.set(4, -5, 8);
-    scene.add(directionalLight);
+    //simulates rays from an infinitely distant source (like the sun)
+    const topLight = new THREE.DirectionalLight(0xffffff, 1.2);
+    topLight.position.set(4, -5, 8); //which is the best position for this light
+    scene.add(topLight);
 }
 
-
+// add Axes
 function addHelpers() {
     const axes = new THREE.AxesHelper(2);
     scene.add(axes);
 
-    /*
-     * Three.js GridHelper normally lies in the XZ plane.
-     * Because this project uses Z as the vertical axis, rotate the grid
-     * into the XY plane.
-     */
     const grid = new THREE.GridHelper(10, 10);
     grid.rotation.x = Math.PI / 2;
     scene.add(grid);
 }
 
+//OrbitControls allow mouse / touch interaction
+// touchscreen: One finger usually rotates, two fingers zoom/pan.
+function addControls(){
+    controls = new OrbitControls(camera, renderer.domElement);
+    //target is point the camera orbits around
+    controls.target.set(0,0,0);
+    //update() applies the target and internal control state
+    controls.update;
 
-// ------------------------------------------------------------
-// Window resize handling
-// ------------------------------------------------------------
+}
 
+//window resize handling for when the browser window changes size, the camera aspect ratio must be updated. Otherwise the image becomes stretched.
 function onWindowResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
 
     renderer.setSize(window.innerWidth, window.innerHeight);
 }
-
-
-// ------------------------------------------------------------
-// Render loop
-// ------------------------------------------------------------
-
+//animate function - render loop
 function animate() {
     requestAnimationFrame(animate);
 
@@ -133,9 +106,34 @@ function animate() {
     renderer.render(scene, camera);
 }
 
+//------------------------------------------------------------
+// Scene initialization - main function 
+//------------------------------------------------------------
+export function initScene(){
+//create a Threejs Scene
+    scene = new THREE.Scene();
 
+    addCamera();
+    addRenderer();
+    addControls();
+
+//add helpers
+    addLights();
+    addHelpers();
+
+// cubeGroup = contains the complete cube construction
+    cubeGroup = new THREE.Group();
+    cubeGroup.name = "cubeGroup";
+    scene.add(cubeGroup);
+
+//Add a listener to the window, so we can resize the window and the camera
+    window.addEventListener("resize", onWindowResize);
+
+    animate();
+
+}
 // ------------------------------------------------------------
-// Cube object creation
+// Cube object creation - should be replaced by glb file code
 // ------------------------------------------------------------
 
 function createCubeObject(node) {

@@ -33,7 +33,7 @@ def serial_worker() -> None:
             if tree_queue.full():
                 try:
                     tree_queue.put_nowait(tree_dict)
-                except EMPTY:
+                except Empty:
                     pass
             tree_queue.put_nowait(tree_dict)
 
@@ -61,7 +61,7 @@ async def handler(websocket) -> None:
                 "type": "tree",
                 "tree": tree,
             }
-            # send tree to websocket client (browser)
+            # send tree to websocket client
             await websocket.send(json.dumps(payload))
             #print(message)
 
