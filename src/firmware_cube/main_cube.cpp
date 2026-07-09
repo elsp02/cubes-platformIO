@@ -133,7 +133,7 @@ static bool wait_for_cmd_status(const wire_t *w)
 
         // Wrong byte -- discard and keep scanning,
         // same as find_sync_byte discarding non-SYNC bytes.
-        log_line("WC");
+        Serial.println("WC");
     }
 }
 //-----------------------------------------------------------
@@ -201,6 +201,7 @@ static bool poll_child(const wire_t *w, uint8_t *data_out, uint8_t max_child_pay
             FRAME_TIMEOUT_US,
             INTER_FRAME_TIMEOUT_US
         )) {
+        Serial.println("WD");
         return false;
     }
 
@@ -253,7 +254,7 @@ void loop()
         // if orientation is already known, no need to check orientation just receive CMD_STATUS
         uint8_t b = 0;
         if (!rx_byte(active_upstream, &b, PARENT_TIMEOUT_US)) {
-            Serial.println("NC");
+            //Serial.println("NC");
             return;
         }
 
@@ -305,12 +306,13 @@ void loop()
                     MAX_CHILD_PAYLOAD_LEN, //with max length of MAX_CHILD_PAYLOAD_LEN to avoid overflow
                     &child_payload_len[i]  //and stores the received payload length from child[i])) {
             )){
-                char num_buf[4];
-                char line[32];
-                format_u8(i, num_buf);
-                strcpy(line, "CV");
-                strcat(line, num_buf);   // i hasn't changed, num_buf is still valid
-                log_line(line);
+                Serial.println("CV");
+                //char num_buf[4];
+                //char line[32];
+                //format_u8(i, num_buf);
+                //strcpy(line, "CV");
+                //strcat(line, num_buf);   // i hasn't changed, num_buf is still valid
+                //log_line(line);
                 child_done[i] = true; //mark child as done -> no more polling of this child in next attempts
             }
         }

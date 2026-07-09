@@ -208,9 +208,11 @@ bool rx_frame(
 {
     uint8_t sync = 0;
 
+    Serial.println("RS");
+
     // Receive SYNC byte and check if it matches the expected one
     if (!rx_byte(w, &sync, frame_timeout_us)) {
-        Serial.print("NS");
+        Serial.println("NS");
         return false;
     }
 

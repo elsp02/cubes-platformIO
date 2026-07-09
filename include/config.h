@@ -31,16 +31,16 @@
 #define BAUD_US             104
 #define BYTE_US             (10 * BAUD_US)
 #define TURNAROUND_US       (BAUD_US * 3)  //delay time for cubes between transactions (always before transmitting something)
-#define CHILD_TIMEOUT_US    (3 * BAUD_US)  // allowed waiting time for ACK_BUSY after sending CMD_STATUS 
+#define CHILD_TIMEOUT_US    (6 * BAUD_US)  // allowed waiting time for ACK_BUSY after sending CMD_STATUS 
 #define CMD_ACK_TIME        (2 * BYTE_US + TURNAROUND_US)
 
 #define FAILED_ATTEMPT_US   (CHILD_RETRIES * (BYTE_US + TURNAROUND_US + CHILD_TIMEOUT_US))
 #define DATA_FRAME_TIME     (3 * (BYTE_US +INTER_FRAME_TIMEOUT_US) + (CUBES_AMOUNT+1) * (3 * (BYTE_US + INTER_FRAME_TIMEOUT_US)))
 //cubes_amount +1 since baseplate is with its current child polling principle also a cube
 #define FRAME_TIMEOUT_US    (CUBES_AMOUNT+6) * CHILD_COUNT * (((CHILD_RETRIES-1) * FAILED_ATTEMPT_US) + CMD_ACK_TIME + DATA_FRAME_TIME + TURNAROUND_US) + 10* BAUD_US      // allowed Waiting time for receiving DATA_FRAME (start of SYNC) after child finishes recursive polling
-
+//frame timeout currently 0,65 sec
 #define INTER_FRAME_TIMEOUT_US (5 * BAUD_US)    // allowed waiting time for next byte in DATA_FRAME after SYNC when child already startet sending DATA_FRAME
-#define PARENT_TIMEOUT_US   FRAME_TIMEOUT_US          // timeout for parent incorrect communication/not sending bits (CMD_STATUS)
+#define PARENT_TIMEOUT_US   CHILD_TIMEOUT_US          // timeout for parent incorrect communication/not sending bits (CMD_STATUS)
 //--------------------------------------------
 
 // needs to be calculated
