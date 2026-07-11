@@ -1,0 +1,11 @@
+level_1: baseplate and one cube
+- baseplate initiates tree detection
+- cube sends identified tree payload
+- baseplate tries to send cmd_feedback
+- cube sends ack_feedback signal
+
+level 2: cube sends cmd_feedback to children and receives ack and sends ack_finished to baseplate
+
+level 3: send predefined feedback frame (2 bytes long with sync, len , feedback_payload and crc) to child and child checks if corect frame. if so relay feedback frame to children 
+
+level 4: send predefined feedback frame with id of all three cubes and cube should identify if own id is contained in the frame if so, serial print U if not X

@@ -280,8 +280,6 @@ static bool send_feedback_to_child(
     // 1. Send feedback command == CMD_STATUS to child (detection sequence)
     tx_byte(w, CMD_FEEDBACK);
 
-    // 2. Release line and wait for child ACK
-    _delay_us(TURNAROUND_US);
     wire_release(w);
 
     // 3. wait for ACK_BUSY == same as in detection sequence
@@ -300,7 +298,7 @@ static bool send_feedback_to_child(
     tx_frame(w, fb_payload, fb_payload_len);
     wire_release(w);
 
-    _delay_us(TURNAROUND_US);
+    //delay_us(TURNAROUND_US);
 
     // receive ack_finished valid/invalid == same as data frame from child (detection sequence)
     // 3. Wait for child's recursive feedback completion
@@ -336,7 +334,7 @@ static void handle_feedback (const wire_t *active_upstream){
         tx_byte(active_upstream, ACK_BUSY);
 
         //why needed
-        _delay_us(TURNAROUND_US);
+        //_delay_us(TURNAROUND_US);
         wire_release(active_upstream);
 
         //receive feedback payload and check if same == nothing that could be compared to the identification sequence
@@ -357,53 +355,56 @@ static void handle_feedback (const wire_t *active_upstream){
         }
 
         // 3. Check whether frame payload is correct and if not send ack_failed to parent
-        if (!is_expected_feedback_payload(fb_payload, fb_payload_len)) {
-            SER_PRINTLN("WFP");  // wrong feedback payload
-
-            _delay_us(TURNAROUND_US);
-            tx_byte(active_upstream, ACK_FAILED);
-            wire_release(active_upstream);
-            return;
+        if (feedback_contains_own_id(fb_payload, fb_payload_len)) {
+            SER_PRINTLN("U");  // wrong feedback payload
+        } else {
+            SER_PRINTLN("X");
         }
 
 
+
         //relay identical cmd_feedback to children == polling children
-        bool feedback_done[CHILD_COUNT] = { false };
+        //bool feedback_done[CHILD_COUNT] = { false };
         bool all_feedback_done = true;
 
         //frame to existing children == polling children (detection sequence)
-        for (uint8_t attempt = 0; attempt < CHILD_RETRIES; attempt++) { //retry loop
+        //for (uint8_t attempt = 0; attempt < CHILD_RETRIES; attempt++) { //retry loop
             for (uint8_t child = 0; child < CHILD_COUNT; child++) {  //child loop, iterates through children
 
                 if (!last_child_present[child]) {
                     continue;
                 }
 
-                if (feedback_done[child]) {
-                    continue;
-                }
+                //if (feedback_done[child]) {
+                 //   continue;
+                //}
 
-                if (send_feedback_to_child(children[child], fb_payload, fb_payload_len)){
+                if (!send_feedback_to_child(children[child], fb_payload, fb_payload_len)){
                     //Serial.println("CV");
-                    feedback_done[child] = true; //mark child as done -> no more polling of this child in next attempts
+                    //feedback_done[child] = true; //mark child as done -> no more polling of this child in next attempts
+                    all_feedback_done = false;
                 }
             }
-        }
+        //}
     
         //if all children that where present during the detection sequence has sent an ACK_BUSY/ACK FINISHED (current send_feedback_to_child functions return true), then send an ACK_FINISHED to parent
-        for (uint8_t child = 0; child < CHILD_COUNT; child++) {
-            if (last_child_present[child] && !feedback_done[child]) {
-                all_feedback_done = false;
-                break;
-            }
-        }
+        //for (uint8_t child = 0; child < CHILD_COUNT; child++) {
+          //  if (last_child_present[child] && !feedback_done[child]) {
+            //    all_feedback_done = false;
+              //  break;
+            //}
+        //}
+        _delay_us(TURNAROUND_US);
+
         if (all_feedback_done) {
             _delay_us(TURNAROUND_US);
             tx_byte(active_upstream, ACK_FINISHED);
         } else {
             _delay_us(TURNAROUND_US);
             tx_byte(active_upstream, ACK_FAILED); //if ack feedback loop failed bei einem kind  
-        }       
+        } 
+
+        wire_release(active_upstream);      
     }
 
 
@@ -414,7 +415,12 @@ static void handle_feedback (const wire_t *active_upstream){
 void setup()
 {
     release_all_lines();
+    // Configure LED pins as outputs.
+    PORTB.DIRSET = GREEN_LED_PIN | RED_LED_PIN;
 
+    // LEDs initially off.
+    PORTB.OUTCLR = GREEN_LED_PIN | RED_LED_PIN;
+    
     Serial.begin(115200);
     Serial.println("Prototype v2 child started");
 }
@@ -442,6 +448,7 @@ void loop()
     if (!orientation_known) {
         wait_for_valid_upstream_cmd(&active_upstream, &orientation_mask); // selects active upstream line and orientation value (orientation value must be transformed to orientation_byte for sending )
         orientation_known = true;
+        handle_detection(active_upstream, orientation_mask);
     }  else {
 
         // instead of function underneath it 
@@ -450,13 +457,6 @@ void loop()
         //    return;
         // }
         //}
-        
-        // if orientation is already known, no need to check orientation just receive CMD_STATUS
-        uint8_t b = 0;
-        if (!rx_byte(active_upstream, &b, PARENT_TIMEOUT_US)) {
-            //Serial.println("NC");
-            return;
-        }
 
         /*
         * Safety check.
@@ -464,6 +464,14 @@ void loop()
         */
         if (active_upstream == nullptr) {
             orientation_known = false;
+            release_all_lines();
+            return;
+        }
+        
+        // if orientation is already known, no need to check orientation just receive CMD_STATUS
+        uint8_t b = 0;
+        if (!rx_byte(active_upstream, &b, PARENT_TIMEOUT_US)) {
+            //Serial.println("NC");
             return;
         }
 

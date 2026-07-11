@@ -84,7 +84,6 @@ static bool send_feedback_to_child(
     tx_byte(w, CMD_FEEDBACK);
 
     // 2. Release line and wait for child ACK
-    _delay_us(TURNAROUND_US);
     wire_release(w);
 
     // wait for ACK_BUSY == same as in detection sequence
@@ -103,6 +102,7 @@ static bool send_feedback_to_child(
     tx_frame(children_pin, feedback_frame, feedback_len)
     */
     _delay_us(TURNAROUND_US);
+    
     tx_frame(w, fb_payload, fb_payload_len);
 
     wire_release(w);
@@ -138,8 +138,6 @@ static bool send_feedback_to_child(
 void setup()
 {
     wire_release(&child_0);
-    PORTB.DIRSET = LED_PIN;     //define as output pin for led
-    PORTB.OUTCLR = LED_PIN; 
 
     Serial.begin(115200);
     SER_PRINT("Prototype v5 parent started");
@@ -277,7 +275,7 @@ void loop()
     
 
     #if SERIAL_DEBUG_END
-        delay(50);
+        delay(150);
     #endif
 
 }

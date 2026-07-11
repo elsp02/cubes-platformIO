@@ -64,18 +64,23 @@
 #define LED_GREEN           0x01
 #define LED_RED             0x02
 
+#define CUBE_A_ID  0x10
+#define CUBE_B_ID  0x11
+#define CUBE_C_ID  0x12
+
 
 //-----------------------------------------------------------
 // FEEDBACK SYSTEM
 //-----------------------------------------------------------
-#define FEEDBACK_FINISHED_TIMEOUT_US 150000UL//calculaten
+#define FEEDBACK_FINISHED_TIMEOUT_US 500000UL//calculaten
 
 #define SERIAL_WRITING 0
 #define SERIAL_DEBUG   0
 #define SERIAL_DEBUG_END 1
 #define LOG_BUF_SIZE 192 //ausrechnen 
 
-#define LED_PIN             PIN4_bm
+#define GREEN_LED_PIN            PIN5_bm
+#define RED_LED_PIN              PIN4_bm
 #define LOG_BUF_SIZE        192 // one ASCII character uses one byte -> because of appenln: letter + \r \n = letter+3 (im durchschnitt 2 zeichen pro text) :: 192/5 = 
 #if SERIAL_WRITING 
     #define SER_PRINT(x)    
