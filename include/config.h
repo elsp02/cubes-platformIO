@@ -57,9 +57,19 @@
 #define DATA_BYTE           0x42
 #define SYNC_BYTE           0xA5
 
+#define CMD_FEEDBACK        0xCC
+#define ACK_FINISHED        0x66
+#define ACK_FAILED          0x77
+
+#define LED_GREEN           0x01
+#define LED_RED             0x02
+
+
 //-----------------------------------------------------------
 // FEEDBACK SYSTEM
 //-----------------------------------------------------------
+#define FEEDBACK_FINISHED_TIMEOUT_US 150000UL//calculaten
+
 #define SERIAL_WRITING 0
 #define SERIAL_DEBUG   0
 #define SERIAL_DEBUG_END 1

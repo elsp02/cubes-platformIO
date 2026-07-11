@@ -133,6 +133,54 @@ Serial.print(node->node_id, HEX);
 //
 
 
+Repository
+git add . -> alles adden
+git commit -m "wefwe" -> sachen comitten/speichern
+git push -> in github veröffentlichen den commit 
+git push -u origin main -> damit github branch für lokalen branch erstellt wird, damit man dann den lokalen branch in den github branch pushen kann 
+git switch -c neuer brach name
+git switch main -> zwischen branchen switchen
+git branch - schauen welche branches es gibt 
+git branch -r schauen welche branches auf github gepushed sind
+
+git reset --soft HEAD~1  - gemachten commit zurückziehen
+
+git branch -d name       - branch löschen (man darf aber nicht auf dem branch grad sein)
+
+git remote add origin https://...  - lokales repository mit einem repository in github verknüpfen
+
+git reflog -> verloreren branch wiederfinden 
+
+git branch -m neuer name -> branch umbenennen
+
+git fetch   -> downloaded änderungen von remote repository zum lokalen repository 
+
+-----------------------
+VS code
+browser vorschau: 
+    - strg + shift + p damit sich command leiste öffnet
+    - browser: open integrated browser eingeben
+    - url eingeben
+
+-----------------------
+PLATFROMIO 
+flashen
+- pio run -e env name // building
+- pio run -e env name -t upload //uploading
+-grafisch: platformIO Icon -> tasks -> cube/baseplate
+// env name = baseplate/cube -> steht in .ini [env: baseplate]
+ATTENTION: when using a different env you have to also update [platformio]
+    [platformio]; 
+    Default build target
+    default_envs = cube  //here name of env 
+
+build flags
+= compiler options to define different e.g constants, dis/enable features ...
+-> no need of different files for different env, just different build flags (e.g for the individual ID of the cubes )
+//-DNAME=value comparable to #define NAME value (in .h file)
+
+
+
 
 
 
