@@ -9,13 +9,13 @@
 // ----------------------------------------------------------
 #define FB_PAYLOAD_LEN 6
 
-extern const uint8_t predefined_feedback_payload[FB_PAYLOAD_LEN];
+//extern const uint8_t predefined_feedback_payload[FB_PAYLOAD_LEN];
 
 bool feedback_contains_own_id(const uint8_t *payload, uint8_t len);
 //bool is_expected_feedback_payload(const uint8_t *payload, uint8_t len);
 
-//extern const uint8_t feedback_payloads[FEEDBACK_COUNT][FB_MAX_PAYLOAD_LEN];
-//extern const uint8_t feedback_payload_lens[FEEDBACK_COUNT];
+extern const uint8_t predefined_feedback_payload[4][FB_MAX_PAYLOAD_LEN];
+extern const uint8_t predefined_feedback_payload_len[4];
 
 //extern uint8_t feedback_index;
 

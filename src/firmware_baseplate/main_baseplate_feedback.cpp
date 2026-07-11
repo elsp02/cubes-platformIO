@@ -21,6 +21,7 @@
 
 #define HEARTBEAT_INTERVAL_CYCLE 50 // after 50 cycles payload is sent again even if it hasn´t changed
 static uint16_t cycles_since_last_send = 0;
+static uint8_t feedback_index = 0;
 // ----------------------------------------------------------
 // Wire descriptors
 // ----------------------------------------------------------
@@ -218,37 +219,6 @@ void loop()
 
     _delay_us(3 * BYTE_US);
 
-    bool feedback_done[CHILD_COUNT] = { false };
-    bool feedback_all_done = false;
-
-    // FEEDBACK FRAME to children - same as child polling (detection sequence)
-        for (uint8_t attempt = 0; attempt < CHILD_RETRIES; attempt++) {
-            for (uint8_t child = 0; child < CHILD_COUNT; child++) {
-
-                if (!child_done[child]) {
-                    continue;   // no detected child
-                }
-
-                if (feedback_done[child]) {
-                    continue;   // feedback already sent successfully
-                }
-
-                if (send_feedback_to_child(children[child], predefined_feedback_payload, FB_PAYLOAD_LEN))
-                 {
-                    SER_PRINTLN("CFA");
-                    feedback_done[child] = true;
-                    feedback_all_done = true;
-                }
-            }
-            if (feedback_all_done){
-                break;
-            }
-        } 
-
-    #if SERIAL_DEBUG_END
-        log_flush();
-    #endif
-
     //Heartbeat sending
     bool changed = payload_changed (payload, payload_len);
     cycles_since_last_send ++;
@@ -265,6 +235,38 @@ void loop()
 
         #endif
 
+        bool feedback_done[CHILD_COUNT] = { false };
+        bool feedback_all_done = false;
+
+        // FEEDBACK FRAME to children - same as child polling (detection sequence)
+            for (uint8_t attempt = 0; attempt < CHILD_RETRIES; attempt++) {
+                for (uint8_t child = 0; child < CHILD_COUNT; child++) {
+
+                    if (!child_done[child]) {
+                        continue;   // no detected child
+                    }
+
+                    if (feedback_done[child]) {
+                        continue;   // feedback already sent successfully
+                    }
+
+                    if (send_feedback_to_child(children[child], predefined_feedback_payload[feedback_index], predefined_feedback_payload_len[feedback_index]))
+                    {
+                        SER_PRINTLN("CFA");
+                        feedback_done[child] = true;
+                        feedback_all_done = true;
+                    }
+                }
+                if (feedback_all_done){
+                    break;
+                }
+            }
+        feedback_index ++;
+        
+        if (feedback_index >= 4) {
+            feedback_index = 0;
+        }   
+
         #if not SERIAL_WRITING
         print_payload_hex(payload, payload_len);
         #endif
@@ -272,7 +274,10 @@ void loop()
         remember_sent_payload(payload, payload_len);
         cycles_since_last_send = 0;
     }
-    
+
+    #if SERIAL_DEBUG_END
+        log_flush();
+    #endif
 
     #if SERIAL_DEBUG_END
         delay(150);

@@ -81,6 +81,12 @@
 
 #define GREEN_LED_PIN            PIN5_bm
 #define RED_LED_PIN              PIN4_bm
+
+
+#define FB_MAX_CUBES        3
+#define FB_ITEM_LEN         2
+#define FB_MAX_PAYLOAD_LEN  (FB_MAX_CUBES * FB_ITEM_LEN)
+
 #define LOG_BUF_SIZE        192 // one ASCII character uses one byte -> because of appenln: letter + \r \n = letter+3 (im durchschnitt 2 zeichen pro text) :: 192/5 = 
 #if SERIAL_WRITING 
     #define SER_PRINT(x)    
