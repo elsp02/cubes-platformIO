@@ -148,7 +148,7 @@ void loop()
 
     //PORTB.OUTTGL = LED_PIN;               // PB4 as LED output
     release_all_lines();
-    //log_flush();
+    log_flush();
 
     //Heartbeat sending
     bool changed = payload_changed (payload, payload_len);

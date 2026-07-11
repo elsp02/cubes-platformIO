@@ -16,6 +16,7 @@
 
 #include "config.h"
 #include "wire_bus.h"
+#include "serial_writing.h"
 
 // ----------------------------------------------------------
 // Wire descriptors- same as v4
@@ -201,7 +202,7 @@ static bool poll_child(const wire_t *w, uint8_t *data_out, uint8_t max_child_pay
             FRAME_TIMEOUT_US,
             INTER_FRAME_TIMEOUT_US
         )) {
-        Serial.println("WD");
+        //Serial.println("WD");
         return false;
     }
 
@@ -306,13 +307,13 @@ void loop()
                     MAX_CHILD_PAYLOAD_LEN, //with max length of MAX_CHILD_PAYLOAD_LEN to avoid overflow
                     &child_payload_len[i]  //and stores the received payload length from child[i])) {
             )){
-                Serial.println("CV");
-                //char num_buf[4];
-                //char line[32];
-                //format_u8(i, num_buf);
-                //strcpy(line, "CV");
-                //strcat(line, num_buf);   // i hasn't changed, num_buf is still valid
-                //log_line(line);
+                //Serial.println("CV");
+                char num_buf[4];
+                char line[32];
+                format_u8(i, num_buf);
+                strcpy(line, "CV");
+                strcat(line, num_buf);   // i hasn't changed, num_buf is still valid
+                log_line(line);
                 child_done[i] = true; //mark child as done -> no more polling of this child in next attempts
             }
         }
@@ -374,6 +375,6 @@ void loop()
     wire_release(active_upstream);
     
     release_all_lines();
-    //log_flush();
+    log_flush();
    
 }
