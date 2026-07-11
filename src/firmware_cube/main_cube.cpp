@@ -17,6 +17,7 @@
 #include "config.h"
 #include "wire_bus.h"
 #include "serial_writing.h"
+#include "poll_child.h"
 
 // ----------------------------------------------------------
 // Wire descriptors- same as v4
@@ -134,7 +135,7 @@ static bool wait_for_cmd_status(const wire_t *w)
 
         // Wrong byte -- discard and keep scanning,
         // same as find_sync_byte discarding non-SYNC bytes.
-        Serial.println("WC");
+        SER_PRINTLN("WC");
     }
 }
 //-----------------------------------------------------------
@@ -161,54 +162,6 @@ static void format_u8(uint8_t value, char *buf)
 // Poll one child port- rx frame  is missing
 // ----------------------------------------------------------
 
-static bool poll_child(const wire_t *w, uint8_t *data_out, uint8_t max_child_payload_len, uint8_t *child_payload_len)
-{
-    uint8_t b = 0;
-
-    /*
-     * 1. Send CMD_STATUS to child.
-     */
-    tx_byte(w, CMD_STATUS);
-
-    /*
-     * 2. Switch direction / wait before receiving.
-     */
-    _delay_us(TURNAROUND_US);
-    wire_release(w);
-
-    /*
-     * 3. Wait for ACK_BUSY.
-     */
-    if (!rx_byte(w, &b, CHILD_TIMEOUT_US)) {
-        Serial.println("NA");
-        return false;
-    }
-
-    if (b != ACK_BUSY) {
-        Serial.println("WA");
-        return false;
-    }
-
-    Serial.println("CA");
-    /*
-     * 4. ACK received, now wait for child data byte.
-     */
-
-    if (!rx_frame(
-            w,
-            data_out,
-            max_child_payload_len,
-            child_payload_len,
-            FRAME_TIMEOUT_US,
-            INTER_FRAME_TIMEOUT_US
-        )) {
-        //Serial.println("WD");
-        return false;
-    }
-
-    return true;
-}
-
 // ----------------------------------------------------------
 // Arduino setup - release all lines
 // ----------------------------------------------------------
@@ -217,7 +170,7 @@ void setup()
 {
     release_all_lines();
 
-    Serial.begin(9600);
+    Serial.begin(115200);
     Serial.println("Prototype v2 child started");
 }
 
@@ -227,6 +180,7 @@ void setup()
 
 void loop()
 {
+    log_reset();
     /*
      * These variables must be static because orientation detection
      * should only happen once, but the detected active upstream line
@@ -260,7 +214,7 @@ void loop()
         }
 
         if (b != CMD_STATUS) {
-            Serial.println("WC");
+            SER_PRINTLN("WC");
             return;
         }
     }
@@ -307,13 +261,13 @@ void loop()
                     MAX_CHILD_PAYLOAD_LEN, //with max length of MAX_CHILD_PAYLOAD_LEN to avoid overflow
                     &child_payload_len[i]  //and stores the received payload length from child[i])) {
             )){
-                //Serial.println("CV");
-                char num_buf[4];
-                char line[32];
-                format_u8(i, num_buf);
-                strcpy(line, "CV");
-                strcat(line, num_buf);   // i hasn't changed, num_buf is still valid
-                log_line(line);
+                SER_PRINTLN("CV");
+                //char num_buf[4];
+                //char line[32];
+                //format_u8(i, num_buf);
+                //strcpy(line, "CV");
+                //strcat(line, num_buf);   // i hasn't changed, num_buf is still valid
+                //log_line(line);
                 child_done[i] = true; //mark child as done -> no more polling of this child in next attempts
             }
         }
@@ -358,12 +312,12 @@ void loop()
     /*
      * 4. Print/debug childmask
      */
-    Serial.print("CM");
+    SER_PRINT("CM");
 
     if ((child_mask & 0b10) == 0) {
-        Serial.print("0");
+        SER_PRINT("0");
     }
-    Serial.println(child_mask, BIN);
+    SER_PRINTLN2(child_mask, BIN);
 
     /*
      * 5. Send predefined DATA_BYTE upstream.
@@ -375,6 +329,9 @@ void loop()
     wire_release(active_upstream);
     
     release_all_lines();
-    log_flush();
+
+    #if SERIAL_DEBUG_END
+        log_flush();
+    #endif
    
 }

@@ -1,5 +1,6 @@
 // everything for serial writing
 #include "config.h"
+#include "serial_writing.h"
 
 #include <util/delay.h>
 //-----------------------------------------------------------
@@ -45,7 +46,7 @@ void remember_sent_payload(const uint8_t *payload, uint8_t payload_len)
 //----------------------------------------------------
 // for log_line
 //----------------------------------------------------
-static char log_buf[LOG_BUF_SIZE];
+/*static char log_buf[LOG_BUF_SIZE];
 static uint8_t log_len = 0;
 
 static void log_line(const char *msg)
@@ -64,5 +65,65 @@ static void log_flush(void)
     if (log_len > 0) {
         Serial.write((const uint8_t *)log_buf, log_len);
         log_len = 0;
+    }
+}*/
+
+
+//------------------------------
+// error message buffer
+//------------------------------
+static char log_buffer[LOG_BUF_SIZE];
+static uint16_t log_length = 0;
+
+
+// Clear the buffer at the beginning of a detection cycle
+void log_reset(void)
+{
+    log_length = 0;
+}
+
+
+// Add text without a line break
+void log_append(const char *message)
+{
+    while (*message != '\0' && log_length < LOG_BUF_SIZE) {
+        log_buffer[log_length++] = *message++;
+    }
+}
+
+
+// Add text with the same line ending as Serial.println()
+void log_appendln(const char *message)
+{
+    log_append(message);
+    log_append("\r\n");
+}
+
+void log_append(uint32_t value, uint8_t base)
+{
+    char number_buffer[33];
+
+    // Convert number into text.
+    // Maximum size is 32 binary digits plus '\0'.
+    ultoa(value, number_buffer, base);
+
+    log_append(number_buffer);
+}
+
+
+void log_appendln(uint32_t value, uint8_t base)
+{
+    log_append(value, base);
+    log_append("\r\n");
+}
+
+// Print everything stored in the buffer
+void log_flush(void)
+{
+    if (log_length > 0) {
+        Serial.write(
+            reinterpret_cast<const uint8_t *>(log_buffer),
+            log_length
+        );
     }
 }

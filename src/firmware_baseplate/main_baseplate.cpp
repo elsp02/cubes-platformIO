@@ -73,7 +73,7 @@ void setup()
     PORTB.DIRSET = LED_PIN;     //define as output pin for led
     PORTB.OUTCLR = LED_PIN; 
 
-    Serial.begin(9600);
+    Serial.begin(115200);
     SER_PRINT("Prototype v5 parent started");
 }
 
@@ -82,7 +82,8 @@ void setup()
 // ----------------------------------------------------------
 void loop()
 {
-        // 0. make sure line is idle / give child time to get back to listening
+    log_reset();
+    // 0. make sure line is idle / give child time to get back to listening
     wire_release(&child_0);
     _delay_us(TURNAROUND_US);
 
@@ -148,7 +149,10 @@ void loop()
 
     //PORTB.OUTTGL = LED_PIN;               // PB4 as LED output
     release_all_lines();
-    log_flush();
+
+    #if SERIAL_DEBUG_END
+        log_flush();
+    #endif
 
     //Heartbeat sending
     bool changed = payload_changed (payload, payload_len);
@@ -173,6 +177,9 @@ void loop()
         remember_sent_payload(payload, payload_len);
         cycles_since_last_send = 0;
     }
+    #if SERIAL_DEBUG_END
+        delay(50);
+    #endif
 
 }
 

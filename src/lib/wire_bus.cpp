@@ -3,6 +3,7 @@
 
 #include "config.h"
 #include "wire_bus.h"
+#include "serial_writing.h"
 
 #include <util/delay.h>
 
@@ -208,16 +209,16 @@ bool rx_frame(
 {
     uint8_t sync = 0;
 
-    Serial.println("RS");
+    SER_PRINTLN("RS");
 
     // Receive SYNC byte and check if it matches the expected one
     if (!rx_byte(w, &sync, frame_timeout_us)) {
-        Serial.println("NS");
+        SER_PRINTLN("NS");
         return false;
     }
 
     if (sync != SYNC_BYTE) {
-        Serial.println("WS");
+        SER_PRINTLN("WS");
         return false;
     }
 
@@ -226,19 +227,19 @@ bool rx_frame(
     uint8_t len = 0;
 
     if (!rx_byte(w, &len, frame_timeout_us)) {
-        Serial.println("TD");
+        SER_PRINTLN("TD");
         return false;
     }
 
     if (len > max_payload_len) {
-        Serial.println("PL");
+        SER_PRINTLN("PL");
         return false;
     }
 
     // Receive PAYLOAD bytes
     for (uint8_t i = 0; i < len; i++) {   //repeat this loop for len times
         if (!rx_byte(w, &payload[i], inter_frame_timeout_us)) {
-            Serial.println("WP");
+            SER_PRINTLN("WP");
             return false;
         }  
     }
@@ -247,14 +248,14 @@ bool rx_frame(
     uint8_t received_checksum = 0;
 
     if (!rx_byte(w, &received_checksum, inter_frame_timeout_us)) {
-        Serial.println("NCS");
+        SER_PRINTLN("NCS");
         return false;
     }
 
     uint8_t calculated_checksum = calc_checksum(len, payload);
 
     if (received_checksum != calculated_checksum) {
-        Serial.println("WCS");
+        SER_PRINTLN("WCS");
         return false;
     }
 
@@ -264,7 +265,7 @@ bool rx_frame(
 }
 
 //----------
-static char log_buf[LOG_BUF_SIZE];
+/*static char log_buf[LOG_BUF_SIZE];
 static uint8_t log_len = 0;
 
 static void log_line(const char *msg)
@@ -285,4 +286,4 @@ static void log_flush(void)
         log_len = 0;
     }
 }
-
+*/

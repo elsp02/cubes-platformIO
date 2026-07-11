@@ -1,5 +1,6 @@
 #include "config.h"
 #include "wire_bus.h"
+#include "serial_writing.h"
 
 #include <util/delay.h>
 // ----------------------------------------------------------

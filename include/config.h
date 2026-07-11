@@ -61,19 +61,29 @@
 // FEEDBACK SYSTEM
 //-----------------------------------------------------------
 #define SERIAL_WRITING 0
+#define SERIAL_DEBUG   0
+#define SERIAL_DEBUG_END 1
+#define LOG_BUF_SIZE 192 //ausrechnen 
 
 #define LED_PIN             PIN4_bm
-#define LOG_BUF_SIZE        192 //needs to be calculated
+#define LOG_BUF_SIZE        192 // one ASCII character uses one byte -> because of appenln: letter + \r \n = letter+3 (im durchschnitt 2 zeichen pro text) :: 192/5 = 
 #if SERIAL_WRITING 
     #define SER_PRINT(x)    
     #define SER_PRINTLN(x)  
     #define SER_PRINTLN2(x,y)
-    #else
+#endif
+
+#if SERIAL_DEBUG
     #define SER_PRINT(x)    Serial.print(x)
     #define SER_PRINTLN(x)  Serial.println(x)
     #define SER_PRINTLN2(x, y) Serial.println(x,y )
 #endif
 
+#if SERIAL_DEBUG_END
+    #define SER_PRINT(x)    log_append(x)
+    #define SER_PRINTLN(x)  log_appendln(x)
+    #define SER_PRINTLN2(x, y) log_appendln(x,y )
+#endif
 // ----------------------------------------------------------
 // Node data
 // ----------------------------------------------------------
