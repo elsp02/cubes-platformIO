@@ -286,6 +286,7 @@ static bool send_feedback_to_child(
     }
     else if (b == ACK_FAILED) {
         SER_PRINTLN("FFF");  // feedback failed
+        return false;
     } 
     else{
         SER_PRINTLN("WFF");
@@ -338,41 +339,29 @@ static void handle_feedback (const wire_t *active_upstream){
         bool all_feedback_done = true;
 
         //frame to existing children == polling children (detection sequence)
-        //for (uint8_t attempt = 0; attempt < CHILD_RETRIES; attempt++) { //retry loop
             for (uint8_t child = 0; child < CHILD_COUNT; child++) {  //child loop, iterates through children
 
                 if (!last_child_present[child]) {
                     continue;
                 }
 
-                //if (feedback_done[child]) {
-                 //   continue;
-                //}
-
+                //if one send feedback to child return a false - then end loop and transmit ACK failed to parent
                 if (!send_feedback_to_child(children[child], fb_payload, fb_payload_len)){
                     //Serial.println("CV");
                     //feedback_done[child] = true; //mark child as done -> no more polling of this child in next attempts
                     all_feedback_done = false;
+                    _delay_us(TURNAROUND_US);
+                    tx_byte(active_upstream, ACK_FAILED);
+                    return;   // stop handle_feedback() immediately
+
                 }
             }
-        //}
-    
-        //if all children that where present during the detection sequence has sent an ACK_BUSY/ACK FINISHED (current send_feedback_to_child functions return true), then send an ACK_FINISHED to parent
-        //for (uint8_t child = 0; child < CHILD_COUNT; child++) {
-          //  if (last_child_present[child] && !feedback_done[child]) {
-            //    all_feedback_done = false;
-              //  break;
-            //}
-        //}
-        _delay_us(TURNAROUND_US);
 
-        if (all_feedback_done) {
+            // if all send feedback to child were valid, send ACK_FINISHED (Only reached if every existing child succeeded)
             _delay_us(TURNAROUND_US);
             tx_byte(active_upstream, ACK_FINISHED);
-        } else {
-            _delay_us(TURNAROUND_US);
-            tx_byte(active_upstream, ACK_FAILED); //if ack feedback loop failed bei einem kind  
-        } 
+    
+        _delay_us(TURNAROUND_US);
 
         wire_release(active_upstream);      
     }

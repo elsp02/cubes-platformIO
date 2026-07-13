@@ -116,21 +116,21 @@ static bool send_feedback_to_child(
         }
 
     if (b == ACK_FINISHED) {
-        SER_PRINTLN("CFF");
+            SER_PRINTLN("CFF");
+            wire_release(w);
+            return true;
+        }
 
-    }
-    else if (b == ACK_FAILED) {
-        SER_PRINTLN("FFF");  // feedback failed
-    } 
-    else{
+        if (b == ACK_FAILED) {
+            SER_PRINTLN("FFF");
+            wire_release(w);
+            return false;
+        }
+
         SER_PRINTLN("WFF");
+        wire_release(w);
         return false;
     }
-
-
-    wire_release(w);
-    return true;
-}
 
 // ----------------------------------------------------------
 // Arduino setup
@@ -235,7 +235,7 @@ void loop()
         // FEEDBACK FRAME to children - same as child polling (detection sequence)
             for (uint8_t attempt = 0; attempt < CHILD_RETRIES; attempt++) {
                 for (uint8_t child = 0; child < CHILD_COUNT; child++) {
-
+                    
                     if (!child_done[child]) {
                         continue;   // no detected child
                     }
@@ -250,10 +250,10 @@ void loop()
                         feedback_done[child] = true;
                         feedback_all_done = true;
                     }
-                }
-                if (feedback_all_done){
-                    break;
-                }
+                    }
+                    if (feedback_all_done){
+                        break;
+                    }
             }
         feedback_index ++;
         
