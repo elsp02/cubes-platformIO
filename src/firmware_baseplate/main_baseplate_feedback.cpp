@@ -77,7 +77,6 @@ static bool send_feedback_to_child(
 {
     uint8_t b = 0;
 
-    //brauch ich das? nicht in poll_child function
     wire_release(w);
     _delay_us(TURNAROUND_US);
 
@@ -154,10 +153,8 @@ void loop()
     wire_release(&child_0);
     _delay_us(TURNAROUND_US);
 
-    // 1. send CMD_STATUS to child
-    //tx_byte(&child_0, CMD_STATUS);
-    // wire_release(&child_0); 
 
+    // 1. poll child
     uint8_t child_payload[CHILD_COUNT][MAX_CHILD_PAYLOAD_LEN];   //temporary storage (2d array) for child payload results -> child_payloads[child_index][payload_index] = byte received from child
     uint8_t child_payload_len[CHILD_COUNT] = {0};                // temporary storage for child payload lengths -> child_payload_len[child_index] = length of payload received from child
     bool child_done[CHILD_COUNT] = {false};
@@ -165,8 +162,6 @@ void loop()
 
     for (uint8_t attempt = 0; attempt < CHILD_RETRIES; attempt ++){
         for (uint8_t child = 0; child < CHILD_COUNT; child ++){
-            //Serial.print("attempt ");
-            //Serial.print(attempt);
 
             if (child_done[child]) {
                 continue;
@@ -214,7 +209,6 @@ void loop()
         }
     }
 
-    //PORTB.OUTTGL = LED_PIN;               // PB4 as LED output
     release_all_lines();
 
     _delay_us(3 * BYTE_US);

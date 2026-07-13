@@ -140,26 +140,6 @@ static bool wait_for_cmd_status(const wire_t *w)
         SER_PRINTLN("WC");
     }
 }
-//-----------------------------------------------------------
-// Converts a uint8_t (0-255) to a decimal string. buf must be at least 4 bytes.
-static void format_u8(uint8_t value, char *buf)
-{
-    if (value >= 100) {
-        buf[0] = '0' + (value / 100);
-        value %= 100;
-        buf[1] = '0' + (value / 10);
-        buf[2] = '0' + (value % 10);
-        buf[3] = '\0';
-    } else if (value >= 10) {
-        buf[0] = '0' + (value / 10);
-        buf[1] = '0' + (value % 10);
-        buf[2] = '\0';
-    } else {
-        buf[0] = '0' + value;
-        buf[1] = '\0';
-    }
-}
-
 // ----------------------------------------------------------
 // Handle Detection
 // ----------------------------------------------------------
@@ -174,10 +154,6 @@ static void handle_detection(const wire_t *active_upstream, uint8_t orientation_
 
      /*
      * 3. Poll own children with retries.
-     *
-     * Child payloads are stored separately first.
-     * This keeps the final payload order correct:
-     * child 0 payload first, then child 1 payload.
      */
     uint8_t child_payload[CHILD_COUNT][MAX_CHILD_PAYLOAD_LEN];   //temporary storage (2d array) for child payload results -> child_payloads[child_index][payload_index] = byte received from child
      // problem of child_payload: always MAX_CHILD_PAYLOAD_LEN long even if e.g actual payload is just 3 bytes long -> not RAM efficient 
@@ -255,11 +231,9 @@ static void handle_detection(const wire_t *active_upstream, uint8_t orientation_
     SER_PRINTLN2(child_mask, BIN);
 
     /*
-     * 5. Send predefined DATA_BYTE upstream.
+     send data frame to parent
      */
     _delay_us(TURNAROUND_US);
-    
-    //log_lineln("data byte gesendet, loop von neu");
     tx_frame(active_upstream, payload, payload_len);
 }
 
@@ -298,7 +272,6 @@ static bool send_feedback_to_child(
     tx_frame(w, fb_payload, fb_payload_len);
     wire_release(w);
 
-    //delay_us(TURNAROUND_US);
 
     // receive ack_finished valid/invalid == same as data frame from child (detection sequence)
     // 3. Wait for child's recursive feedback completion
@@ -338,7 +311,6 @@ static void handle_feedback (const wire_t *active_upstream){
         wire_release(active_upstream);
 
         //receive feedback payload and check if same == nothing that could be compared to the identification sequence
-        //überspringe send feedback to child process weil feedback frame eh schon falsch angekommen}
 
         if (!rx_frame(
                 active_upstream,
@@ -360,8 +332,6 @@ static void handle_feedback (const wire_t *active_upstream){
         } else {
             SER_PRINTLN("X");
         }
-
-
 
         //relay identical cmd_feedback to children == polling children
         //bool feedback_done[CHILD_COUNT] = { false };
@@ -433,10 +403,6 @@ void loop()
 {
     log_reset();
     /*
-     * These variables must be static because orientation detection
-     * should only happen once, but the detected active upstream line
-     * must still be available in later loop() iterations.
-     * same as v4
      */
     static bool orientation_known = false;
     static const wire_t *active_upstream = nullptr; //code merkt sich dauerhaft die Orientierungsleitung
@@ -450,13 +416,6 @@ void loop()
         orientation_known = true;
         handle_detection(active_upstream, orientation_mask);
     }  else {
-
-        // instead of function underneath it 
-        //if (!wait_for_cmd_status(active_upstream)) {
-        //    log_line("NC");
-        //    return;
-        // }
-        //}
 
         /*
         * Safety check.

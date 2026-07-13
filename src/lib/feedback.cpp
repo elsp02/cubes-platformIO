@@ -5,16 +5,6 @@
 
 #include <util/delay.h>
 
-//#define FEEDBACK_COUNT (sizeof(feedback_payload_lens) / sizeof(feedback_payload_lens[0]))
-
-
-//--------------------
-/*const uint8_t predefined_feedback_payload[FB_PAYLOAD_LEN] = {
-    CUBE_A_ID, LED_RED, 
-    CUBE_B_ID, LED_RED,
-    CUBE_C_ID, LED_RED
-};*/
-
 bool feedback_contains_own_id(const uint8_t *payload, uint8_t len)
 {   bool found_own_id = false;
     for (uint8_t i = 0; i < len; i+=2) {

@@ -12,6 +12,8 @@ level 4: send predefined feedback frame with id of all three cubes and cube shou
 
 level 5: feedback loop only if payload changed or heartbeat, three different feedback payloads
 
+level 6: feedback loop retry only when baseplate receives not CFF
+
 
 
 final: target tree with NODE containing the Type of block (appearance) in the first 4 bits of one byte (e.g. 00001111). NODE_ID of a cube has also these 4 bits and then 4 individual bits for identify this individual node/cube (e.g. 10001111)
