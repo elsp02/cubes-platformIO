@@ -51,3 +51,87 @@ final: target tree with NODE containing the Type of block (appearance) in the fi
         uint8_t count;
      }compare_result_t
 
+
+-----------------------
+COMPARISON SEQUENCE
+1. Receive the actual tree
+- The baseplate starts detection with CMD_STATUS.
+- The cubes recursively build the serialized actual tree.
+- The baseplate receives the complete DATA_FRAME.
+
+2. Check whether the actual tree changed
+- Compare the new serialized tree with the previous_actual_tree.
+- If nothing changed, no new comparison or feedback is required -> back to CMD_STATUS
+- If it changed/(heartbeat) -> store as current_actual_tree and continue with CMD_ FEEDBACK 
+
+3. Parse the actual tree
+- Deserialize the actual payload into nodes.
+- For each node, store: 
+    NODE_ID (Including cube type (3 bits) and individual instance ID (5bits))
+    parent?
+    child port?
+    orientation
+    child mask
+
+4. Select the expected target state
+- Use the construction order selected by the user.
+
+5. Compare every actual node with the target
+- Compare the actual node at its tree position with the expected node.
+- Check in a defined order:
+(strict strucutral rule: when a parent is wrong, all descendants are also wrong because their complete path is invalid)
+    cube type
+    parent
+    port
+    orientation
+- Store the result in current_compare_result.
+- for cubes/LED derivation: 
+    compare feedback payload with previous payload and store FEEDBACK FRAME: SYNC LEN FEEDBACK-PAYLOAD CRC
+    LED FEEDBACK payload for cubes:
+        Previous comparison |	Current comparison|	 Feedback
+        absent	                correct	              green - add to feedback payload
+        correct	                correct	              omit → off 
+        invalid	                correct	              green - add to feedback payload
+        absent	                invalid	              red - add to feedback payload
+        correct	                invalid	              red - add to feedback payload
+        invalid	                invalid	              red - add to feedback payload
+        present	                absent	              nothing; cube is disconnected
+
+      LED STATE for cubes 
+      - green: 0x01
+      - red: 0x02
+- Build feedback_result.
+
+- for visualization:
+    Build an evaluated binary tree/combined node for pc: NODE_ID | ORIENTATION | CHILD_MASK | STATUS_FEEDBACK | CHILDREN
+    cube-to-baseplate detection frame should remain: NODE_ID | ORIENTATION | CHILD_MASK | CHILDREN
+    Cube feedback for visualization (bit mask for when cube has multiple errors):
+     - error_none = 0x00
+     - error_wrong cube type = bit 0 (1 << 0)
+     - error_wrong_parent = bit 1 (1 <<1)
+     - error_wrong_port = bit 2 (1<<2)
+     - erron_wrong_orientation = bit 3 (1<<3)
+
+     comparison result table entry:
+     typedef struct{
+        uint8_t node_id,
+        uint8_t led_state, //just for cubes
+        uint8_t error_mask // just for Visualization
+     }compare_entry_t
+
+     result table
+     typedef struct{
+        compare_entry entries [MAX_NODES];
+        uint8_t count;
+     }compare_result_t
+
+- send parsed tree (JSON - maybe better binary?) to pc/visualization gateway
+- send feedback frame through all cubes (handle feedback)
+- Each cube:
+    - searches for its complete NODE_ID,
+    - sets green/red if found,
+    - turns LEDs off if absent,
+    - fwhorwards the unchanged frame to detected children.
+- start again with CMD_STATUS from baseplate 
+
+
