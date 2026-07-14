@@ -38,20 +38,6 @@ final: target tree with NODE containing the Type of block (appearance) in the fi
      - error_wrong_port = bit 2 (1<<2)
      - erron_wrong_orientation = bit 3 (1<<3)
 
-     comparison result table entry:
-     typedef struct{
-        uint8_t node_id,
-        uint8_t led_state, //just for cubes
-        uint8_t error_mask // just for Visualization
-     }compare_entry_t
-
-     result table
-     typedef struct{
-        compare_entry entries [MAX_NODES];
-        uint8_t count;
-     }compare_result_t
-
-
 -----------------------
 COMPARISON SEQUENCE
 1. Receive the actual tree
@@ -59,12 +45,18 @@ COMPARISON SEQUENCE
 - The cubes recursively build the serialized actual tree.
 - The baseplate receives the complete DATA_FRAME.
 
+(1.1 start end end of a building sequence)
+- start: pc/esp receives target info from user interface input
+- pc/esp sends "start message" to baseplate attiny (uart interrupt??) - baseplate starts detection 
+- end: pc/esp receives stop info from user interface input, (other end events?)
+- pc/esp sends "stop message with feedback message all cube leds off" to baseplate attiny (uart interrupt?) - all cube leds off and baseplate attiny waits for next start message
+
 2. Check whether the actual tree changed
 - Compare the new serialized tree with the previous_actual_tree.
 - If nothing changed, no new comparison or feedback is required -> back to CMD_STATUS
-- If it changed/(heartbeat) -> store as current_actual_tree and continue with CMD_ FEEDBACK 
+- If it changed/(heartbeat) -> store as current_actual_tree and send serialized tree/data frame via uart to PC(continue with CMD_ FEEDBACK)
 
-3. Parse the actual tree
+3. Parse the actual tree (PC)
 - Deserialize the actual payload into nodes.
 - For each node, store: 
     NODE_ID (Including cube type (3 bits) and individual instance ID (5bits))
@@ -86,7 +78,7 @@ COMPARISON SEQUENCE
     orientation
 - Store the result in current_compare_result.
 - for cubes/LED derivation: 
-    compare feedback payload with previous payload and store FEEDBACK FRAME: SYNC LEN FEEDBACK-PAYLOAD CRC
+    compare feedback payload with previous payload and store FEEDBACK FRAME: SYNC LEN [NODE_ID, LED_STATE]×n CRC
     LED FEEDBACK payload for cubes:
         Previous comparison |	Current comparison|	 Feedback
         absent	                correct	              green - add to feedback payload
@@ -96,6 +88,8 @@ COMPARISON SEQUENCE
         correct	                invalid	              red - add to feedback payload
         invalid	                invalid	              red - add to feedback payload
         present	                absent	              nothing; cube is disconnected
+    -> Contains only physically present cubes, each green or red. 
+    Missing/attachable cubes can't appear here — there's no cube to light.
 
       LED STATE for cubes 
       - green: 0x01
@@ -103,30 +97,30 @@ COMPARISON SEQUENCE
 - Build feedback_result.
 
 - for visualization:
-    Build an evaluated binary tree/combined node for pc: NODE_ID | ORIENTATION | CHILD_MASK | STATUS_FEEDBACK | CHILDREN
-    cube-to-baseplate detection frame should remain: NODE_ID | ORIENTATION | CHILD_MASK | CHILDREN
+    - evaluated tree (JSON over websocket): actual tree annotated with error masks, plus the target-side information (attachable and blocked slots) that the feedback frame can't carry
     Cube feedback for visualization (bit mask for when cube has multiple errors):
      - error_none = 0x00
      - error_wrong cube type = bit 0 (1 << 0)
      - error_wrong_parent = bit 1 (1 <<1)
      - error_wrong_port = bit 2 (1<<2)
      - erron_wrong_orientation = bit 3 (1<<3)
+     - error_unexpected_cube = bit 4 (1 << 4)
+    Classifications: 
+    - classify every target node into one of four states: 
+        correct (present and everything matches), 
+        wrong (present but type/parent/port/orientation mismatch → red LED + error mask), 
+        attachable (in the target, not placed yet, and its parent is placed and correct — this is your "show what comes next")
+        blocked (in the target, not placed, but its parent is also missing or wrong — buildable later, not now)
 
-     comparison result table entry:
-     typedef struct{
-        uint8_t node_id,
-        uint8_t led_state, //just for cubes
-        uint8_t error_mask // just for Visualization
-     }compare_entry_t
 
-     result table
-     typedef struct{
-        compare_entry entries [MAX_NODES];
-        uint8_t count;
-     }compare_result_t
+data flow inside the module is: 
+- one compare() produces one result structure + two small builders derive the two outputs from it:
+    - build_feedback_frame() filters to present cubes and maps to green/red
+    - build_evaluated_tree() merges the result back into the tree dict for the frontend.
 
-- send parsed tree (JSON - maybe better binary?) to pc/visualization gateway
-- send feedback frame through all cubes (handle feedback)
+- send evaluated tree (json over websocket)
+- send feedback frame (info for cubes) back to baseplate attiny 
+
 - Each cube:
     - searches for its complete NODE_ID,
     - sets green/red if found,

@@ -58,6 +58,21 @@ def parse_tree(payload: bytes) -> CubeNode:
     return root
 
 
+"""inverse of parse_tree: node -> detection payload bytes.
+
+Children must be stored in ascending port order and match child_mask,
+which is exactly what parse_tree produces. Used to build readable test
+fixtures and to verify parse/serialize round-trips.
+"""
+def serialize_tree(node: CubeNode) -> bytes:
+    out = bytearray((node.id, node.orientation, node.child_mask))
+
+    for child in node.children:
+        out += serialize_tree(child)
+
+    return bytes(out)
+
+
 def print_tree(node, depth: int = 0):
     indent = "  " * depth
 

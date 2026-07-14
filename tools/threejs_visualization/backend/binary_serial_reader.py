@@ -4,18 +4,7 @@ import serial
 
 from cube_node import CubeNode
 from payload_parser import parse_tree
-
-
-SYNC = 0xA5
-
-#checksum validation
-def calc_checksum(payload_len: int, payload: bytes) -> int:
-    checksum = payload_len
-
-    for byte in payload:
-        checksum ^= byte
-
-    return checksum
+from framing import SYNC, calc_checksum
 
 """ for reading DATA_FRAME after valid SYNC appeared"""
 def rx_frame(ser:serial.Serial) ->Optional[bytes]:
