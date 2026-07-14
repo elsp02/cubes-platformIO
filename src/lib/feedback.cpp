@@ -7,7 +7,9 @@
 
 bool feedback_contains_own_id(const uint8_t *payload, uint8_t len)
 {   bool found_own_id = false;
-    for (uint8_t i = 0; i < len; i+=2) {
+    // i + 1 < len: each entry is an (ID, LED_STATE) pair, so never read
+    // a state byte past the end of an odd-length payload
+    for (uint8_t i = 0; i + 1 < len; i+=2) {
         if (payload[i] == NODE_ID) {
             found_own_id = true;
             uint8_t led_state = payload[i+1];

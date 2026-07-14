@@ -22,6 +22,7 @@
 #define HEARTBEAT_INTERVAL_CYCLE 50 // after 50 cycles payload is sent again even if it hasn´t changed
 static uint16_t cycles_since_last_send = 0;
 static uint8_t feedback_index = 0;
+static bool last_child_present[CHILD_COUNT] = { false }; // which ports had a child last cycle -> retry budget
 // ----------------------------------------------------------
 // Wire descriptors
 // ----------------------------------------------------------
@@ -56,7 +57,7 @@ static void print_payload_hex(const uint8_t *payload, uint8_t len)
             Serial.print("0");
         }
 
-        Serial.println(payload[i], HEX);
+        Serial.print(payload[i], HEX);
 
         if (i < len - 1) {
             Serial.print(" ");
@@ -158,29 +159,55 @@ void loop()
     uint8_t child_payload[CHILD_COUNT][MAX_CHILD_PAYLOAD_LEN];   //temporary storage (2d array) for child payload results -> child_payloads[child_index][payload_index] = byte received from child
     uint8_t child_payload_len[CHILD_COUNT] = {0};                // temporary storage for child payload lengths -> child_payload_len[child_index] = length of payload received from child
     bool child_done[CHILD_COUNT] = {false};
-    bool all_done = false; //flag to check if all children have responded
+    bool child_acked[CHILD_COUNT] = {false}; // child answered ACK_BUSY at least once this cycle -> port is occupied even if its frame failed
 
     for (uint8_t attempt = 0; attempt < CHILD_RETRIES; attempt ++){
+        bool any_pending = false; //true if any child still has attempts left after this round
+
         for (uint8_t child = 0; child < CHILD_COUNT; child ++){
 
             if (child_done[child]) {
                 continue;
             }
 
+            // presence-aware retry budget: a port counts as occupied if it
+            // had a child last cycle OR already ACKed this cycle (a corrupt
+            // frame must not demote a present child). Occupied ports keep
+            // the full retries, empty ports get a single attempt.
+            uint8_t attempt_budget = (last_child_present[child] || child_acked[child]) ? CHILD_RETRIES : 1;
+
+            if (attempt >= attempt_budget) {
+                continue;
+            }
+
+            bool acked = false;
+
             if (poll_child(
-                children[child], 
+                children[child],
                 child_payload[child],
                 MAX_CHILD_PAYLOAD_LEN,
-                &child_payload_len[child]
+                &child_payload_len[child],
+                &acked
             )){
                 SER_PRINT("CV");
                 child_done[child] = true; //mark child as done -> no more polling of this child in next attempts
-                all_done = true;    // works correctly only for CHILD_COUNT = 1          
+            } else {
+                if (acked) {
+                    child_acked[child] = true; // present but frame failed -> full retry budget from now on
+                    any_pending = true;
+                } else if (attempt + 1 < attempt_budget) {
+                    any_pending = true;
+                }
             }
         }
-        if (all_done) {
+        if (!any_pending) {
             break;
         }
+    }
+
+    // remember which ports had a child this cycle (retry budget + feedback)
+    for (uint8_t child = 0; child < CHILD_COUNT; child++) {
+        last_child_present[child] = child_done[child] || child_acked[child];
     }
 
     /*
@@ -230,12 +257,13 @@ void loop()
         #endif
 
         bool feedback_done[CHILD_COUNT] = { false };
-        bool feedback_all_done = false;
 
         // FEEDBACK FRAME to children - same as child polling (detection sequence)
             for (uint8_t attempt = 0; attempt < CHILD_RETRIES; attempt++) {
+                bool any_pending = false; //true if any child still needs a retry
+
                 for (uint8_t child = 0; child < CHILD_COUNT; child++) {
-                    
+
                     if (!child_done[child]) {
                         continue;   // no detected child
                     }
@@ -248,10 +276,11 @@ void loop()
                     {
                         SER_PRINTLN("CFA");
                         feedback_done[child] = true;
-                        feedback_all_done = true;
+                    } else {
+                        any_pending = true;
                     }
                     }
-                    if (feedback_all_done){
+                    if (!any_pending){
                         break;
                     }
             }

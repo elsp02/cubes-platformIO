@@ -159,29 +159,56 @@ static void handle_detection(const wire_t *active_upstream, uint8_t orientation_
      // problem of child_payload: always MAX_CHILD_PAYLOAD_LEN long even if e.g actual payload is just 3 bytes long -> not RAM efficient 
     uint8_t child_payload_len[CHILD_COUNT] = {0};                 // temporary storage for child payload lengths -> child_payload_len[child_index] = length of payload received from child
     bool child_done[CHILD_COUNT] = {false};                       // stores if child has already responded and can be skipped
+    bool child_acked[CHILD_COUNT] = {false};                      // child answered ACK_BUSY at least once this cycle -> port is occupied even if its frame failed
 
     for (uint8_t attempt = 0; attempt < CHILD_RETRIES; attempt++) { //retry loop
+        bool any_pending = false; //true if any child still has attempts left after this round
+
         for (uint8_t i = 0; i < CHILD_COUNT; i++) {  //child loop, iterates through children
 
             if (child_done[i]) {
                 continue;
             }
 
+            // presence-aware retry budget: a port counts as occupied if it
+            // had a child last cycle OR already ACKed this cycle (a corrupt
+            // frame must not demote a present child). Occupied ports keep
+            // the full retries, empty ports get a single attempt.
+            uint8_t attempt_budget = (last_child_present[i] || child_acked[i]) ? CHILD_RETRIES : 1;
+
+            if (attempt >= attempt_budget) {
+                continue;
+            }
+
+            bool acked = false;
+
             if (poll_child(
                     children[i],           //with wire/pin of child[i]
                     child_payload[i],     //and receive and store the payload in child_payloads[i]
                     MAX_CHILD_PAYLOAD_LEN, //with max length of MAX_CHILD_PAYLOAD_LEN to avoid overflow
-                    &child_payload_len[i]  //and stores the received payload length from child[i])) {
+                    &child_payload_len[i], //and stores the received payload length from child[i]
+                    &acked
             )){
                 SER_PRINTLN("CV");
                 child_done[i] = true; //mark child as done -> no more polling of this child in next attempts
+            } else {
+                if (acked) {
+                    child_acked[i] = true; // present but frame failed -> full retry budget from now on
+                    any_pending = true;
+                } else if (attempt + 1 < attempt_budget) {
+                    any_pending = true;
+                }
             }
+        }
+
+        if (!any_pending) {
+            break;
         }
     }
 
     // for feedback loop to know at which port to send the feedback frame
     for (uint8_t child = 0; child < CHILD_COUNT; child++) {
-        last_child_present[child] = child_done[child];   
+        last_child_present[child] = child_done[child] || child_acked[child];
     }
 
     /*

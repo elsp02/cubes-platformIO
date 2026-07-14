@@ -7,9 +7,11 @@
 // Poll one child port
 // ----------------------------------------------------------
 
-bool poll_child(const wire_t *w, uint8_t *data_out, uint8_t max_child_payload_len, uint8_t *child_payload_len)
+bool poll_child(const wire_t *w, uint8_t *data_out, uint8_t max_child_payload_len, uint8_t *child_payload_len, bool *acked_out)
 {
     uint8_t b = 0;
+
+    *acked_out = false;
 
     /*
      * 1. Send CMD_STATUS to child.
@@ -17,10 +19,14 @@ bool poll_child(const wire_t *w, uint8_t *data_out, uint8_t max_child_payload_le
     tx_byte(w, CMD_STATUS);
 
     /*
-     * 2. Switch direction / wait before receiving.
+     * 2. Switch direction: release the line and open the receive window
+     * as early as possible. Listening early is harmless (start detection
+     * is edge-triggered), and it gives the child's ACK timing ~200 us of
+     * margin instead of racing our own TURNAROUND_US delay. One bit time
+     * is enough for the pull-up to settle after release.
      */
-    _delay_us(TURNAROUND_US);
     wire_release(w);
+    _delay_us(BAUD_US);
 
     /*
      * 3. Wait for ACK_BUSY.
@@ -34,6 +40,8 @@ bool poll_child(const wire_t *w, uint8_t *data_out, uint8_t max_child_payload_le
         SER_PRINTLN("WA");
         return false;
     }
+
+    *acked_out = true;   // a child is definitely present on this port
 
     //SER_PRINT("CA");
     /*

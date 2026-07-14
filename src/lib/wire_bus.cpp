@@ -86,21 +86,35 @@ void tx_byte(const wire_t *w, uint8_t b)
 // ----------------------------------------------------------
 // Normal byte receive
 // Detection of start bit and then reception of data frame (data bits and stop bit)
-// brauch ich bei rx_byte definition das uint8_t *out?
+//
+// Timing constraint: entry latency shifts every bit sample point of the
+// byte late, and inside a frame the next start bit may already be on the
+// line. So: check the line BEFORE any micros() call, and while waiting
+// poll the line several times per (comparatively slow) micros() read.
 // ----------------------------------------------------------
 
-bool rx_byte(const wire_t *w, uint8_t *out, uint64_t timeout_us)
+bool rx_byte(const wire_t *w, uint8_t *out, uint32_t timeout_us)
 {
-    // wait for falling edge (start bit)
-    while (is_line_high(w)) {            // Wait while bus is idle high; start bit begins with a falling edge
-        if (timeout_us-- == 0) {     // Decrement timeout once per millisecond while waiting
-            return false;            // No start bit arrived before timeout expired
-        }
-
-        _delay_us(1);                // Poll line quickly to not miss an edge
+    // Fast path: start bit already on the line (back-to-back frame bytes).
+    if (!is_line_high(w)) {
+        return rx_byte_frame(w, out);
     }
 
-    return rx_byte_frame(w, out);
+    // Wait for falling edge (start bit) until the deadline. The unsigned
+    // subtraction stays correct across micros() overflow.
+    uint32_t start = micros();
+
+    while (true) {
+        for (uint8_t burst = 0; burst < 8; burst++) {
+            if (!is_line_high(w)) {
+                return rx_byte_frame(w, out);
+            }
+        }
+
+        if ((uint32_t)(micros() - start) >= timeout_us) {
+            return false;            // No start bit arrived before timeout expired
+        }
+    }
 }
 
 
@@ -141,7 +155,12 @@ bool rx_byte_frame(const wire_t *w, uint8_t *out)
         return false;
     }
 
-    _delay_us(BAUD_US/2); // notiz an mich: vlt _delay_us(BAUD_US/2) oder stop bit wie start bit zweimal abfragen?
+    // Wait out the second half of the stop bit. DO NOT return early:
+    // sender and receiver must share the same timing reference point
+    // (end of stop bit) for TURNAROUND_US, otherwise a responder starts
+    // transmitting ~half a bit before the requester is listening and
+    // every ACK handshake fails.
+    _delay_us(BAUD_US/2);
 
     *out = b;   // Write the value of b (stored bits) into the variable that out points to
     return true;
@@ -203,8 +222,8 @@ bool rx_frame(
     uint8_t *payload,
     uint8_t max_payload_len,
     uint8_t *payload_len,
-    uint64_t frame_timeout_us,
-    uint64_t inter_frame_timeout_us
+    uint32_t frame_timeout_us,
+    uint32_t inter_frame_timeout_us
 )
 {
     uint8_t sync = 0;
