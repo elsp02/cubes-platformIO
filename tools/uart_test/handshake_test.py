@@ -75,9 +75,11 @@ def main() -> None:
     with open_port(port, baud) as ser:
         print(f"Connected to {port} at {baud} baud.")
         ser.reset_input_buffer()
-
+    #send start byte for starting the programm of the attiny
         print(f"Step 1: sending START '{START_BYTE.decode()}'")
         ser.write(START_BYTE)
+
+        #receive the payload frame and print it, then send feedback byte to pc and wait for finished byte, then wait for next payload frame of attiny baseplate 
 
         if not expect_byte(ser, ACK_BYTE, "ACK"):
             print("Handshake FAILED.")
@@ -85,7 +87,7 @@ def main() -> None:
 
         print(f"Step 2: sending FEEDBACK '{FEEDBACK_BYTE.decode()}'")
         ser.write(FEEDBACK_BYTE)
-
+    #after you received 5 payload frames, send 
         if not expect_byte(ser, DONE_BYTE, "DONE"):
             print("Handshake FAILED.")
             sys.exit(1)

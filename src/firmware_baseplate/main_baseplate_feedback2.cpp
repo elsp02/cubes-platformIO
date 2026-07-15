@@ -149,6 +149,7 @@ void setup()
 // Main loop
 // ----------------------------------------------------------
 void loop()
+// if START_DETECTION byte from pc received, start the programm
 {
     log_reset();
 
@@ -249,6 +250,7 @@ void loop()
     
     if (changed || cycles_since_last_send>= HEARTBEAT_INTERVAL_CYCLE) {
 
+        //send payload to pc
         #if SERIAL_WRITING 
 
         //also write if polling children failed (with a DETECTION_FAILED for example)
@@ -260,6 +262,8 @@ void loop()
         Serial.write(checksum);
 
         #endif
+
+        //wait for predefined FEEDBACK_FRAME (maybe just an A for now) and check if correct. if so, send a FINISHED byte back to pc
 
         bool feedback_done[CHILD_COUNT] = { false };
 
