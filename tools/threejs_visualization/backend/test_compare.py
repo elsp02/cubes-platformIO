@@ -6,7 +6,7 @@ fixture tree -> serialize_tree -> parse_tree -> compare -> outputs
 Run with:  python -m pytest test_compare.py -v
 or plain:  python test_compare.py
 """
-from cube_node import CubeNode
+from cube_node import CubeNode, make_node
 from payload_parser import parse_tree, serialize_tree
 from target_tree import TARGET_TOWER_3
 from compare_core import (
@@ -37,26 +37,6 @@ CUBE_TYPE1 = 0x30  # a type-1 cube (0x30 >> 5 == 1)
 # ----------------------------------------------------------------
 # fixture helpers
 # ----------------------------------------------------------------
-
-def make_node(node_id: int, orientation: int = 0, children: dict[int, CubeNode] | None = None) -> CubeNode:
-    """Build a CubeNode with child_mask/ports derived from the children dict."""
-    children = children or {}
-    child_mask = 0
-    child_list = []
-
-    for port in sorted(children):
-        child_mask |= 1 << port
-        children[port].port = port
-        child_list.append(children[port])
-
-    return CubeNode(
-        id=node_id,
-        orientation=orientation,
-        port=None,
-        child_mask=child_mask,
-        children=child_list,
-    )
-
 
 def perfect_tower() -> CubeNode:
     """A - B - C chained on port 0, all orientation 0 (matches TARGET_TOWER_3)."""

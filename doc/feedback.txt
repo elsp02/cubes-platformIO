@@ -98,6 +98,13 @@ COMPARISON SEQUENCE
 
 - for visualization:
     - evaluated tree (JSON over websocket): actual tree annotated with error masks, plus the target-side information (attachable and blocked slots) that the feedback frame can't carry
+        Classifications: 
+    - classify every target node into one of four states: 
+        correct (present and everything matches), 
+        wrong (present but type/parent/port/orientation mismatch → red LED + error mask), 
+        attachable (in the target, not placed yet, and its parent is placed and correct — this is your "show what comes next")
+        blocked (in the target, not placed, but its parent is also missing or wrong — buildable later, not now)
+        
     Cube feedback for visualization (bit mask for when cube has multiple errors):
      - error_none = 0x00
      - error_wrong cube type = bit 0 (1 << 0)
@@ -105,12 +112,7 @@ COMPARISON SEQUENCE
      - error_wrong_port = bit 2 (1<<2)
      - erron_wrong_orientation = bit 3 (1<<3)
      - error_unexpected_cube = bit 4 (1 << 4)
-    Classifications: 
-    - classify every target node into one of four states: 
-        correct (present and everything matches), 
-        wrong (present but type/parent/port/orientation mismatch → red LED + error mask), 
-        attachable (in the target, not placed yet, and its parent is placed and correct — this is your "show what comes next")
-        blocked (in the target, not placed, but its parent is also missing or wrong — buildable later, not now)
+
 
 
 data flow inside the module is: 

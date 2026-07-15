@@ -219,10 +219,88 @@ function loadCubeModel() {
 
 
 // ------------------------------------------------------------
+// evaluated-tree node view + status appearance
+// ------------------------------------------------------------
+
+/*
+ * Normalizes one node so the renderer works with both formats:
+ *   evaluated tree (new): node_id, status, error_mask, expected_orientation
+ *   raw detection tree (old): id, no status
+ * Ghost = empty target slot (attachable): no physical cube, so no own
+ * orientation -> the expected one is used.
+ */
+function nodeView(node) {
+    const id = node.node_id ?? node.id ?? null;
+
+    return {
+        id: id,
+        isGhost: id === null,
+        status: node.status ?? "correct",
+        errorMask: node.error_mask ?? 0,
+        orientation: node.orientation ?? node.expected_orientation ?? 0,
+        port: node.port,
+        children: node.children ?? [],
+    };
+}
+
+// mirror of the physical LEDs plus ghost slots; "blocked" is not listed
+// because blocked slots are not rendered at all
+const STATUS_APPEARANCE = {
+    correct:    { tint: 0x22bb44, tintStrength: 0.25, opacity: 1.0 },
+    wrong:      { tint: 0xcc2222, tintStrength: 0.5,  opacity: 1.0 },
+    unexpected: { tint: 0xcc2222, tintStrength: 0.5,  opacity: 1.0 },
+    attachable: { tint: 0x3388ff, tintStrength: 0.4,  opacity: 0.35 },
+};
+
+// tints the cloned model per status; materials must be cloned too,
+// otherwise all cubes share the template's materials and get the same color
+function applyStatusAppearance(visualModel, view) {
+    const appearance = STATUS_APPEARANCE[view.status];
+
+    if (!appearance) {
+        return;
+    }
+
+    visualModel.traverse((object) => {
+        if (!object.isMesh) {
+            return;
+        }
+
+        const materials = Array.isArray(object.material)
+            ? object.material
+            : [object.material];
+
+        const tinted = materials.map((material) => {
+            const clone = material.clone();
+
+            if (clone.emissive !== undefined) {
+                clone.emissive = new THREE.Color(appearance.tint);
+                clone.emissiveIntensity = appearance.tintStrength;
+            }
+
+            if (appearance.opacity < 1.0) {
+                clone.transparent = true;
+                clone.opacity = appearance.opacity;
+                clone.depthWrite = false; // avoids transparency sorting artifacts
+            }
+
+            return clone;
+        });
+
+        object.material = Array.isArray(object.material) ? tinted : tinted[0];
+
+        if (appearance.opacity < 1.0) {
+            object.castShadow = false; // ghost slots should not throw shadows
+        }
+    });
+}
+
+
+// ------------------------------------------------------------
 // creates one cube instance
 // ------------------------------------------------------------
 
-function createCubeObject(node) {
+function createCubeObject(view) {
     /*
      * This group represents one logical cube node.
      *
@@ -232,19 +310,27 @@ function createCubeObject(node) {
 
     const cubeObject = new THREE.Group();
 
-    cubeObject.name = `cube_${node.id.toString(16).toUpperCase()}`;
-    cubeObject.userData.cubeId = node.id;
-    cubeObject.userData.orientation = node.orientation;
-    cubeObject.userData.port = node.port;
+    cubeObject.name = view.isGhost
+        ? (view.port === null || view.port === undefined
+            ? "slot_root"
+            : `slot_port_${view.port}`)
+        : `cube_${view.id.toString(16).toUpperCase()}`;
+    cubeObject.userData.cubeId = view.id;
+    cubeObject.userData.orientation = view.orientation;
+    cubeObject.userData.port = view.port;
+    cubeObject.userData.status = view.status;
+    cubeObject.userData.errorMask = view.errorMask;
 
 
     if (cubeTemplate === null) {
         throw new Error("Cube model is not loaded yet.");
     }
 
-    //uses the template cube defined in loadCubeModel as the visual mode 
+    //uses the template cube defined in loadCubeModel as the visual mode
     const visualModel = cubeTemplate.clone(true);
     visualModel.scale.setScalar(MODEL_SCALE);
+
+    applyStatusAppearance(visualModel, view);
 
     cubeObject.add(visualModel);
 
@@ -255,6 +341,14 @@ function createCubeObject(node) {
 // ------------------------------------------------------------
 // Nested tree rendering
 // ------------------------------------------------------------
+
+// removes all cubes from the scene (used when the server connection is lost,
+// so the display never shows stale data)
+export function clearTree() {
+    latestTree = null;
+    cubeGroup.clear();
+}
+
 
 export function redrawTree(rootNode) {
     latestTree = rootNode;
@@ -271,20 +365,25 @@ export function redrawTree(rootNode) {
 
 
 function addCubeRecursive(node, parentObject, isRoot) {
-    const cubeObject = createCubeObject(node);
+    const view = nodeView(node);
+
+    // blocked slots (and everything below them) are not buildable yet -> hidden
+    if (view.status === "blocked") {
+        return;
+    }
+
+    const cubeObject = createCubeObject(view);
 
     const pose = isRoot
-        ? localPoseForRoot(node)
-        : localPoseForChild(node);
+        ? localPoseForRoot(view)
+        : localPoseForChild(view);
 
     cubeObject.position.copy(pose.position);
     cubeObject.quaternion.copy(pose.quaternion);
 
     parentObject.add(cubeObject); //this is where nesting and child parent relationship happens
 
-    const children = node.children ?? [];
-
-    for (const child of children) {
+    for (const child of view.children) {
         addCubeRecursive(child, cubeObject, false);
     }
 }

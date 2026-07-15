@@ -10,13 +10,22 @@ QUESTIONS
 
 ich darf nicht 1 child 3 mal pollen und dann das andere danach sondern muss 1 child pollen dann warten dann das andere pollen dann wieder das erste pollen etc 
 
-NEXT STEPS
-- individual payload/sync for mehscat if error in baseplate 
-- error messages/message window also in browser
-- if FFF of child - break feedback polling sequence and return FFF also to parent -> if baseplate receives FFF, knows to restart the feedback sequence again
-- threejs buffer error (wenn ein payload kommt und der andere noch nicht verarbeitet ist, gibt es einen error)
+NEXT STEPS 
+- three js cubes aussehen
+- communication zwischen attiny baseplate und pc (attiny sendet data frame oder detection failed oder feedback failed)
+    - info frames 
+    - start und end message von pc an baseplate für detection process
+- feedback an cubes senden test (mit leds)
 - threejs appearance
-- threejs maybe error evaluation with serial monitoring window 
+    - auf website infofenster mit error_mask von aktuellem baustein - art serieller monitor
+- esp
+    - zuerst über usb und dann wifi?
+    - code änderungen (nur server und tree comparison, frontend sollte gleich bleiben)
+- automatisches reconnecten von client mit server falls server abstürzt/disconnected war (aktuell neuladen der website)
+- feedback led grün nur an bis neueer cube dazu kommt
+
+
+
 
 ## Open claude suggested improvements
 

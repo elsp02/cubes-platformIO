@@ -146,4 +146,3 @@ serial port ──▶ binary_serial_reader ──▶ payload_parser.parse_tree �
                                           (later: serial back to baseplate)
 The important property: everything in the middle rows (payload_parser, target_tree, compare_core, feedback_output, framing) is pure — bytes and dataclasses in, bytes and dicts out — which is exactly the part that later moves to the ESP32. Only the top and bottom rows (binary_serial_reader, ws_server) touch hardware or network, and they're not yet connected to the compare pipeline — ws_server currently sends the raw detected tree (tree_to_dict); switching it to send build_evaluated_tree output is part of the later wiring step.
 
-One thing to note: ws_server.serial_worker has a small pre-existing bug — when the queue is full it calls put_nowait inside try/except Empty, but a full queue raises Full, and then puts again outside, so it can crash the worker thread. Worth fixing when we do the wiring step.
