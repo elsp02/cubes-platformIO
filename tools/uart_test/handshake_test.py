@@ -1,36 +1,52 @@
-"""Minimal UART handshake test, PC side.
+"""PC-side driver for the UART building sequence test.
 
-Counterpart to src/firmware_test/main_uart_handshake.cpp:
+Counterpart to src/firmware_baseplate/uart_main_baseplate.cpp:
 
-    PC -> ATtiny : 'S' (START)
-    ATtiny -> PC : 'A' (ACK)
-    PC -> ATtiny : 'F' (FEEDBACK)
-    ATtiny -> PC : 'D' (DONE)
+    PC -> baseplate : 'S' (START)   -> baseplate begins detection
+    baseplate -> PC : payload frame SYNC | LEN | PAYLOAD | CHECKSUM
+                      (first cycle always, then on change or heartbeat)
+    PC -> baseplate : 'A' (feedback byte, placeholder for the real
+                      feedback frame later)
+    baseplate -> PC : 'D' (done) or 'N' (wrong feedback byte)
+    ... repeats ...
+    PC -> baseplate : 'X' (STOP) instead of 'A' after the 5th frame
+                      -> baseplate returns to idle
 
 Usage:
     python handshake_test.py COM4 [115200]
 
-Exit code 0 = handshake PASSED, 1 = FAILED.
+Exit code 0 = sequence completed (5 frames + stop), 1 = failed.
 """
+import os
 import sys
 
 import serial
 from serial.tools import list_ports
 
+# reuse the frame logic of the visualization backend (SYNC, checksum)
+sys.path.insert(0, os.path.join(
+    os.path.dirname(os.path.abspath(__file__)),
+    "..", "threejs_visualization", "backend",
+))
+from framing import SYNC, calc_checksum
+
 DEFAULT_PORT = "COM4"
-DEFAULT_BAUD = 115200  # must match Serial.begin() in the test firmware
+DEFAULT_BAUD = 115200  # must match Serial.begin() in the firmware
 
 START_BYTE = b"S"
-ACK_BYTE = b"A"
-FEEDBACK_BYTE = b"F"
+STOP_BYTE = b"X"
+FEEDBACK_BYTE = b"A"
 DONE_BYTE = b"D"
+FB_FAILED_BYTE = b"N"
 
-STEP_TIMEOUT_S = 2.0
+FRAMES_UNTIL_STOP = 5
+REPLY_TIMEOUT_S = 2.0  # for the single status bytes
+READ_TIMEOUT_S = 2.0   # per read while waiting for a frame (idle is normal)
 
 
 def open_port(port: str, baud: int) -> serial.Serial:
     try:
-        return serial.Serial(port, baud, timeout=STEP_TIMEOUT_S)
+        return serial.Serial(port, baud, timeout=READ_TIMEOUT_S)
     except serial.SerialException as error:
         print(f"Could not open {port}: {error}")
         if "PermissionError" in str(error) or "Zugriff" in str(error):
@@ -48,24 +64,68 @@ def open_port(port: str, baud: int) -> serial.Serial:
         sys.exit(1)
 
 
-def expect_byte(ser: serial.Serial, expected: bytes, step_name: str) -> bool:
-    """Read one byte and check it. Prints what actually happened."""
-    received = ser.read(1)
+def read_payload_frame(ser: serial.Serial) -> bytes:
+    """Block until a valid SYNC | LEN | PAYLOAD | CHECKSUM frame arrives.
 
-    if not received:
-        print(f"  FAIL: no {step_name} received within "
-              f"{STEP_TIMEOUT_S:.0f} s (timeout)")
-        return False
+    Idle stretches are normal (the baseplate only sends on change or
+    heartbeat), so timeouts while scanning just print a waiting note.
+    Broken frames (timeout mid-frame, checksum error) are reported and
+    scanning starts over.
+    """
+    while True:
+        # scan byte-wise for SYNC
+        byte = ser.read(1)
 
-    if received != expected:
-        print(f"  FAIL: expected {step_name} "
-              f"{expected.decode()} (0x{expected[0]:02X}), "
-              f"got 0x{received[0]:02X}")
-        return False
+        if not byte:
+            print("  ... waiting for payload frame (idle is normal) ...")
+            continue
 
-    print(f"  OK: received {step_name} {received.decode()} "
-          f"(0x{received[0]:02X})")
-    return True
+        if byte[0] != SYNC:
+            print(f"  skipping unexpected byte 0x{byte[0]:02X}")
+            continue
+
+        # SYNC found: read LEN, PAYLOAD, CHECKSUM
+        len_byte = ser.read(1)
+        if not len_byte:
+            print("  timeout after SYNC, resyncing")
+            continue
+        payload_len = len_byte[0]
+
+        payload = ser.read(payload_len)
+        if len(payload) != payload_len:
+            print(f"  timeout in payload: expected {payload_len} bytes, "
+                  f"got {len(payload)}, resyncing")
+            continue
+
+        checksum_byte = ser.read(1)
+        if not checksum_byte:
+            print("  timeout before checksum, resyncing")
+            continue
+
+        expected = calc_checksum(payload_len, payload)
+        if checksum_byte[0] != expected:
+            print(f"  checksum error (got 0x{checksum_byte[0]:02X}, "
+                  f"expected 0x{expected:02X}), frame ignored")
+            continue
+
+        return payload
+
+
+def exchange_feedback(ser: serial.Serial) -> None:
+    """Send the feedback byte and report the baseplate's status reply."""
+    ser.write(FEEDBACK_BYTE)
+    print(f"  sent feedback '{FEEDBACK_BYTE.decode()}'")
+
+    reply = ser.read(1)
+
+    if not reply:
+        print(f"  WARNING: no status byte within {REPLY_TIMEOUT_S:.0f} s")
+    elif reply == DONE_BYTE:
+        print("  baseplate confirmed: D (done)")
+    elif reply == FB_FAILED_BYTE:
+        print("  WARNING: baseplate reports wrong feedback byte (N)")
+    else:
+        print(f"  WARNING: unexpected status byte 0x{reply[0]:02X}")
 
 
 def main() -> None:
@@ -75,24 +135,32 @@ def main() -> None:
     with open_port(port, baud) as ser:
         print(f"Connected to {port} at {baud} baud.")
         ser.reset_input_buffer()
-    #send start byte for starting the programm of the attiny
-        print(f"Step 1: sending START '{START_BYTE.decode()}'")
+
+        # start the building sequence on the baseplate
         ser.write(START_BYTE)
+        print(f"Sent START '{START_BYTE.decode()}' - baseplate should begin "
+              f"detection.")
 
-        #receive the payload frame and print it, then send feedback byte to pc and wait for finished byte, then wait for next payload frame of attiny baseplate 
+        for frame_number in range(1, FRAMES_UNTIL_STOP + 1):
+            payload = read_payload_frame(ser)
 
-        if not expect_byte(ser, ACK_BYTE, "ACK"):
-            print("Handshake FAILED.")
-            sys.exit(1)
+            if payload:
+                print(f"Frame {frame_number}/{FRAMES_UNTIL_STOP}: "
+                      f"payload = {payload.hex(' ')} (len={len(payload)})")
+            else:
+                print(f"Frame {frame_number}/{FRAMES_UNTIL_STOP}: "
+                      f"empty payload (len=0) - nothing detected")
 
-        print(f"Step 2: sending FEEDBACK '{FEEDBACK_BYTE.decode()}'")
-        ser.write(FEEDBACK_BYTE)
-    #after you received 5 payload frames, send 
-        if not expect_byte(ser, DONE_BYTE, "DONE"):
-            print("Handshake FAILED.")
-            sys.exit(1)
+            if frame_number < FRAMES_UNTIL_STOP:
+                exchange_feedback(ser)
+            else:
+                # 5th frame: stop instead of feedback
+                ser.write(STOP_BYTE)
+                print(f"Sent STOP '{STOP_BYTE.decode()}' after frame "
+                      f"{FRAMES_UNTIL_STOP}.")
 
-    print("Handshake PASSED: both UART directions work.")
+    print("Sequence completed: baseplate is idle again, waiting for the "
+          "next START.")
 
 
 if __name__ == "__main__":

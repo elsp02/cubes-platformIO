@@ -63,6 +63,16 @@
 #define ACK_FINISHED        0x66
 #define ACK_FAILED          0x77
 
+// PC <-> baseplate UART link (independent of the wire-bus bytes above,
+// ASCII on purpose so the link can be tested by hand in a serial monitor)
+#define PC_CMD_START        0x53 // 'S' PC -> baseplate: start detection
+#define PC_CMD_STOP         0x58 // 'X' PC -> baseplate: stop sequence, back to idle
+#define PC_FB_OK            0x41 // 'A' PC -> baseplate: feedback reply to a payload frame
+#define PC_RESP_DONE        0x44 // 'D' baseplate -> PC: correct feedback byte received
+#define PC_RESP_FB_FAILED   0x4E // 'N' baseplate -> PC: wrong feedback byte received
+
+#define PC_REPLY_TIMEOUT_MS 2000UL // how long the baseplate waits for the PC reply byte
+
 #define LED_GREEN           0x01
 #define LED_RED             0x02
 
