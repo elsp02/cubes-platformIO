@@ -1,3 +1,11 @@
+// scene_glb.js - the actual 3D view: builds the three.js scene and
+// renders the evaluated tree with the exported GLB cube model.
+//
+// Position in the frontend:
+//   main.js calls initScene() once at startup, then redrawTree(tree)
+//   for every tree that ws_client.js receives. Poses come from
+//   layout.js; this file handles everything visual (camera, lights,
+//   model loading, status colors, nesting).
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
@@ -20,34 +28,35 @@ const MODEL_SCALE = 25.0;
 
 
 // ------------------------------------------------------------
-// Three.js globals
+// Three.js globals (created once in initScene, reused everywhere)
 // ------------------------------------------------------------
 
-let scene;
+let scene;      // root of everything three.js draws
 let camera;
 let renderer;
-let controls;
-let cubeGroup;
+let controls;   // OrbitControls (mouse rotation/zoom)
+let cubeGroup;  // parent group of the whole cube construction
 
-let cubeTemplate = null;
-let latestTree = null;
+let cubeTemplate = null;  // loaded GLB model, cloned per cube (see loadCubeModel)
+let latestTree = null;    // last received tree, kept for a redraw after the model loads
 
 
 // Use Z as the vertical axis, similar to your Meshcat / NumPy logic.
+// (three.js default is Y-up; this must match the math in layout.js)
 THREE.Object3D.DEFAULT_UP.set(0, 0, 1);
 
 
 //-----------------------------------------------------------
-// function definitions 
+// function definitions
 //-----------------------------------------------------------
-// add camera - 
+// add camera -
 function addCamera(){
     //create a new camera with positions and angles - fov, aspect, closest visible distance from camera, farest ...
     camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 1000 );
-    
+
     //set how far the camera will be from the 3D model - should depend on the construction size, always all cubes in scene visible
     camera.position.set(4, -6, 4);
-    
+
     //where the camera should look at
     camera.lookAt(0,0,0);
 
@@ -57,14 +66,16 @@ function addCamera(){
 
 //add renderer
 function addRenderer(){
-    //instantiate a new renderer and set its size 
+    //instantiate a new renderer and set its size
     // parameters: alpha: transparent background, antialias: Kantenglättung
     //https://threejs.org/docs/#Renderer
     renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
 
-    //to match the render resolution with the device screen's physical pixel density
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); //maybe not needed
+    // match the render resolution to the screen's physical pixel density
+    // (capped at 2: sharper on high-DPI displays without rendering 3-4x
+    // the pixels on phones - purely a quality/performance trade-off)
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
     // Enable shadow rendering
     renderer.shadowMap.enabled = true;
@@ -83,19 +94,22 @@ function addLights() {
     scene.add(ambientLight);
 
     //simulates rays from an infinitely distant source (like the sun)
+    // position = direction the rays come FROM; above and diagonally in
+    // front of the tower, so every visible face gets some light and the
+    // shadow falls behind the construction
     const topLight = new THREE.DirectionalLight(0xffffff, 1.2);
-    topLight.position.set(4, -5, 8); //which is the best position for this light
+    topLight.position.set(4, -5, 8);
     scene.add(topLight);
     topLight.castShadow = true;
 }
 
-// add Axes
+// add axes (x=red, y=green, z=blue) and a ground grid for orientation
 function addHelpers() {
     const axes = new THREE.AxesHelper(2);
     scene.add(axes);
 
     const grid = new THREE.GridHelper(10, 10);
-    grid.rotation.x = Math.PI / 2;
+    grid.rotation.x = Math.PI / 2;  // GridHelper is XZ by default, rotate into the XY plane (Z-up)
     scene.add(grid);
 }
 
@@ -117,17 +131,20 @@ function onWindowResize() {
 
     renderer.setSize(window.innerWidth, window.innerHeight);
 }
-//animate function - render loop
+
+// render loop: requestAnimationFrame schedules this function again for
+// the next display frame (~60x per second), so the scene stays
+// interactive (OrbitControls) even when no new tree arrives
 function animate() {
     requestAnimationFrame(animate);
 
     controls.update();
-    //scene rendering 
+    //scene rendering
     renderer.render(scene, camera);
 }
 
 //------------------------------------------------------------
-// Scene initialization - main function 
+// Scene initialization - main function, called once from main.js
 //------------------------------------------------------------
 export function initScene(){
 //create a Threejs Scene
@@ -143,6 +160,8 @@ export function initScene(){
     addGround();
 
 // cubeGroup = contains the complete cube construction
+// (redrawTree only ever clears/fills this group, never the whole scene,
+// so lights/camera/helpers survive every redraw)
     cubeGroup = new THREE.Group();
     cubeGroup.name = "cubeGroup";
     scene.add(cubeGroup);
@@ -155,7 +174,8 @@ export function initScene(){
     animate();
 
 }
-//
+
+// large white plane just below the cubes that receives their shadows
 function addGround() {
     const groundSize = 1000;
 
@@ -166,12 +186,13 @@ function addGround() {
 
     const groundMaterial = new THREE.MeshStandardMaterial({
         color: 0xffffff,
-        roughness: 0.8,
+        roughness: 0.8,   // mostly matte surface
         metalness: 0.0,
     });
 
     const ground = new THREE.Mesh(groundGeometry, groundMaterial);
 
+    // top of the ground exactly at the bottom face of the root cube
     ground.position.set(0, 0, -CUBE_SIZE / 2);
 
     ground.receiveShadow = true;
@@ -182,6 +203,10 @@ function addGround() {
 
 // ------------------------------------------------------------
 // loads a template mesh for the cube
+//
+// Loading the GLB file is asynchronous (it is an HTTP request), so the
+// template is null until the callback below fires. Every drawn cube is
+// a CLONE of this template - the file is fetched exactly once.
 // ------------------------------------------------------------
 
 function loadCubeModel() {
@@ -190,11 +215,13 @@ function loadCubeModel() {
     loader.load(
         CUBE_MODEL_URL,
 
+        // success callback, runs when the file has arrived
         function (gltf)  {
             //sets glb file as cubeTemplate model
             cubeTemplate = gltf.scene;
 
-            //receiving shadows is enabled
+            // enable shadows on every mesh inside the model
+            // (traverse visits the model's whole object hierarchy)
             cubeTemplate.traverse((object) => {
                 if (object.isMesh) {
                     object.castShadow = true;
@@ -209,8 +236,9 @@ function loadCubeModel() {
                 redrawTree(latestTree);
             }
         },
-        undefined,
+        undefined,   // progress callback, not needed
 
+        // error callback
         function (error) {
             console.error("Could not load cube model:", error);
         }
@@ -228,6 +256,8 @@ function loadCubeModel() {
  *   raw detection tree (old): id, no status
  * Ghost = empty target slot (attachable): no physical cube, so no own
  * orientation -> the expected one is used.
+ * (?? is the "nullish coalescing" operator: use the right side only
+ * when the left side is null or undefined)
  */
 function nodeView(node) {
     const id = node.node_id ?? node.id ?? null;
@@ -246,19 +276,21 @@ function nodeView(node) {
 // mirror of the physical LEDs plus ghost slots; "blocked" is not listed
 // because blocked slots are not rendered at all
 const STATUS_APPEARANCE = {
-    correct:    { tint: 0x22bb44, tintStrength: 0.25, opacity: 1.0 },
-    wrong:      { tint: 0xcc2222, tintStrength: 0.5,  opacity: 1.0 },
-    unexpected: { tint: 0xcc2222, tintStrength: 0.5,  opacity: 1.0 },
-    attachable: { tint: 0x3388ff, tintStrength: 0.4,  opacity: 0.35 },
+    correct:    { tint: 0x22bb44, tintStrength: 0.25, opacity: 1.0 },   // green
+    wrong:      { tint: 0xcc2222, tintStrength: 0.5,  opacity: 1.0 },   // red
+    unexpected: { tint: 0xcc2222, tintStrength: 0.5,  opacity: 1.0 },   // red
+    attachable: { tint: 0x3388ff, tintStrength: 0.4,  opacity: 0.35 },  // transparent blue ghost
 };
 
 // tints the cloned model per status; materials must be cloned too,
-// otherwise all cubes share the template's materials and get the same color
+// because clone(true) on an Object3D copies meshes but SHARES their
+// materials - without cloning them, coloring one cube would recolor
+// every cube in the scene
 function applyStatusAppearance(visualModel, view) {
     const appearance = STATUS_APPEARANCE[view.status];
 
     if (!appearance) {
-        return;
+        return;  // unknown status: leave the model in its original look
     }
 
     visualModel.traverse((object) => {
@@ -266,6 +298,8 @@ function applyStatusAppearance(visualModel, view) {
             return;
         }
 
+        // a mesh can have one material or an array of them; treat both
+        // the same by always working on an array
         const materials = Array.isArray(object.material)
             ? object.material
             : [object.material];
@@ -273,6 +307,8 @@ function applyStatusAppearance(visualModel, view) {
         const tinted = materials.map((material) => {
             const clone = material.clone();
 
+            // emissive = color the surface "glows" with, independent of
+            // lighting - a reliable way to tint without repainting textures
             if (clone.emissive !== undefined) {
                 clone.emissive = new THREE.Color(appearance.tint);
                 clone.emissiveIntensity = appearance.tintStrength;
@@ -310,6 +346,8 @@ function createCubeObject(view) {
 
     const cubeObject = new THREE.Group();
 
+    // readable name + userData: not used for rendering, but they make
+    // debugging in the browser console much easier (scene.getObjectByName)
     cubeObject.name = view.isGhost
         ? (view.port === null || view.port === undefined
             ? "slot_root"
@@ -326,7 +364,8 @@ function createCubeObject(view) {
         throw new Error("Cube model is not loaded yet.");
     }
 
-    //uses the template cube defined in loadCubeModel as the visual mode
+    //uses the template cube defined in loadCubeModel as the visual model
+    // clone(true) = deep clone including all child meshes
     const visualModel = cubeTemplate.clone(true);
     visualModel.scale.setScalar(MODEL_SCALE);
 
@@ -350,10 +389,13 @@ export function clearTree() {
 }
 
 
+// full redraw: throw away all cube objects and rebuild them from the
+// tree (simple and always correct; fine at this scale of a few cubes)
 export function redrawTree(rootNode) {
     latestTree = rootNode;
 
     if (cubeTemplate === null) {
+        // GLB still loading; loadCubeModel's callback redraws latestTree later
         console.warn("Cube model not loaded yet. Tree will be drawn after loading.");
         return;
     }
@@ -364,6 +406,9 @@ export function redrawTree(rootNode) {
 }
 
 
+// walks the tree depth-first and mirrors it as nested three.js groups:
+// each cube object is added as a CHILD of its parent's object, so the
+// local poses from layout.js are automatically stacked up the chain
 function addCubeRecursive(node, parentObject, isRoot) {
     const view = nodeView(node);
 

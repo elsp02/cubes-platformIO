@@ -28,16 +28,25 @@ sys.path.insert(0, os.path.join(
     os.path.dirname(os.path.abspath(__file__)),
     "..", "threejs_visualization", "backend",
 ))
-from framing import SYNC, calc_checksum
+from framing import (
+    SYNC,
+    calc_checksum,
+    CMD_START,
+    CMD_STOP,
+    FB_OK,
+    RESP_DONE,
+    RESP_FB_FAILED,
+)
 
 DEFAULT_PORT = "COM4"
 DEFAULT_BAUD = 115200  # must match Serial.begin() in the firmware
 
-START_BYTE = b"S"
-STOP_BYTE = b"X"
-FEEDBACK_BYTE = b"A"
-DONE_BYTE = b"D"
-FB_FAILED_BYTE = b"N"
+# single source of truth for the byte values is framing.py
+START_BYTE = bytes([CMD_START])
+STOP_BYTE = bytes([CMD_STOP])
+FEEDBACK_BYTE = bytes([FB_OK])
+DONE_BYTE = bytes([RESP_DONE])
+FB_FAILED_BYTE = bytes([RESP_FB_FAILED])
 
 FRAMES_UNTIL_STOP = 5
 REPLY_TIMEOUT_S = 2.0  # for the single status bytes

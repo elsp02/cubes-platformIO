@@ -1,19 +1,42 @@
-""" payload parser for visualization """
+"""Payload parser: turns detection payload bytes into a CubeNode tree.
+
+Position in the pipeline:
+
+    binary_serial_reader.py (or a test fixture)
+        --payload bytes--> THIS FILE --> CubeNode tree --> compare_core.py
+
+The firmware serializes the detected construction depth-first: each
+cube writes its own 3-byte header, then the full payload of every
+child in ascending port order. parse_tree() reverses exactly that.
+"""
 
 from cube_node import CubeNode
 
-MAX_CHILDREN = 5
+MAX_CHILDREN = 5   # ports 0..4, must match the firmware's child_mask width
 
 """
     Node parsing and deserialization
 
-    Node format:
+    Node format (3-byte header, then the children's bytes):
     NODE_ID | ORIENTATION | CHILD_MASK
+
+    CHILD_MASK: bit N set = a child cube is attached on port N, and its
+    bytes follow directly after this header (depth-first, ports in
+    ascending order). The mask is what makes the flat byte stream
+    unambiguous - no length fields per node are needed.
 """
 
+# Parses one node (and, recursively, its whole subtree) starting at
+# byte position `index`. Returns (node, index_after_subtree) - passing
+# the index along like this is what lets the recursion walk the flat
+# byte stream without ever copying or slicing it.
+# `port` is the parent port this node hangs on (None for the root).
 def parse_node(payload: bytes, index: int, port: int | None) -> tuple[CubeNode, int]:
 
     if index + 3 > len(payload):
+        # fewer than 3 bytes left where a node header must start:
+        # payload is truncated (e.g. child_mask promised a child that
+        # never arrived in the bytes)
         raise ValueError("Payload too short while parsing node header.")
 
     id = payload[index]
@@ -30,6 +53,8 @@ def parse_node(payload: bytes, index: int, port: int | None) -> tuple[CubeNode, 
         children=[]
     )
 
+    # walk the mask bit by bit; the children's bytes appear in exactly
+    # this order (ascending ports), so index moves forward through them
     for child_port in range(MAX_CHILDREN):
         if child_mask & (1 << child_port):
             child_node, index = parse_node(
@@ -42,7 +67,7 @@ def parse_node(payload: bytes, index: int, port: int | None) -> tuple[CubeNode, 
     return node, index
 
 
-"""main fct for tree deserialization"""
+"""main fct for tree deserialization: whole payload -> root CubeNode"""
 def parse_tree(payload: bytes) -> CubeNode:
     root, index = parse_node(
         payload=payload,
@@ -51,6 +76,9 @@ def parse_tree(payload: bytes) -> CubeNode:
     )
 
     if index != len(payload):
+        # leftover bytes after the root's subtree ended = the payload
+        # does not describe exactly one tree -> corrupt, better to
+        # reject it than to silently show a wrong construction
         raise ValueError(
             f"Payload was not fully consumed. Parsed {index} of {len(payload)} bytes."
         )
@@ -73,6 +101,7 @@ def serialize_tree(node: CubeNode) -> bytes:
     return bytes(out)
 
 
+"""debug helper: prints the tree structure with indentation per level"""
 def print_tree(node, depth: int = 0):
     indent = "  " * depth
 
@@ -83,7 +112,7 @@ def print_tree(node, depth: int = 0):
 
     print(
         f"{indent}- cube 0x{node.id:02X}, "   #hex zahl mit mind 2 stellen
-        f"child_mask= 0x{node.child_mask:02X}, "     
+        f"child_mask= 0x{node.child_mask:02X}, "
         f"orientation={node.orientation}, "
         f"{port_text}"
     )

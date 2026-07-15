@@ -64,6 +64,9 @@ def _story() -> list[tuple[str, Optional[CubeNode]]]:
     ]
 
 
+# Generator with the same shape as iter_trees_from_binary_serial:
+# yields one tree per story step, then sleeps, and loops forever -
+# ws_server.py can consume either source with the same for-loop.
 def iter_trees_simulated(interval_s: float = 5.0) -> Iterator[Optional[CubeNode]]:
     while True:
         for label, tree in _story():

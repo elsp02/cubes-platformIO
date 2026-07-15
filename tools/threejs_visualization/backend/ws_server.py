@@ -1,5 +1,17 @@
-# this server compares the actual tree against the target tree and sends
-# the evaluated tree in json to the websocket client (just for one client, no broadcasting)
+# WebSocket server: the glue between tree source, comparison and frontend.
+#
+# Position in the pipeline:
+#
+#   tree source (real baseplate OR simulated story)
+#       --CubeNode tree--> compare against TARGET --evaluated dict-->
+#           --JSON over websocket--> three.js frontend
+#
+# Architecture: the tree source blocks on the serial port (or on
+# time.sleep in simulation), so it runs in its own worker THREAD.
+# The websocket part runs in the asyncio event loop of the main thread.
+# The two sides only meet at tree_queue.
+#
+# (just for one client, no broadcasting)
 # documentation on https://websockets.readthedocs.io/en/stable/intro/tutorial1.html
 import asyncio
 import json
@@ -15,7 +27,7 @@ from target_tree import TARGET_TOWER_3
 #--------------------------------
 # Configuration
 #--------------------------------
-USE_SIMULATION = True    # True: scripted build story, False: real baseplate on SERIAL_PORT
+USE_SIMULATION = False   # True: scripted build story, False: real baseplate on SERIAL_PORT
 SIM_INTERVAL_S = 5.0     # seconds per simulated story step
 
 SERIAL_PORT = 'COM4'  # Change this to your serial port
@@ -25,7 +37,10 @@ WEBSOCKET_PORT = 8765
 
 TARGET = TARGET_TOWER_3  # the construction the user is supposed to build
 
-#stores only the newest evaluated tree
+# Hand-over point between worker thread and websocket handler.
+# maxsize=1 on purpose: the frontend only ever needs the NEWEST state,
+# so if the browser is slow the old unread tree is dropped (see
+# tree_worker) instead of queueing up a backlog of stale states.
 tree_queue: Queue[dict] = Queue(maxsize=1)
 
 
@@ -53,6 +68,8 @@ def evaluate_tree(actual) -> dict:
 #received tree against the target and puts the evaluated tree into the queue
 def tree_worker() -> None:
     try:
+        # this for-loop drives the generator: each iteration resumes
+        # iter_trees_... until its next `yield tree`
         for actual in tree_source():
             evaluated = evaluate_tree(actual)
 
@@ -61,23 +78,33 @@ def tree_worker() -> None:
                 try:
                     tree_queue.get_nowait()
                 except Empty:
+                    # only possible if the handler grabbed it in between
+                    # emptying and putting - then there is nothing to drop
                     pass
             tree_queue.put_nowait(evaluated)
 
     except Exception as error:
+        # without this, an exception in the thread would disappear
+        # silently (the main thread keeps running without a source)
         print(f"Tree worker stopped because of an error: {error}")
 
 
-#websocket handler -> Sends the newest evaluated tree to the connected browser
+#websocket handler -> runs once per connected browser: sends the newest
+#evaluated tree whenever one appears in the queue
 async def handler(websocket) -> None:
     print("Browser connected.")
 
     try:
         while True:
             try:
+                # non-blocking check; Queue has no async interface, so
+                # polling + short sleep is the simplest bridge between
+                # the thread world and the asyncio world
                 tree = tree_queue.get_nowait()
 
             except Empty:
+                # nothing new yet: yield control to the event loop for
+                # 20 ms so this loop does not burn a CPU core
                 await asyncio.sleep(0.02)
                 continue
 
@@ -98,6 +125,7 @@ async def handler(websocket) -> None:
 
 
 async def main()-> None:
+    # websockets.serve calls handler() once per connecting client
     async with websockets.serve(handler, WEBSOCKET_HOST, WEBSOCKET_PORT):
         print(
             f"WebSocket server started on "
@@ -106,6 +134,8 @@ async def main()-> None:
         await asyncio.Future()  # run forever
 
 if __name__ == "__main__":
+    # daemon=True: the worker thread dies together with the main thread
+    # on Ctrl+C instead of keeping the process alive
     worker_thread = Thread(
         target=tree_worker,
         daemon=True,

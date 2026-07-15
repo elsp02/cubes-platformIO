@@ -1,6 +1,13 @@
+// ws_client.js - websocket connection to the backend (ws_server.py).
+//
+// Message contract with the server: every message is JSON of the form
+//   { "type": "evaluated_tree", "tree": { ...nested node dicts... } }
+// where tree is what feedback_output.build_evaluated_tree() produced
+// (node_id, status, error_mask, orientation, port, children, ...).
 const WEBSOCKET_URL = "ws://localhost:8765";
 
 // function is called in main.js to connect to the websocket server and receive tree data
+// onTreeReceived(tree) is called for every valid tree message
 // onDisconnected (optional) is called when the connection closes or fails
 export function connectWebSocket(onTreeReceived, onDisconnected) {
     const socket = new WebSocket(WEBSOCKET_URL);
@@ -16,7 +23,7 @@ export function connectWebSocket(onTreeReceived, onDisconnected) {
         }
     };
 
-    // if message is received from the server 
+    // if message is received from the server
     socket.onmessage = (event) => {
         try {
             const message = JSON.parse(event.data);
@@ -32,10 +39,12 @@ export function connectWebSocket(onTreeReceived, onDisconnected) {
                 return;
             }
 
+            // hand the tree to main.js (which passes it to the renderer)
             onTreeReceived(message.tree);
-            
+
 
         } catch (error) {
+            // JSON.parse failed - the server sent something unreadable
             console.error("Could not parse WebSocket message:", error);
             console.error("Raw message:", event.data);
         }

@@ -1,5 +1,4 @@
 <!doctype html>
-<!doctype html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
@@ -8,6 +7,7 @@
     <title>Cube Visualization</title>
 
     <style>
+        /* the three.js canvas fills the whole window */
         body {
             margin: 0;
             overflow: hidden;
@@ -15,6 +15,8 @@
             background: #f2f2f2;
         }
 
+        /* small connection-status box in the top-left corner,
+           its text is updated by ws_client.js */
         #status {
             position: absolute;
             top: 12px;
@@ -39,6 +41,7 @@
 <body>
     <div id="status">WebSocket not connected</div>
 
+    <!-- entry point: main.js starts the scene and the websocket client -->
     <script type="module" src="/src/main.js"></script>
 </body>
 </html>
