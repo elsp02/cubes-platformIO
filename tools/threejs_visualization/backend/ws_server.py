@@ -21,7 +21,7 @@ from threading import Thread
 import websockets
 
 from compare_core import compare
-from feedback_output import build_evaluated_tree
+from feedback_output import build_evaluated_tree, build_feedback_frame, led_states
 from target_tree import TARGET_TOWER_3
 
 #--------------------------------
@@ -54,7 +54,21 @@ def tree_source():
 
     from binary_serial_reader import iter_trees_from_binary_serial
     print(f"Starting serial reader on {SERIAL_PORT} at {BAUDRATE} baud.")
-    return iter_trees_from_binary_serial(SERIAL_PORT, BAUDRATE)
+    return iter_trees_from_binary_serial(
+        SERIAL_PORT,
+        BAUDRATE,
+        feedback_builder=build_feedback_for_tree,
+    )
+
+
+# LED feedback frame for one actual tree (None = nothing built): the
+# reader sends this as the reply to every payload frame. compare() runs
+# here AND in evaluate_tree once per tree - trees are a handful of
+# nodes, so recomputing is simpler than sharing the result across the
+# reader/worker boundary.
+def build_feedback_for_tree(actual) -> bytes:
+    result = compare(actual, TARGET)
+    return build_feedback_frame(led_states(result))
 
 
 # orchestrator: actual tree (CubeNode or None) -> evaluated tree dict

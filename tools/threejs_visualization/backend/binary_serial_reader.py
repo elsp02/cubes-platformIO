@@ -10,14 +10,22 @@ Implements the PC side of the building-sequence protocol:
     PC -> baseplate : CMD_START ('S')   baseplate begins detection
     baseplate -> PC : payload frame  SYNC | LEN | PAYLOAD | CHECKSUM
                       (first cycle always, then on change or heartbeat)
-    PC -> baseplate : FB_OK ('A')       feedback byte, answered for EVERY frame
-    baseplate -> PC : RESP_DONE ('D') or RESP_FB_FAILED ('N')
-    PC -> baseplate : CMD_STOP ('X')    on shutdown, baseplate goes back to idle
+    PC -> baseplate : FEEDBACK FRAME (same SYNC|LEN|PAYLOAD|CHECKSUM
+                      format, payload = [NODE_ID, LED_STATE] pairs from
+                      the compare result), answered for EVERY frame
+    baseplate -> PC : RESP_DONE ('D') when every cube confirmed the
+                      relayed feedback, RESP_FB_FAILED ('N') otherwise
+    PC -> baseplate : CMD_STOP ('X')    on shutdown; the baseplate then
+                      relays an empty frame (all LEDs off) and idles
+
+The feedback frame itself is built by the caller: ws_server.py passes
+a `feedback_builder` callable (tree -> frame bytes), so this file
+stays free of any compare/target knowledge.
 
 The main entry point is iter_trees_from_binary_serial() at the bottom;
 ws_server.py runs it in a worker thread and consumes the yielded trees.
 """
-from typing import Optional
+from typing import Callable, Optional
 
 import serial
 
@@ -26,9 +34,9 @@ from payload_parser import parse_tree
 from framing import (
     SYNC,
     calc_checksum,
+    build_frame,
     CMD_START,
     CMD_STOP,
-    FB_OK,
     RESP_DONE,
     RESP_FB_FAILED,
 )
@@ -100,17 +108,17 @@ def wait_for_valid_sync_cmd(ser: serial.Serial, verbose: bool) -> bool:
 
 
 """
-    Answers a payload frame: sends the feedback byte (placeholder 'A'
-    for now) and checks the baseplate's status reply.
+    Answers a payload frame: sends the complete feedback frame and
+    checks the baseplate's status reply.
 
     The firmware waits up to PC_REPLY_TIMEOUT_MS for this reply after
     EVERY frame it sends (heartbeats included), so this must be called
     for every valid frame - otherwise each frame stalls for 2 seconds.
-    A missing/wrong status byte is only reported, never fatal.
+    A missing/failed status byte is only reported, never fatal.
 """
-def confirm_frame(ser: serial.Serial, verbose: bool) -> None:
+def send_feedback_frame(ser: serial.Serial, frame: bytes, verbose: bool) -> None:
 
-    ser.write(bytes([FB_OK]))
+    ser.write(frame)
 
     status = ser.read(1)
 
@@ -118,9 +126,10 @@ def confirm_frame(ser: serial.Serial, verbose: bool) -> None:
         if verbose:
             print("No status byte from baseplate (timeout).")
     elif status[0] == RESP_DONE:
-        pass    # normal case: feedback byte accepted
+        pass    # normal case: every cube confirmed the feedback
     elif status[0] == RESP_FB_FAILED:
-        print("Baseplate reports wrong feedback byte (N).")
+        print("Baseplate reports feedback failure (bad frame or a cube "
+              "did not confirm).")
     elif verbose:
         print(f"Unexpected status byte: 0x{status[0]:02X}")
 
@@ -150,6 +159,9 @@ def iter_trees_from_binary_serial(
     port: str,  # port defined as string, e.g. "COM3"
     baudrate: int = 115200,  # must match Serial.begin() in the firmware
     verbose: bool = True,   # False silences the idle/resync/heartbeat chatter
+    # builds the feedback frame for a tree (None = nothing built);
+    # supplied by ws_server so this file needs no compare/target imports
+    feedback_builder: Optional[Callable[[Optional[CubeNode]], bytes]] = None,
 ):
 
 
@@ -162,7 +174,13 @@ def iter_trees_from_binary_serial(
         ser.write(bytes([CMD_START]))
         print(f"Connected to {port} at {baudrate} baud, START sent.")
 
-        last_payload: Optional[bytes] = None   # snapshot of last answered payload
+        # without a builder (standalone use) every frame is answered with
+        # the empty feedback frame = all LEDs off
+        if feedback_builder is None:
+            feedback_builder = lambda tree: build_frame(b"")
+
+        last_payload: Optional[bytes] = None         # snapshot of last answered payload
+        last_feedback_frame: Optional[bytes] = None  # its frame, resent on heartbeats
 
         try:
             while True:
@@ -179,38 +197,48 @@ def iter_trees_from_binary_serial(
                 if payload is None:
                     continue   # broken frame: no reply, firmware's own timeout covers it
 
-                # answer EVERY valid frame (heartbeats too) - the firmware
-                # blocks waiting for the feedback byte after each frame
-                confirm_frame(ser, verbose)
-
                 # heartbeat = identical payload sent again just to show the
-                # link is alive; already answered above, nothing new to yield
-                if payload == last_payload:
+                # link is alive; the compare result would be identical too,
+                # so resend the cached feedback frame (EVERY frame must be
+                # answered - the firmware blocks waiting for it) and yield
+                # nothing new
+                if payload == last_payload and last_feedback_frame is not None:
                     if verbose:
                         print("Heartbeat")
+                    send_feedback_frame(ser, last_feedback_frame, verbose)
                     continue
 
-                last_payload = payload   # update snapshot before yielding
                 print(f"DEBUG payload: {payload.hex(' ')} (len={len(payload)})")
 
-                # empty payload (LEN 0) = nothing detected -> "nothing built",
-                # same as the simulated story's first step
+                # payload -> tree; empty payload (LEN 0) = nothing detected
+                # -> None ("nothing built", same as the simulated story)
                 if len(payload) == 0:
-                    yield None
-                    continue
+                    tree: Optional[CubeNode] = None
+                else:
+                    try:
+                        tree = parse_tree(payload)
 
-                #parse payload to tree
-                try:
-                    tree: CubeNode = parse_tree(payload)
-                    yield tree   # hand the tree to the consumer, pause here
+                    except ValueError as error:
+                        # parse_tree raises ValueError when the payload does
+                        # not form a valid tree (truncated node header,
+                        # child_mask promising children that are missing,
+                        # leftover bytes). No tree = no feedback frame; send
+                        # nothing, the firmware's reply timeout covers this
+                        # rare case.
+                        print(f"Parser error: {error}")
+                        print(f"Payload: {payload.hex(' ')}")
+                        ser.reset_input_buffer()
+                        continue
 
-                except ValueError as error:
-                    # parse_tree raises ValueError when the payload does not
-                    # form a valid tree (truncated node header, child_mask
-                    # promising children that are missing, leftover bytes)
-                    print(f"Parser error: {error}")
-                    print(f"Payload: {payload.hex(' ')}")
-                    ser.reset_input_buffer()
+                # answer the frame with the feedback derived from this tree
+                feedback_frame = feedback_builder(tree)
+                send_feedback_frame(ser, feedback_frame, verbose)
+
+                # update the snapshots only after a fully successful exchange
+                last_payload = payload
+                last_feedback_frame = feedback_frame
+
+                yield tree   # hand the tree to the consumer, pause here
 
         finally:
             # on generator close or error: send the baseplate back to idle

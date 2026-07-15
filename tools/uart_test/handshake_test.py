@@ -5,12 +5,13 @@ Counterpart to src/firmware_baseplate/uart_main_baseplate.cpp:
     PC -> baseplate : 'S' (START)   -> baseplate begins detection
     baseplate -> PC : payload frame SYNC | LEN | PAYLOAD | CHECKSUM
                       (first cycle always, then on change or heartbeat)
-    PC -> baseplate : 'A' (feedback byte, placeholder for the real
-                      feedback frame later)
-    baseplate -> PC : 'D' (done) or 'N' (wrong feedback byte)
+    PC -> baseplate : feedback frame (this test always sends the EMPTY
+                      frame A5 00 00 = all LEDs off; the real feedback
+                      comes from ws_server's compare result)
+    baseplate -> PC : 'D' (done) or 'N' (feedback failed)
     ... repeats ...
-    PC -> baseplate : 'X' (STOP) instead of 'A' after the 5th frame
-                      -> baseplate returns to idle
+    PC -> baseplate : 'X' (STOP) instead of feedback after the 5th
+                      frame -> LEDs off, baseplate returns to idle
 
 Usage:
     python handshake_test.py COM4 [115200]
@@ -31,9 +32,9 @@ sys.path.insert(0, os.path.join(
 from framing import (
     SYNC,
     calc_checksum,
+    build_frame,
     CMD_START,
     CMD_STOP,
-    FB_OK,
     RESP_DONE,
     RESP_FB_FAILED,
 )
@@ -44,7 +45,9 @@ DEFAULT_BAUD = 115200  # must match Serial.begin() in the firmware
 # single source of truth for the byte values is framing.py
 START_BYTE = bytes([CMD_START])
 STOP_BYTE = bytes([CMD_STOP])
-FEEDBACK_BYTE = bytes([FB_OK])
+# protocol-layer test feedback: the EMPTY feedback frame (A5 00 00) is
+# always valid and means "no cube listed" = all LEDs off
+FEEDBACK_FRAME = build_frame(b"")
 DONE_BYTE = bytes([RESP_DONE])
 FB_FAILED_BYTE = bytes([RESP_FB_FAILED])
 
@@ -121,18 +124,18 @@ def read_payload_frame(ser: serial.Serial) -> bytes:
 
 
 def exchange_feedback(ser: serial.Serial) -> None:
-    """Send the feedback byte and report the baseplate's status reply."""
-    ser.write(FEEDBACK_BYTE)
-    print(f"  sent feedback '{FEEDBACK_BYTE.decode()}'")
+    """Send the (empty) feedback frame and report the status reply."""
+    ser.write(FEEDBACK_FRAME)
+    print(f"  sent empty feedback frame {FEEDBACK_FRAME.hex(' ')}")
 
     reply = ser.read(1)
 
     if not reply:
         print(f"  WARNING: no status byte within {REPLY_TIMEOUT_S:.0f} s")
     elif reply == DONE_BYTE:
-        print("  baseplate confirmed: D (done)")
+        print("  baseplate confirmed: D (feedback relayed)")
     elif reply == FB_FAILED_BYTE:
-        print("  WARNING: baseplate reports wrong feedback byte (N)")
+        print("  WARNING: baseplate reports feedback failure (N)")
     else:
         print(f"  WARNING: unexpected status byte 0x{reply[0]:02X}")
 

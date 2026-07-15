@@ -7,14 +7,18 @@
 //   - runs the normal detection sequence
 //   - sends the payload frame SYNC | LEN | PAYLOAD | CHECKSUM to the
 //     PC (first cycle always, then on change or heartbeat)
-//   - waits for the PC feedback byte PC_FB_OK and answers with
-//     PC_RESP_DONE (wrong byte: PC_RESP_FB_FAILED, timeout: nothing)
-//   - PC_CMD_STOP (as reply or between frames) ends the sequence and
-//     returns to idle, waiting for the next PC_CMD_START
+//   - waits for the PC reply: a FEEDBACK FRAME (same SYNC|LEN|PAYLOAD|
+//     CHECKSUM format, payload = [NODE_ID, LED_STATE] pairs computed
+//     from the compare result on the PC), relays it to the cubes over
+//     the wire bus, and answers PC_RESP_DONE when every present cube
+//     confirmed ACK_FINISHED (PC_RESP_FB_FAILED on a bad frame from
+//     the PC or a cube that failed after all retries)
+//   - PC_CMD_STOP (as reply or between frames) relays an EMPTY
+//     feedback frame (no IDs = every cube turns its LED off), ends
+//     the sequence and returns to idle, waiting for the next START
 //
-// Feedback to the cubes (LEDs) is intentionally NOT part of this
-// firmware yet. The serial line carries only binary frames and the
-// single status bytes - no ASCII debug (log_flush is never called).
+// The serial line carries only binary frames and the single status
+// bytes - no ASCII debug (log_flush is never called).
 // ============================================================
 
 #include <Arduino.h>
@@ -84,6 +88,163 @@ static bool stop_received(void)
     return stop;
 }
 
+// possible outcomes of waiting for the PC reply after a payload frame
+enum pc_reply_t : uint8_t {
+    PC_REPLY_TIMEOUT,   // nothing arrived at all
+    PC_REPLY_STOP,      // PC_CMD_STOP instead of a feedback frame
+    PC_REPLY_FRAME,     // valid feedback frame stored in the buffer
+    PC_REPLY_BAD,       // unexpected byte / broken frame / bad checksum
+};
+
+// waits for the PC reply and, if it is a feedback frame, reads and
+// validates it into fb_payload/fb_payload_len
+static pc_reply_t read_pc_reply(uint8_t *fb_payload, uint8_t *fb_payload_len)
+{
+    uint8_t b = 0;
+
+    if (!wait_for_pc_byte(&b, PC_REPLY_TIMEOUT_MS)) {
+        return PC_REPLY_TIMEOUT;
+    }
+
+    if (b == PC_CMD_STOP) {
+        return PC_REPLY_STOP;
+    }
+
+    if (b != SYNC_BYTE) {
+        return PC_REPLY_BAD;
+    }
+
+    // SYNC seen: the rest of the frame follows back-to-back, so only a
+    // short gap between bytes is allowed
+    uint8_t len = 0;
+    if (!wait_for_pc_byte(&len, PC_FRAME_BYTE_TIMEOUT_MS)) {
+        return PC_REPLY_BAD;
+    }
+
+    if (len > MAX_PAYLOAD_LEN) {
+        return PC_REPLY_BAD;
+    }
+
+    for (uint8_t i = 0; i < len; i++) {
+        if (!wait_for_pc_byte(&fb_payload[i], PC_FRAME_BYTE_TIMEOUT_MS)) {
+            return PC_REPLY_BAD;
+        }
+    }
+
+    uint8_t received_checksum = 0;
+    if (!wait_for_pc_byte(&received_checksum, PC_FRAME_BYTE_TIMEOUT_MS)) {
+        return PC_REPLY_BAD;
+    }
+
+    if (received_checksum != calc_checksum(len, fb_payload)) {
+        return PC_REPLY_BAD;
+    }
+
+    *fb_payload_len = len;
+    return PC_REPLY_FRAME;
+}
+
+// ----------------------------------------------------------
+// Feedback relay to the cubes (copied from main_baseplate_feedback2)
+// ----------------------------------------------------------
+
+// send one feedback frame to one child and wait until the whole
+// subtree below it confirmed (ACK_FINISHED) or failed
+static bool send_feedback_to_child(
+    const wire_t *w,
+    const uint8_t *fb_payload,
+    uint8_t fb_payload_len
+)
+{
+    uint8_t b = 0;
+
+    wire_release(w);
+    _delay_us(TURNAROUND_US);
+
+    // 1. announce the feedback frame (like CMD_STATUS in detection)
+    tx_byte(w, CMD_FEEDBACK);
+
+    // 2. release line and wait for child ACK
+    wire_release(w);
+
+    if (!rx_byte(w, &b, CHILD_TIMEOUT_US)) {
+        return false;   // no ACK at all
+    }
+
+    if (b != ACK_BUSY) {
+        return false;   // wrong ACK
+    }
+
+    // 3. send the feedback frame itself
+    _delay_us(TURNAROUND_US);
+
+    tx_frame(w, fb_payload, fb_payload_len);
+
+    wire_release(w);
+
+    _delay_us(TURNAROUND_US);
+
+    // 4. wait until the child (and recursively its whole subtree)
+    //    reports the outcome
+    if (!rx_byte(w, &b, FEEDBACK_FINISHED_TIMEOUT_US)) {
+        return false;   // no finished byte
+    }
+
+    wire_release(w);
+    return (b == ACK_FINISHED);
+}
+
+// relay one feedback frame to every port that had a child this cycle,
+// with the same retry pattern as the detection polling.
+// Returns true if every present child confirmed.
+static bool relay_feedback_to_children(
+    const uint8_t *fb_payload,
+    uint8_t fb_payload_len
+)
+{
+    bool feedback_done[CHILD_COUNT] = { false };
+    bool all_done = true;
+
+    for (uint8_t attempt = 0; attempt < CHILD_RETRIES; attempt++) {
+        bool retry_needed = false;
+        all_done = true;
+
+        for (uint8_t child = 0; child < CHILD_COUNT; child++) {
+
+            if (!last_child_present[child]) {
+                continue;   // no cube on this port
+            }
+
+            if (feedback_done[child]) {
+                continue;   // already confirmed
+            }
+
+            if (send_feedback_to_child(children[child], fb_payload, fb_payload_len)) {
+                feedback_done[child] = true;
+            } else {
+                all_done = false;
+                retry_needed = true;
+            }
+        }
+
+        if (!retry_needed) {
+            break;
+        }
+    }
+
+    return all_done;
+}
+
+// stop sequence: every cube turns its LED off when its ID is missing
+// from the feedback payload, so an EMPTY frame switches all LEDs off
+static void run_stop_sequence(void)
+{
+    static const uint8_t empty_payload[1] = { 0 };  // never read at len 0
+
+    relay_feedback_to_children(empty_payload, 0);
+    detection_running = false;
+}
+
 // ----------------------------------------------------------
 // Arduino setup
 // ----------------------------------------------------------
@@ -121,7 +282,7 @@ void loop()
 
     // stop between frames: PC may send PC_CMD_STOP at any time
     if (stop_received()) {
-        detection_running = false;
+        run_stop_sequence();   // all LEDs off, back to idle
         return;
     }
 
@@ -230,19 +391,39 @@ void loop()
         Serial.write(payload, payload_len);
         Serial.write(checksum);
 
-        //wait for the PC reply: feedback byte, stop, or timeout
-        uint8_t reply = 0;
+        //wait for the PC reply: feedback frame, stop, or timeout
+        uint8_t fb_payload[MAX_PAYLOAD_LEN];   // MAX_PAYLOAD_LEN, not FB_MAX_PAYLOAD_LEN:
+                                               // an unexpected extra cube makes the payload longer
+        uint8_t fb_payload_len = 0;
 
-        if (wait_for_pc_byte(&reply, PC_REPLY_TIMEOUT_MS)) {
-            if (reply == PC_FB_OK) {
-                Serial.write(PC_RESP_DONE);
-            } else if (reply == PC_CMD_STOP) {
-                detection_running = false; // no response byte; the PC exits after sending STOP
-            } else {
+        switch (read_pc_reply(fb_payload, &fb_payload_len)) {
+
+            case PC_REPLY_FRAME:
+                // relay the LED states to the cubes; DONE only when every
+                // present cube confirmed the frame came back around
+                if (relay_feedback_to_children(fb_payload, fb_payload_len)) {
+                    Serial.write(PC_RESP_DONE);
+                } else {
+                    Serial.write(PC_RESP_FB_FAILED);
+                }
+                break;
+
+            case PC_REPLY_STOP:
+                run_stop_sequence(); // no response byte; the PC exits after sending STOP
+                break;
+
+            case PC_REPLY_BAD:
+                // broken frame from the PC: report it and drop stray bytes
+                while (Serial.available() > 0) {
+                    Serial.read();
+                }
                 Serial.write(PC_RESP_FB_FAILED);
-            }
+                break;
+
+            case PC_REPLY_TIMEOUT:
+                // send nothing, continue with the next cycle
+                break;
         }
-        // timeout: send nothing, continue with the next cycle
 
         remember_sent_payload(payload, payload_len);
         cycles_since_last_send = 0;

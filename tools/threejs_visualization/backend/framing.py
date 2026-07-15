@@ -11,10 +11,9 @@ SYNC = 0xA5
 # include/config.h; ASCII on purpose so the link can also be driven by
 # hand in a serial monitor)
 CMD_START      = 0x53  # 'S' PC -> baseplate: start detection
-CMD_STOP       = 0x58  # 'X' PC -> baseplate: stop sequence, back to idle
-FB_OK          = 0x41  # 'A' PC -> baseplate: feedback reply to a payload frame
-RESP_DONE      = 0x44  # 'D' baseplate -> PC: correct feedback byte received
-RESP_FB_FAILED = 0x4E  # 'N' baseplate -> PC: wrong feedback byte received
+CMD_STOP       = 0x58  # 'X' PC -> baseplate: stop sequence (all LEDs off), back to idle
+RESP_DONE      = 0x44  # 'D' baseplate -> PC: feedback frame relayed, every cube confirmed
+RESP_FB_FAILED = 0x4E  # 'N' baseplate -> PC: bad frame from PC or a cube failed to confirm
 
 
 def calc_checksum(payload_len: int, payload: bytes) -> int:
