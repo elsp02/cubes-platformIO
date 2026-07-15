@@ -75,11 +75,6 @@ static int8_t scan_upstream(void)
     return -1;
 }
 
-//-----------------------------------------------------------
-// wait for CMD byte from parent
-//-----------------------------------------------------------
-// auch auf falling edge warten (rx_byte) aber ohne timeout
-
 // ----------------------------------------------------------
 // Wait for upstream command - same as v4 despite from release all lines
 // ----------------------------------------------------------
@@ -162,7 +157,7 @@ static void handle_detection(const wire_t *active_upstream, uint8_t orientation_
     bool child_acked[CHILD_COUNT] = {false};                      // child answered ACK_BUSY at least once this cycle -> port is occupied even if its frame failed
 
     for (uint8_t attempt = 0; attempt < CHILD_RETRIES; attempt++) { //retry loop
-        bool any_pending = false; //true if any child still has attempts left after this round
+        bool retry_needed = false; //true if any child still has attempts left after this round
 
         for (uint8_t i = 0; i < CHILD_COUNT; i++) {  //child loop, iterates through children
 
@@ -170,10 +165,9 @@ static void handle_detection(const wire_t *active_upstream, uint8_t orientation_
                 continue;
             }
 
-            // presence-aware retry budget: a port counts as occupied if it
-            // had a child last cycle OR already ACKed this cycle (a corrupt
-            // frame must not demote a present child). Occupied ports keep
-            // the full retries, empty ports get a single attempt.
+            // presence-aware retry budget: a port counts as occupied if it had a child last cycle OR already ACKed this cycle
+            // Occupied ports keep the full retries, empty ports get a single attempt.
+            // -> attempt_budget specifies the maximum number of attempts a the port is allowed in this detection cycle
             uint8_t attempt_budget = (last_child_present[i] || child_acked[i]) ? CHILD_RETRIES : 1;
 
             if (attempt >= attempt_budget) {
@@ -194,14 +188,14 @@ static void handle_detection(const wire_t *active_upstream, uint8_t orientation_
             } else {
                 if (acked) {
                     child_acked[i] = true; // present but frame failed -> full retry budget from now on
-                    any_pending = true;
-                } else if (attempt + 1 < attempt_budget) {
-                    any_pending = true;
+                    retry_needed = true;
+                } else if (attempt + 1 < attempt_budget) { //if child was present in the previous detection loop - then also retry
+                    retry_needed = true;
                 }
             }
         }
 
-        if (!any_pending) {
+        if (!retry_needed) {
             break;
         }
     }
@@ -267,6 +261,7 @@ static void handle_detection(const wire_t *active_upstream, uint8_t orientation_
 //----------------------------------------------------------
 // Handle Feedback
 //----------------------------------------------------------
+//maybe to a new file becuase baseplate also uses this
 static bool send_feedback_to_child(
     const wire_t *w,
     const uint8_t *fb_payload,
@@ -274,7 +269,6 @@ static bool send_feedback_to_child(
 ){
     uint8_t b = 0;
 
-    //brauch ich das? nicht in poll_child function
     wire_release(w);
     _delay_us(TURNAROUND_US);
 
@@ -362,7 +356,6 @@ static void handle_feedback (const wire_t *active_upstream){
         }
 
         //relay identical cmd_feedback to children == polling children
-        //bool feedback_done[CHILD_COUNT] = { false };
         bool all_feedback_done = true;
 
         //frame to existing children == polling children (detection sequence)
@@ -374,8 +367,6 @@ static void handle_feedback (const wire_t *active_upstream){
 
                 //if one send feedback to child return a false - then end loop and transmit ACK failed to parent
                 if (!send_feedback_to_child(children[child], fb_payload, fb_payload_len)){
-                    //Serial.println("CV");
-                    //feedback_done[child] = true; //mark child as done -> no more polling of this child in next attempts
                     all_feedback_done = false;
                     _delay_us(TURNAROUND_US);
                     tx_byte(active_upstream, ACK_FAILED);

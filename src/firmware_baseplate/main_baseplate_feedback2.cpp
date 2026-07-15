@@ -43,7 +43,7 @@ static void release_all_lines(void){
 }
 
 //-----------------------------------------------------------
-// payload print
+// payload print - in serial_writing_file
 //-----------------------------------------------------------
 static void print_payload_hex(const uint8_t *payload, uint8_t len)
 {
@@ -66,6 +66,7 @@ static void print_payload_hex(const uint8_t *payload, uint8_t len)
 
     Serial.println();
 }
+// feedback sequence
 
 //feedback to child
 //feedback led
@@ -138,10 +139,10 @@ static bool send_feedback_to_child(
 // ----------------------------------------------------------
 void setup()
 {
-    wire_release(&child_0);
+    release_all_lines();
 
     Serial.begin(115200);
-    SER_PRINT("Prototype v5 parent started");
+    SER_PRINT("Prototype v7 parent started");
 }
 
 // ----------------------------------------------------------
@@ -150,6 +151,7 @@ void setup()
 void loop()
 {
     log_reset();
+
     // 0. make sure line is idle / give child time to get back to listening
     wire_release(&child_0);
     _delay_us(TURNAROUND_US);
@@ -162,7 +164,7 @@ void loop()
     bool child_acked[CHILD_COUNT] = {false}; // child answered ACK_BUSY at least once this cycle -> port is occupied even if its frame failed
 
     for (uint8_t attempt = 0; attempt < CHILD_RETRIES; attempt ++){
-        bool any_pending = false; //true if any child still has attempts left after this round
+        bool retry_needed = false; //true if any child still has attempts left after this round
 
         for (uint8_t child = 0; child < CHILD_COUNT; child ++){
 
@@ -170,10 +172,9 @@ void loop()
                 continue;
             }
 
-            // presence-aware retry budget: a port counts as occupied if it
-            // had a child last cycle OR already ACKed this cycle (a corrupt
-            // frame must not demote a present child). Occupied ports keep
-            // the full retries, empty ports get a single attempt.
+            // presence-aware retry budget: a port counts as occupied if it had a child last cycle OR already ACKed this cycle
+            // Occupied ports keep the full retries, empty ports get a single attempt.
+            // -> attempt_budget specifies the maximum number of attempts a the port is allowed in this detection cycle
             uint8_t attempt_budget = (last_child_present[child] || child_acked[child]) ? CHILD_RETRIES : 1;
 
             if (attempt >= attempt_budget) {
@@ -191,16 +192,16 @@ void loop()
             )){
                 SER_PRINT("CV");
                 child_done[child] = true; //mark child as done -> no more polling of this child in next attempts
-            } else {
+            } else { //retries are needed
                 if (acked) {
                     child_acked[child] = true; // present but frame failed -> full retry budget from now on
-                    any_pending = true;
-                } else if (attempt + 1 < attempt_budget) {
-                    any_pending = true;
+                    retry_needed = true;
+                } else if (attempt + 1 < attempt_budget) { //if child was present in the previous detection loop - then also retry
+                    retry_needed = true;
                 }
             }
         }
-        if (!any_pending) {
+        if (!retry_needed) {
             break;
         }
     }
@@ -210,6 +211,7 @@ void loop()
         last_child_present[child] = child_done[child] || child_acked[child];
     }
 
+// payload building
     /*
      * 4. Build own/nodes payload:
      * Payload format: NODE_ID ORIENTATION CHILD_MASK CHILD_PAYLOADS...
@@ -240,6 +242,7 @@ void loop()
 
     _delay_us(3 * BYTE_US);
 
+// if payload changed or heartbeat, then send payload to pc and send feedback framne to children
     //Heartbeat sending
     bool changed = payload_changed (payload, payload_len);
     cycles_since_last_send ++;
@@ -247,6 +250,8 @@ void loop()
     if (changed || cycles_since_last_send>= HEARTBEAT_INTERVAL_CYCLE) {
 
         #if SERIAL_WRITING 
+
+        //also write if polling children failed (with a DETECTION_FAILED for example)
         uint8_t checksum = calc_checksum(payload_len, payload);
 
         Serial.write(SYNC_BYTE);
@@ -258,9 +263,9 @@ void loop()
 
         bool feedback_done[CHILD_COUNT] = { false };
 
-        // FEEDBACK FRAME to children - same as child polling (detection sequence)
+// FEEDBACK FRAME to children - same as child polling (detection sequence)
             for (uint8_t attempt = 0; attempt < CHILD_RETRIES; attempt++) {
-                bool any_pending = false; //true if any child still needs a retry
+                bool retry_needed = false; //true if any child still needs a retry
 
                 for (uint8_t child = 0; child < CHILD_COUNT; child++) {
 
@@ -277,10 +282,10 @@ void loop()
                         SER_PRINTLN("CFA");
                         feedback_done[child] = true;
                     } else {
-                        any_pending = true;
+                        retry_needed = true;
                     }
                     }
-                    if (!any_pending){
+                    if (!retry_needed){
                         break;
                     }
             }
@@ -289,6 +294,8 @@ void loop()
         if (feedback_index >= 4) {
             feedback_index = 0;
         }   
+        //also write to pc/esp if feedback to cube sending failed (with a feedback_FAILED for example)
+
 
         #if not SERIAL_WRITING
         print_payload_hex(payload, payload_len);
@@ -300,9 +307,6 @@ void loop()
 
     #if SERIAL_DEBUG_END
         log_flush();
-    #endif
-
-    #if SERIAL_DEBUG_END
         delay(150);
     #endif
 

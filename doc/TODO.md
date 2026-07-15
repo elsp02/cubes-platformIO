@@ -13,17 +13,21 @@ ich darf nicht 1 child 3 mal pollen und dann das andere danach sondern muss 1 ch
 NEXT STEPS 
 - three js cubes aussehen
 - communication zwischen attiny baseplate und pc (attiny sendet data frame oder detection failed oder feedback failed)
+    - serial.write oder wie definieren?
     - info frames 
     - start und end message von pc an baseplate für detection process
 - feedback an cubes senden test (mit leds)
 - threejs appearance
     - auf website infofenster mit error_mask von aktuellem baustein - art serieller monitor
+- ID in EEPROM
+- Payload len and max node calculation
 - esp
     - zuerst über usb und dann wifi?
     - code änderungen (nur server und tree comparison, frontend sollte gleich bleiben)
 - automatisches reconnecten von client mit server falls server abstürzt/disconnected war (aktuell neuladen der website)
 - feedback led grün nur an bis neueer cube dazu kommt
-
+- CRC
+- definieren dass bei unterstem cube die kinder an x und -x seite keine kinder auf ihrer seite die global nach unten schaut haben können
 
 
 

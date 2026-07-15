@@ -19,7 +19,7 @@ USE_SIMULATION = True    # True: scripted build story, False: real baseplate on 
 SIM_INTERVAL_S = 5.0     # seconds per simulated story step
 
 SERIAL_PORT = 'COM4'  # Change this to your serial port
-BAUDRATE = 9600
+BAUDRATE = 115200  # must match Serial.begin() in the baseplate firmware
 WEBSOCKET_HOST = 'localhost'
 WEBSOCKET_PORT = 8765
 

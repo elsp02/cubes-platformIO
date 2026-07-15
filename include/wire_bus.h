@@ -69,7 +69,4 @@ uint8_t calc_checksum(
     uint8_t payload_len,
     const uint8_t *payload
 );
-
-/*void log_line(const char *msg);
-void log_flush(void);*/
 #endif

@@ -87,6 +87,8 @@ void tx_byte(const wire_t *w, uint8_t b)
 // Normal byte receive
 // Detection of start bit and then reception of data frame (data bits and stop bit)
 //
+// micros: better than the previous timeout measurement (before v7) because of an
+// specific time rather than just an approximate number of passes through the loop.
 // Timing constraint: entry latency shifts every bit sample point of the
 // byte late, and inside a frame the next start bit may already be on the
 // line. So: check the line BEFORE any micros() call, and while waiting
@@ -95,22 +97,24 @@ void tx_byte(const wire_t *w, uint8_t b)
 
 bool rx_byte(const wire_t *w, uint8_t *out, uint32_t timeout_us)
 {
-    // Fast path: start bit already on the line (back-to-back frame bytes).
+    // Fast path: start bit (low) already on the line (before micros() since the call takes time).
     if (!is_line_high(w)) {
         return rx_byte_frame(w, out);
     }
 
-    // Wait for falling edge (start bit) until the deadline. The unsigned
-    // subtraction stays correct across micros() overflow.
+     // time stamp (startzeit speichern)
     uint32_t start = micros();
 
+
+    // Wait for falling edge (start bit) until the deadline. The unsigned
     while (true) {
-        for (uint8_t burst = 0; burst < 8; burst++) {
+        for (uint8_t line_check = 0; line_check < 8; line_check++) {  //leitung mehrfach schnell prüfen (line_check) und nur gelegentlich micros für das Timeout aufrufen
             if (!is_line_high(w)) {
                 return rx_byte_frame(w, out);
             }
         }
 
+        // check if past time is shorter than timeout 
         if ((uint32_t)(micros() - start) >= timeout_us) {
             return false;            // No start bit arrived before timeout expired
         }
@@ -155,11 +159,6 @@ bool rx_byte_frame(const wire_t *w, uint8_t *out)
         return false;
     }
 
-    // Wait out the second half of the stop bit. DO NOT return early:
-    // sender and receiver must share the same timing reference point
-    // (end of stop bit) for TURNAROUND_US, otherwise a responder starts
-    // transmitting ~half a bit before the requester is listening and
-    // every ACK handshake fails.
     _delay_us(BAUD_US/2);
 
     *out = b;   // Write the value of b (stored bits) into the variable that out points to
@@ -172,10 +171,8 @@ bool rx_byte_frame(const wire_t *w, uint8_t *out)
 
 uint8_t calc_checksum(uint8_t payload_len, const uint8_t *payload)
 {
-    /*
-     * Simple XOR checksum for prototype_v3.
-     * Protected fields: LEN + PAYLOAD
-     */
+    //Simple XOR checksum. Protected fields: LEN + PAYLOAD
+
     uint8_t checksum = payload_len;
 
     for (uint8_t i = 0; i < payload_len; i++) {
@@ -282,27 +279,3 @@ bool rx_frame(
     *payload_len = len; // write value of len to the variable tha payload_len points to
     return true;
 }
-
-//----------
-/*static char log_buf[LOG_BUF_SIZE];
-static uint8_t log_len = 0;
-
-static void log_line(const char *msg)
-{
-    uint8_t i = 0;
-    while (msg[i] != '\0' && log_len < LOG_BUF_SIZE - 2) {
-        log_buf[log_len++] = msg[i++];
-    }
-    if (log_len < LOG_BUF_SIZE - 1) {
-        log_buf[log_len++] = '\n';
-    }
-}
-
-static void log_flush(void)
-{
-    if (log_len > 0) {
-        Serial.write((const uint8_t *)log_buf, log_len);
-        log_len = 0;
-    }
-}
-*/
