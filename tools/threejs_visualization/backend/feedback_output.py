@@ -54,7 +54,7 @@ def build_evaluated_tree(result: CompareEntry) -> dict:
         "error_mask": result.error_mask,
         "node_id": result.node_id,
         "orientation": result.orientation,
-        "port": result.port,
+        "port": result.port, #real port
         "expected_type": result.expected_type,
         "expected_orientation": result.expected_orientation,
         "children": [build_evaluated_tree(child) for child in result.children],

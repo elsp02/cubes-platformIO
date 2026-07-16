@@ -1,15 +1,15 @@
-# WebSocket server: the glue between tree source, comparison and frontend.
+# WebSocket server: the glue between baseplate, comparison and frontend.
 #
 # Position in the pipeline:
 #
-#   tree source (real baseplate OR simulated story)
+#   real baseplate (binary_serial_reader)
 #       --CubeNode tree--> compare against TARGET --evaluated dict-->
 #           --JSON over websocket--> three.js frontend
+#   and back: compare result --feedback frame--> baseplate --> cube LEDs
 #
-# Architecture: the tree source blocks on the serial port (or on
-# time.sleep in simulation), so it runs in its own worker THREAD.
-# The websocket part runs in the asyncio event loop of the main thread.
-# The two sides only meet at tree_queue.
+# Architecture: the serial reader blocks on the serial port, so it runs
+# in its own worker THREAD. The websocket part runs in the asyncio
+# event loop of the main thread. The two sides only meet at tree_queue.
 #
 # (just for one client, no broadcasting)
 # documentation on https://websockets.readthedocs.io/en/stable/intro/tutorial1.html
@@ -20,6 +20,7 @@ from threading import Thread
 
 import websockets
 
+from binary_serial_reader import iter_trees_from_binary_serial
 from compare_core import compare
 from feedback_output import build_evaluated_tree, build_feedback_frame, led_states
 from target_tree import TARGET_TOWER_3
@@ -27,9 +28,6 @@ from target_tree import TARGET_TOWER_3
 #--------------------------------
 # Configuration
 #--------------------------------
-USE_SIMULATION = False   # True: scripted build story, False: real baseplate on SERIAL_PORT
-SIM_INTERVAL_S = 5.0     # seconds per simulated story step
-
 SERIAL_PORT = 'COM4'  # Change this to your serial port
 BAUDRATE = 115200  # must match Serial.begin() in the baseplate firmware
 WEBSOCKET_HOST = 'localhost'
@@ -42,23 +40,6 @@ TARGET = TARGET_TOWER_3  # the construction the user is supposed to build
 # so if the browser is slow the old unread tree is dropped (see
 # tree_worker) instead of queueing up a backlog of stale states.
 tree_queue: Queue[dict] = Queue(maxsize=1)
-
-
-# selects where actual trees come from; both sources yield CubeNode trees
-# (imports happen here so simulation mode works without pyserial installed)
-def tree_source():
-    if USE_SIMULATION:
-        from simulated_source import iter_trees_simulated
-        print(f"Starting simulated source ({SIM_INTERVAL_S}s per step).")
-        return iter_trees_simulated(SIM_INTERVAL_S)
-
-    from binary_serial_reader import iter_trees_from_binary_serial
-    print(f"Starting serial reader on {SERIAL_PORT} at {BAUDRATE} baud.")
-    return iter_trees_from_binary_serial(
-        SERIAL_PORT,
-        BAUDRATE,
-        feedback_builder=build_feedback_for_tree,
-    )
 
 
 # LED feedback frame for one actual tree (None = nothing built): the
@@ -78,13 +59,19 @@ def evaluate_tree(actual) -> dict:
     return build_evaluated_tree(result)
 
 
-#worker thread -> runs the tree source in the background, compares every
+#worker thread -> runs the serial reader in the background, compares every
 #received tree against the target and puts the evaluated tree into the queue
 def tree_worker() -> None:
     try:
+        print(f"Starting serial reader on {SERIAL_PORT} at {BAUDRATE} baud.")
+
         # this for-loop drives the generator: each iteration resumes
-        # iter_trees_... until its next `yield tree`
-        for actual in tree_source():
+        # iter_trees_from_binary_serial until its next `yield tree`
+        for actual in iter_trees_from_binary_serial(
+            SERIAL_PORT,
+            BAUDRATE,
+            feedback_builder=build_feedback_for_tree,
+        ):
             evaluated = evaluate_tree(actual)
 
             # keep only the newest tree: drop the unread old one first

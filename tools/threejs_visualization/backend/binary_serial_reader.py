@@ -211,7 +211,7 @@ def iter_trees_from_binary_serial(
                 print(f"DEBUG payload: {payload.hex(' ')} (len={len(payload)})")
 
                 # payload -> tree; empty payload (LEN 0) = nothing detected
-                # -> None ("nothing built", same as the simulated story)
+                # -> None ("nothing built")
                 if len(payload) == 0:
                     tree: Optional[CubeNode] = None
                 else:

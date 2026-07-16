@@ -191,7 +191,16 @@ static bool send_feedback_to_child(
     }
 
     wire_release(w);
-    return (b == ACK_FINISHED);
+    switch (b) {
+        case ACK_FINISHED:
+            return true;
+
+        case ACK_FAILED:
+            return false;
+
+        default:
+            return false;
+        }
 }
 
 // relay one feedback frame to every port that had a child this cycle,
@@ -288,6 +297,7 @@ void loop()
 
     log_reset(); // lib code appends into the log buffer; it is never flushed
 
+    //DETECTION SEQUENCE
     // 0. make sure line is idle / give child time to get back to listening
     wire_release(&child_0);
     _delay_us(TURNAROUND_US);
@@ -346,7 +356,7 @@ void loop()
         last_child_present[child] = child_done[child] || child_acked[child];
     }
 
-// payload building
+// PAYLOAD BUILDING
     /*
      * Build own/nodes payload:
      * Payload format: NODE_ID ORIENTATION CHILD_MASK CHILD_PAYLOADS...
@@ -396,8 +406,10 @@ void loop()
                                                // an unexpected extra cube makes the payload longer
         uint8_t fb_payload_len = 0;
 
+        //switch wertet einen einzelnen wert aus und führt abhängig davon den passenden case block aus
         switch (read_pc_reply(fb_payload, &fb_payload_len)) {
 
+            // FEEDBACK TO CHILDREN
             case PC_REPLY_FRAME:
                 // relay the LED states to the cubes; DONE only when every
                 // present cube confirmed the frame came back around
@@ -407,11 +419,13 @@ void loop()
                     Serial.write(PC_RESP_FB_FAILED);
                 }
                 break;
-
+            
+            //when pc sends an end message -> all leds of and go back to detection running sequence at the beginning
             case PC_REPLY_STOP:
                 run_stop_sequence(); // no response byte; the PC exits after sending STOP
                 break;
-
+            
+            // if pc sends any invalid message (invalid sync byte, len, crc, ...)- tell that PC
             case PC_REPLY_BAD:
                 // broken frame from the PC: report it and drop stray bytes
                 while (Serial.available() > 0) {
@@ -419,7 +433,8 @@ void loop()
                 }
                 Serial.write(PC_RESP_FB_FAILED);
                 break;
-
+            
+            // if nothing arrives from pc
             case PC_REPLY_TIMEOUT:
                 // send nothing, continue with the next cycle
                 break;

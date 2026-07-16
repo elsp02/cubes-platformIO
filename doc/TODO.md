@@ -11,14 +11,14 @@ QUESTIONS
 ich darf nicht 1 child 3 mal pollen und dann das andere danach sondern muss 1 child pollen dann warten dann das andere pollen dann wieder das erste pollen etc 
 
 NEXT STEPS 
+donnerstag
 - three js cubes aussehen
 - communication zwischen attiny baseplate und pc (attiny sendet data frame oder detection failed oder feedback failed)
-    - serial.write oder wie definieren?
     - info frames 
-    - start und end message von pc an baseplate für detection process
-- feedback an cubes senden test (mit leds)
 - threejs appearance
     - auf website infofenster mit error_mask von aktuellem baustein - art serieller monitor
+
+
 - ID in EEPROM
 - Payload len and max node calculation
 - esp
@@ -29,6 +29,15 @@ NEXT STEPS
 - CRC
 - definieren dass bei unterstem cube die kinder an x und -x seite keine kinder auf ihrer seite die global nach unten schaut haben können
 
+WUNSCH ERWEITERUNGEN
+- verschiedene bausteine
+- selber bauen (ohne target_tree)
+- KI generierte target trees
+- zeit druck
+- partner mode
+- broadcast
+- datenbase mit eigenen constructionen
+- bestenliste
 
 
 ## Open claude suggested improvements

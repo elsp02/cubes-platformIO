@@ -21,7 +21,7 @@ import {
 // Configuration
 // ------------------------------------------------------------
 
-const CUBE_MODEL_URL = "/assets/cube_model.glb";
+const CUBE_MODEL_URL = "/assets/cube_model_z.glb";
 
 // Change this only if your exported cube model is not 1 x 1 x 1 units.
 const MODEL_SCALE = 25.0;

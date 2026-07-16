@@ -313,21 +313,22 @@ static bool send_feedback_to_child(
         return false;
     }
 
-    if (b == ACK_FINISHED) {
-        SER_PRINTLN("CFF");
+    switch (b) {
+        case ACK_FINISHED:
+            SER_PRINTLN("CFF");
+            wire_release(w);
+            return true;
 
-    }
-    else if (b == ACK_FAILED) {
-        SER_PRINTLN("FFF");  // feedback failed
-        return false;
-    }
-    else{
-        SER_PRINTLN("WFF");
-        return false;
-    }
+        case ACK_FAILED:
+            SER_PRINTLN("FFF");
+            wire_release(w);
+            return false;
 
-    wire_release(w);
-    return true;
+        default:
+            SER_PRINTLN("WFF");
+            wire_release(w);
+            return false;
+    }
 }
 
 // handle feedback -> if CMD_FEEDBACK do feedback led sequence
@@ -456,18 +457,19 @@ void loop()
         }
 
         //check if received byte is CMD_STATUS or CMD_FEEDBACK
-        if (b == CMD_STATUS){
-            SER_PRINTLN("CS");
-            handle_detection(active_upstream, orientation_mask);
+        switch (b) {
+            case CMD_STATUS:
+                handle_detection(active_upstream, orientation_mask);
+                break;
+
+            case CMD_FEEDBACK:
+                handle_feedback(active_upstream);
+                break;
+
+            default:
+                SER_PRINTLN("WC");
+                return;
         }
-        else if (b == CMD_FEEDBACK) {
-            SER_PRINTLN("CF");
-            handle_feedback(active_upstream);
-        }
-        else {
-            SER_PRINTLN("WC");
-            return;
-                }
     }
 
     wire_release(active_upstream);

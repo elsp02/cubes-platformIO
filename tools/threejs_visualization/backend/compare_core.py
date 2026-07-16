@@ -83,6 +83,7 @@ def iter_entries(entry: CompareEntry):
 # internals
 # ----------------------------------------------------------------
 
+#function die error_mask beschreibt
 def _compare_slot(
     actual: Optional[CubeNode],
     target: TargetNode,
@@ -159,7 +160,7 @@ def _compare_children(
 
     return entries
 
-
+# nachfolgend:  error functionen die dann bestimmen, welchen genauen error und nodestatus der individuelle node bekommt
 def _missing_slot(
     target: TargetNode,
     port: Optional[int],
