@@ -1,6 +1,6 @@
 // page while connecting with server - dissapears when connected
 // ???? what if connection breaks? - maybe text with reload window
-const MIN_LOADER_TIME = 5000; // ms
+const MIN_LOADER_TIME = 1000; // ms
 
 //adress components
 const loader = document.getElementById("loader-container");

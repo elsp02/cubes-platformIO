@@ -392,7 +392,7 @@ export function clearTree() {
 // full redraw: throw away all cube objects and rebuild them from the
 // tree (simple and always correct; fine at this scale of a few cubes)
 export function redrawTree(rootNode) {
-    latestTree = rootNode;
+    latestTree = rootNode; //von hier wird der evaluated tree zum visualisieren gelesen
 
     if (cubeTemplate === null) {
         // GLB still loading; loadCubeModel's callback redraws latestTree later
