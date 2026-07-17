@@ -1,0 +1,278 @@
+:root{
+    /*font-families*/
+    --font-title: 'Lemon';/* cursive;*/
+    --font-text: 'Times New Roman', Times, bold;
+    --font-handwriting: 'Liu Jian Mao Cao'; /* handwriting;*/
+
+    /* Font Sizes 1rem ? 16px*/
+    --fs-title: 3rem;
+    --fs-text: 1.5rem;
+    --fw-text: 600; /* bold */
+    --fs-handwriting: 1rem;
+
+    --fs-title-small: 2.6rem;
+    --fs-text-small: 1.3rem;
+    --fw-text-small: 600; /* bold */
+    --fs-handwriting-small: 1rem;
+
+
+
+    /* Special Effects
+    --stroke-thin: 0.1px; */
+
+    /* Colors */
+    --font-color: #323131;  
+    --background-color: #fbfaf2;
+    --green: #868656;
+    --light-green: #DBDBB6;
+    --red: #5C2B2B;
+    --blue: #4E5F83;
+
+    /* Spacing */
+    --page-padding: clamp(1.25rem, 5vw, 2rem);
+    --img-overlap: clamp(1.25rem, 5vw, 3rem);
+    --overlap: clamp(24px, 8vw, 120px);
+
+
+    /*images*/
+    --img-h: clamp(250px, 60vw, 450px); /* image width */
+    --img-r: 3/4; /* image aspect ratio */
+    --img-border: 8px;
+    --stage-overlap: calc((var(--fs-title) * 0.65));
+    }
+
+     *{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    }
+
+    body {
+        /*background-color: var(--background-color);*/
+        font-family: var(--font-text);
+        font-weight: var(--fw-text);
+        font-size: var(--fs-text);
+        color: var(--font-color);
+        overflow-x: hidden; /*clip: verhindert horizontales scrollen, wenn Elemente über die Seite hinausragen*/
+        width: 100%;
+        background-color: var(--background-color);
+    }
+
+    
+
+    .typo-title {
+        font-family: var(--font-title);
+        font-size: var(--fs-title);
+        text-align: start;
+        /*background-color: lightcoral;*/
+        width: 55vw;
+        align-self: flex-end;
+    }
+
+    .title-smaller{
+        font-size: calc(var(--fs-title));
+    }
+
+    .typo-title-start{
+        align-self: flex-start;
+        padding-left: var(--page-padding);
+    }
+
+    .typo-title-mid{
+        font-family: var(--font-title);
+        font-size: var(--fs-title);
+        /*background-color: lightcoral;*/
+        align-self: center;
+
+    }
+
+    .typo-title-smaller{
+        font-size: calc(var(--fs-title)*0.9);
+    }
+
+    .typo-text{
+        background-color: #807f7f;
+        width: 50vw;
+        text-align: end;
+    }
+
+    .text-inline{
+        /*background-color: #7f8080;*/
+        align-self: center;
+    }
+
+
+    .typo-text-end{
+        width: 50vw;
+        /*background-color: #b87777;*/
+        align-self: flex-end;
+        text-align: start;
+    }
+
+
+    .typo-text-mid{
+        text-align: center;
+        /*background-color: #868656;*/
+    }
+    .typo-handwriting {
+        font-family: var(--font-handwriting);
+        font-size: var(--fs-handwriting);
+        -webkit-text-stroke: var(--stroke-thin) currentColor;
+    }
+
+    /* ---------------------------------------------------------
+       Loader
+       --------------------------------------------------------- */
+    #loader-container {
+        position: fixed;
+        inset: 0;
+        background-color: var(--blue);
+        z-index: 999;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .centered-container {
+        background-color: var(--green);
+        justify-items: center;
+    }
+
+     /* ---------------------------------------------------------
+       Tree selection cards
+       --------------------------------------------------------- */   
+        .scroll-section {
+        width: 100%;
+        height: max-content;
+        overflow: visible;
+        position: relative; /* statt fixed */
+        background-color: lightblue;
+        padding-bottom: 2rem;
+        padding-inline: var(--page-padding);
+        }
+
+        .scroll-container {
+        display: flex;
+        justify-self: start;
+        width: 100%;
+        /*margin-top: 20vh;*/
+        gap: 1rem;
+        overflow-x: auto;
+        overscroll-behavior-x: contain;
+        scroll-behavior: smooth;
+        background-color: rgb(156, 156, 119);
+        touch-action: pan-x;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        justify-content: flex-start; /* default: links starten */
+        }
+
+                    /* Wenn alles reinpasst -> zentrieren */
+        .scroll-container.is-centered{
+        justify-content: center;
+        }
+
+        #text-end{
+            width: 55vw;
+        }
+
+        /*no scroll line*/
+        .scroll-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .scroll-container{
+        scroll-snap-type: x mandatory;
+        }
+
+        .card{
+        scroll-snap-align: start;
+        }
+
+
+       .aspect-ratio-3-4{
+        aspect-ratio: 3/4;
+       }
+
+       .card{
+        background-color: var(--light-green);
+        width: fit-content;
+        display: flex;
+        flex-direction:column;
+        }
+
+        .card img {
+        height: var(--img-h);
+        object-fit: contain;
+        display: block;
+        border-radius: var(--img-border);
+        background-color: lightpink;
+        }
+
+    /* ---------------------------------------------------------
+       Layout of the appearance test page
+       --------------------------------------------------------- */
+
+    #main-container {
+        background-color: var(--blue);
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+        padding: var(--page-padding);
+        min-height: 100vh;
+    }
+
+    #page {
+        opacity: 0;
+    }
+
+    .button-section {
+        background-color: var(--red);
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .button {
+        font-family: var(--font-text);
+        font-weight: var(--fw-text);
+        font-size: var(--fs-text-small);
+        color: var(--font-color);
+
+        padding: 0.4em 1.4em;
+        border: 2px solid var(--font-color);
+        border-radius: 10px;
+        background-color: var(--light-green);
+        cursor: pointer;
+    }
+
+    .button:hover {
+        background-color: var(--blue);
+        color: var(--background-color);
+    }
+
+    /* currently selected appearance */
+    .button.active {
+        background-color: var(--green);
+        color: var(--background-color);
+    }
+
+    /* the three.js canvas is placed inside .cube (#würfel) */
+    #orbit-container {
+        flex: 1;                 /* take the remaining page height */
+        max-height: 500px;
+        display: flex;
+    }
+
+    .cube {
+        flex: 1;
+        border: 2px solid var(--font-color);
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .cube canvas {
+        display: block;
+    }
