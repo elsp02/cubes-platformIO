@@ -60,7 +60,7 @@ THREE.Object3D.DEFAULT_UP.set(0, 0, 1);
 // Scene setup (container-sized, not fullscreen)
 // ------------------------------------------------------------
 
-const container = document.getElementById("würfel");
+const container = document.getElementById("target-tree");
 if (!container) {
     throw new Error("#würfel wurde nicht gefunden.");
 }

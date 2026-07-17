@@ -9,6 +9,8 @@ import {
     localPoseForChild,
 } from "../../src/layout.js";
 
+import { TARGET_TREES } from "../target_trees/index.js";
+
 //Cube Configurations
 const CUBE_MODEL_URL = "./assets/cube_model_z.glb";
 const MODEL_SCALE = 25.0;
@@ -16,16 +18,6 @@ const MODEL_SCALE = 25.0;
 //Resolution/ratio for the thumbnail snapshot to match the 3:4 ratio of the cards
 const THUMBNAIL_WIDTH = 600;
 const THUMBNAIL_HEIGHT = 800;
-
-//target trees - when more than one, where to store?
-const TARGET_TREE = {
-    orientation: 0,
-    children: [
-        { port: 4, orientation: 1, children: [
-            {port:2, orientation: 2, children: []}
-        ] },
-    ],
-};
 
 //Z axis as the vertical axis
 THREE.Object3D.DEFAULT_UP.set(0,0,1);
@@ -193,24 +185,35 @@ function renderTreeToImage(treeDefinition){
 //---------------------------------------------------
 
 //MAIN MAIN Function
-// for now the SAME tree goes on all three cards (testing only);
-// later: one tree per card via data-tree-id
+// calls all functions and creates an image for the cards. one card per entry in TARGET_TREES (created in target_trees/index.js)
 async function showTargetTreeThumbnails() {
     try {
         await loadCubeTemplate();
 
-        const dataUrl = renderTreeToImage(TARGET_TREE);
+        const scrollContainer = document.querySelector(".scroll-container");
 
-        const cardImages = document.querySelectorAll(".scroll-container .card img");
+        for (const { id, name, tree } of TARGET_TREES) {
+            const dataUrl = renderTreeToImage(tree);
 
-        for (const img of cardImages) {
+            const card = document.createElement("div");
+            card.className = "card aspect-ratio-3-4";
+            card.id = `card-${id}`;
+
+            const img = document.createElement("img");
             img.src = dataUrl;
-            img.alt = "Zielbaum: zwei gestapelte Würfel";
+            img.alt = `Zielbaum: ${name}`;
+
+            const label = document.createElement("p");
+            label.className = "typo-handwriting";
+            label.textContent = name;
+
+            card.append(img, label);
+            scrollContainer.append(card);
         }
 
-        console.log(`Target tree thumbnail set on ${cardImages.length} cards.`);
+        console.log(`Created ${TARGET_TREES.length} target tree cards.`);
     } catch (error) {
-        console.error("Could not create target tree thumbnail:", error);
+        console.error("Could not create target tree thumbnails:", error);
     }
 }
 
