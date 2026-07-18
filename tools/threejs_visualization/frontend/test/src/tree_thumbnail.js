@@ -101,6 +101,7 @@ async function showTargetTreeThumbnails() {
         }
 
         console.log(`Created ${TARGET_TREES.length} target tree cards.`);
+        document.dispatchEvent(new CustomEvent("cards-ready"));
     } catch (error) {
         console.error("Could not create target tree thumbnails:", error);
     }

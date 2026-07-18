@@ -64,9 +64,9 @@
         font-family: var(--font-title);
         font-size: var(--fs-title);
         text-align: start;
-        /*background-color: lightcoral;*/
+        background-color: lightcoral;
         width: 55vw;
-        align-self: flex-end;
+        align-self: center;
     }
 
     .title-smaller{
@@ -134,22 +134,152 @@
         justify-content: center;
     }
 
-    .centered-container {
-        background-color: var(--green);
-        justify-items: center;
+    /*-----------------------------------------------------------
+    Main Container
+    ------------------------------------------------------------*/
+    .main-container {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        height: fit-content;
+        overflow-x: hidden;
     }
+
+    #centered-container-dashboard {
+        margin-top: auto;
+        margin-bottom: auto;
+    }
+
+    #page {
+        opacity: 0;
+    }
+
+    .centered-container {
+        width: 100%;
+        height: max-content;
+        background-color: var(--green);
+        display: flex;
+        flex-direction: column;
+        justify-items: center;
+        align-items: center; 
+        padding-inline: var(--page-padding);
+        padding-block: var(--page-padding);
+    }
+
+    
+    #centered-container-dashboard {
+        margin-top: auto;
+        margin-bottom: auto;
+    }
+
+     /* ---------------------------------------------------------
+       Tree selection cards
+       --------------------------------------------------------- */   
+        .scroll-section {
+        width: 100%;
+        height: max-content;
+        overflow: visible;
+        position: relative; /* statt fixed */
+        background-color: lightblue;
+        /*padding-bottom: 2rem;*/
+        }
+
+        .scroll-container {
+        display: flex;
+        justify-self: start;
+        width: 100%;
+        /*margin-top: 20vh;*/
+        gap: 1.5rem;
+        overflow-x: auto;
+        overscroll-behavior-x: contain;
+        scroll-behavior: smooth;
+        background-color: rgb(156, 156, 119);
+        touch-action: pan-x;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        justify-content: flex-start; /* default: links starten */
+        }
+
+        /* Wenn alles reinpasst -> zentrieren */
+        .scroll-container.is-centered{
+        justify-content: center;
+        }
+
+        /*no scroll line*/
+        .scroll-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .scroll-container{
+        scroll-snap-type: x mandatory;
+        }
+
+
+       .aspect-ratio-3-4{
+        aspect-ratio: 3/4;
+       }
+
+       .card{
+        background-color: var(--light-green);
+        width: fit-content;
+        display: flex;
+        flex-direction:column;
+        align-items: center;
+        transition: transform 0.25s ease;
+        scroll-snap-align: center;
+        }
+
+        /*.card.is-active {
+        transform: scale(1.12);
+        z-index: 1;
+        }*/
+
+        .card img {
+        height: var(--img-h);
+        object-fit: contain;
+        display: block;
+        border-radius: var(--img-border);
+        background-color: lightpink;
+        }
+
+        .dots-container {
+            display: flex;
+            justify-content: center;
+            gap: 0.6rem;
+            margin-top: 1rem;
+        }
+
+        .dot {
+            width: 0.7rem;
+            height: 0.7rem;
+            border-radius: 50%;
+            border: none;
+            padding: 0;
+            background-color: var(--light-green);
+            cursor: pointer;
+            transition: background-color 0.5s ease, transform 0.5s ease;
+        }
+
+        .dot.is-active {
+            background-color: var(--green);
+            transform: scale(1.3);
+            width: 1rem;
+            height: 0.7rem;
+            border-radius: 20%;
+        }
 
     /* ---------------------------------------------------------
        Level selection window
        --------------------------------------------------------- */
     #centered-container-level {
+        height: 100vh;
         display: none;
         position: fixed;
         inset: 0;
         z-index: 500;
         align-items: center;
         justify-content: center;
-        background-color: rgba(0, 0, 0, 0.4);
+        background-color: rgba(0, 0, 0, 0.4); /*blurren*/
     }
 
     #centered-container-level.is-open {
@@ -167,6 +297,7 @@
     }
 
     #level-container {
+        background-color: #5C2B2B;
         display: flex;
         gap: 1rem;
         flex-wrap: wrap;
@@ -196,93 +327,28 @@
         color: var(--background-color);
     }
 
-     /* ---------------------------------------------------------
-       Tree selection cards
-       --------------------------------------------------------- */   
-        .scroll-section {
-        width: 100%;
-        height: max-content;
-        overflow: visible;
-        position: relative; /* statt fixed */
-        background-color: lightblue;
-        padding-bottom: 2rem;
-        padding-inline: var(--page-padding);
-        }
-
-        .scroll-container {
+    .button-container{
+        background-color: #5C2B2B;
         display: flex;
-        justify-self: start;
-        width: 100%;
-        /*margin-top: 20vh;*/
         gap: 1rem;
-        overflow-x: auto;
-        overscroll-behavior-x: contain;
-        scroll-behavior: smooth;
-        background-color: rgb(156, 156, 119);
-        touch-action: pan-x;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: none;
-        justify-content: flex-start; /* default: links starten */
-        }
-
-                    /* Wenn alles reinpasst -> zentrieren */
-        .scroll-container.is-centered{
-        justify-content: center;
-        }
-
-        #text-end{
-            width: 55vw;
-        }
-
-        /*no scroll line*/
-        .scroll-container::-webkit-scrollbar {
-            display: none;
-        }
-
-        .scroll-container{
-        scroll-snap-type: x mandatory;
-        }
-
-        .card{
-        scroll-snap-align: start;
-        }
-
-
-       .aspect-ratio-3-4{
-        aspect-ratio: 3/4;
-       }
-
-       .card{
-        background-color: var(--light-green);
-        width: fit-content;
         display: flex;
-        flex-direction:column;
-        }
-
-        .card img {
-        height: var(--img-h);
-        object-fit: contain;
-        display: block;
-        border-radius: var(--img-border);
-        background-color: lightpink;
-        }
+        flex-direction: column;
+        justify-content: center;
+    }
+#arrow-button{
+    display:flex;
+    width: 30%;
+    max-width: 80px;
+    background-color: transparent;
+    border-color: transparent;
+    /*background-color: aqua;*/
+}
 
     /* ---------------------------------------------------------
        Layout of the appearance test page
        --------------------------------------------------------- */
 
-    #main-container {
-        background-color: var(--blue);
-        display: flex;
-        flex-direction: column;
-        gap: 1.5rem;
-        padding: var(--page-padding);
-        min-height: 100vh;
-    }
-
-    #page {
-        opacity: 0;
-    }
+     
 
     .button-section {
         background-color: var(--red);
@@ -318,8 +384,9 @@
 
     /* the three.js canvas is placed inside .cube (#würfel) */
     #orbit-container {
+        background-color: #4E5F83;
         flex: 1;                 /* take the remaining page height */
-        max-height: 500px;
+        min-height: 100vh;
         display: flex;
     }
 
