@@ -12,24 +12,15 @@
     <body>
         <main>
             <div id = "main-container">
-                <section class = "button-section">
-                    <button class = "button typo-text active" id="original">original</button>
-                    <button class = "button typo-text" id="valid">gültig</button>
-                    <button class = "button typo-text" id="invalid">falsch</button>
-                    <button class = "button typo-text" id="ghost">ghost</button>
-                </section>
-
                <section id = "orbit-container">
-                    <div class = "cube" id="würfel"></div>
+                    <div class = "cube" id="target-tree"></div>
                </section>
             </div>
         </main>
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js" integrity="sha512-NcZdtrT77bJr4STcmsGAESr06BYGE8woZdSdEgqnpyqac7sugNO+Tr4bGwGF3MsnEkGKhU2KL2xh6Ec+BqsaHA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
         <script src="https://unpkg.com/lenis@1.1.18/dist/lenis.min.js"></script>
-        <!-- entry point: builds the test scene and wires the buttons -->
-        <script type="module" src="./src/scene_test.js"></script>
-        <!-- renders the target tree once and puts it on the selection cards -->
-        <script type="module" src="./src/selected_tree_visualization.js"></script>
+        <!-- shows the target tree chosen on the dashboard, live and orbit-able -->
+        <script type="module" src="./src/tree_preview.js"></script>
     </body>
 </html>

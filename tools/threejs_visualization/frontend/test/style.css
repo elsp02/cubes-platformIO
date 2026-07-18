@@ -139,6 +139,63 @@
         justify-items: center;
     }
 
+    /* ---------------------------------------------------------
+       Level selection window
+       --------------------------------------------------------- */
+    #centered-container-level {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 500;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(0, 0, 0, 0.4);
+    }
+
+    #centered-container-level.is-open {
+        display: flex;
+    }
+
+    .window-container {
+        background-color: var(--background-color);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        padding: 2rem;
+        border-radius: var(--img-border);
+    }
+
+    #level-container {
+        display: flex;
+        gap: 1rem;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .level {
+        font-family: var(--font-text);
+        font-weight: var(--fw-text);
+        font-size: var(--fs-text-small);
+        color: var(--font-color);
+
+        padding: 0.4em 1.4em;
+        border: 2px solid var(--font-color);
+        border-radius: 10px;
+        background-color: var(--light-green);
+        cursor: pointer;
+    }
+
+    .level:hover {
+        background-color: var(--blue);
+        color: var(--background-color);
+    }
+
+    .level.active {
+        background-color: var(--green);
+        color: var(--background-color);
+    }
+
      /* ---------------------------------------------------------
        Tree selection cards
        --------------------------------------------------------- */   
