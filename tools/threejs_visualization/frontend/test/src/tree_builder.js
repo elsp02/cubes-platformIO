@@ -53,6 +53,61 @@ export function loadCubeTemplate() {
     });
 }
 
+// optional per-node build-status tint, mirrors scene_glb.js's live status
+// colors so a mock "in progress" tree looks consistent with the real app.
+// Nodes without a `status` field (plain target-tree JSON) render untinted.
+const STATUS_APPEARANCE = {
+    correct:    { tint: 0x22bb44, tintStrength: 0.25, opacity: 1.0 },   // green
+    wrong:      { tint: 0xcc2222, tintStrength: 0.5,  opacity: 1.0 },   // red
+    unexpected: { tint: 0xcc2222, tintStrength: 0.5,  opacity: 1.0 },   // red
+    attachable: { tint: 0x3388ff, tintStrength: 0.4,  opacity: 0.35 },  // transparent blue ghost
+};
+
+// tints the cloned model per status; materials must be cloned too,
+// because clone(true) on an Object3D copies meshes but SHARES their
+// materials - without cloning them, coloring one cube would recolor
+// every cube in the scene
+function applyStatusAppearance(visualModel, status) {
+    const appearance = STATUS_APPEARANCE[status];
+
+    if (!appearance) {
+        return; // no/unknown status: leave the model in its original look
+    }
+
+    visualModel.traverse((object) => {
+        if (!object.isMesh) {
+            return;
+        }
+
+        const materials = Array.isArray(object.material)
+            ? object.material
+            : [object.material];
+
+        const tinted = materials.map((material) => {
+            const clone = material.clone();
+
+            if (clone.emissive !== undefined) {
+                clone.emissive = new THREE.Color(appearance.tint);
+                clone.emissiveIntensity = appearance.tintStrength;
+            }
+
+            if (appearance.opacity < 1.0) {
+                clone.transparent = true;
+                clone.opacity = appearance.opacity;
+                clone.depthWrite = false; // avoids transparency sorting artifacts
+            }
+
+            return clone;
+        });
+
+        object.material = Array.isArray(object.material) ? tinted : tinted[0];
+
+        if (appearance.opacity < 1.0) {
+            object.castShadow = false; // ghost slots should not throw shadows
+        }
+    });
+}
+
 //represents one cube
 function createCubeObject(node) {
     const cubeObject = new THREE.Group();
@@ -63,6 +118,11 @@ function createCubeObject(node) {
 
     const visualModel = cubeTemplate.clone(true);
     visualModel.scale.setScalar(MODEL_SCALE);
+
+    if (node.status) {
+        applyStatusAppearance(visualModel, node.status);
+    }
+
     cubeObject.add(visualModel);
 
     return cubeObject;

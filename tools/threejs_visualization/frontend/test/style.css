@@ -400,3 +400,63 @@
     .cube canvas {
         display: block;
     }
+
+    /* ---------------------------------------------------------
+       Bauen page
+       --------------------------------------------------------- */
+    #bauen-page {
+        padding: var(--page-padding);
+        gap: 1rem;
+    }
+
+    .header-container {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .progress-track {
+        flex: 1;
+        height: 0.9rem;
+        border-radius: 999px;
+        background-color: var(--light-green);
+        overflow: hidden;
+    }
+
+    .progress-fill {
+        height: 100%;
+        width: 0%;
+        border-radius: 999px;
+        background-color: var(--green);
+        transition: width 0.4s ease;
+    }
+
+    .trees {
+        position: relative;
+        flex: 1;
+        display: flex;
+    }
+
+    .scene-container {
+        flex: 1;
+        display: flex;
+    }
+
+    .target-tree-container-window {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        width: 140px;
+        height: 140px;
+        display: flex;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+        border-radius: var(--img-border);
+        cursor: pointer;
+        transition: width 0.35s ease, height 0.35s ease;
+        z-index: 10;
+    }
+
+    .target-tree-container-window.is-expanded {
+        width: 100%;
+        height: 100%;
+    }
