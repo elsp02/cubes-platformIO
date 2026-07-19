@@ -10,6 +10,14 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
+// post-processing: OutlinePass draws a soft glowing halo along the
+// cubes' visible silhouette (with built-in pulsation); the composer
+// chains it behind the normal render (same setup as test/src/scene_test.js)
+import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
+import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
+import { OutlinePass } from "three/addons/postprocessing/OutlinePass.js";
+import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
+
 import { CUBE_SIZE } from "../layout.js";
 import {
     loadCubeTemplate,
@@ -27,6 +35,15 @@ let camera;
 let renderer;
 let controls;   // OrbitControls (mouse rotation/zoom)
 let cubeGroup;  // parent group of the whole cube construction
+
+let composer;        // post-processing chain: render -> outlines -> output
+let outlineCorrect;  // green pulsing halo around correct cubes
+let outlineWrong;    // red pulsing halo around wrong/unexpected cubes
+
+// models collected per redraw, then assigned to the outline passes
+// (one pass can only have ONE color/pulse, so one list per status group)
+let correctSelection = [];
+let wrongSelection = [];
 
 let latestTree = null;    // last received tree, kept for a redraw after the model loads
 
@@ -93,6 +110,46 @@ function addRenderer(){
 
 }
 
+// post-processing chain: normal render -> green outlines -> red
+// outlines -> color output. scene_test.js shows ONE cube and re-uses a
+// single OutlinePass; here many cubes with different statuses are
+// visible at once, and one pass has only one color/pulse - so there is
+// one pass per status group, each with its own selection list.
+function addComposer() {
+    const { width, height } = viewSize();
+    const size = new THREE.Vector2(width, height);
+
+    composer = new EffectComposer(renderer);
+    composer.addPass(new RenderPass(scene, camera));
+
+    outlineCorrect = makeOutlinePass(size, STATUS_APPEARANCE.correct);
+    composer.addPass(outlineCorrect);
+
+    outlineWrong = makeOutlinePass(size, STATUS_APPEARANCE.wrong);
+    composer.addPass(outlineWrong);
+
+    composer.addPass(new OutputPass()); // color-space correction, must be last
+}
+
+// one configured OutlinePass; edge parameters come from STATUS_APPEARANCE
+function makeOutlinePass(size, appearance) {
+    const pass = new OutlinePass(size, scene, camera);
+
+    // visible = silhouette parts facing the camera,
+    // hidden = parts occluded by other cubes - same color for both
+    pass.visibleEdgeColor.set(appearance.edgeColor);
+    pass.hiddenEdgeColor.set(appearance.edgeColor);
+
+    pass.edgeStrength = appearance.edgeStrength;
+    pass.edgeGlow = appearance.edgeGlow;
+    pass.edgeThickness = appearance.edgeThickness;
+    pass.pulsePeriod = appearance.pulsePeriod;
+
+    pass.selectedObjects = []; // nothing glows until a tree is drawn
+
+    return pass;
+}
+
 // add light
 function addLights() {
     //illuminates every surface equally from all directions, providing a flat base brightness
@@ -139,6 +196,7 @@ function onResize() {
     camera.updateProjectionMatrix();
 
     renderer.setSize(width, height);
+    composer.setSize(width, height); // propagates to all passes incl. the outlines
 }
 
 // render loop: requestAnimationFrame schedules this function again for
@@ -148,8 +206,8 @@ function animate() {
     requestAnimationFrame(animate);
 
     controls.update();
-    //scene rendering
-    renderer.render(scene, camera);
+    //scene rendering: full pass chain render -> outline glow -> output
+    composer.render();
 }
 
 //------------------------------------------------------------
@@ -163,9 +221,14 @@ export function initScene(container = null){
 //create a Threejs Scene
     scene = new THREE.Scene();
 
+    // explicit background matching the page color: the composer renders
+    // into a texture, where a transparent canvas is unreliable
+    scene.background = new THREE.Color(0xfbfaf2);
+
     addCamera();
     addRenderer();
     addControls();
+    addComposer();
 
 //add helpers
     addLights();
@@ -234,23 +297,29 @@ function addGround() {
 // ------------------------------------------------------------
 
 // mirror of the physical LEDs plus ghost slots; "blocked" is not listed
-// because blocked slots are not rendered at all (tree_builder skips them)
+// because blocked slots are not rendered at all (tree_builder skips them).
+// correct/wrong/unexpected: body stays original, a glowing halo pulses
+//   around the cube's silhouette (edgeStrength = brightness, edgeGlow =
+//   how far the glow bleeds, edgeThickness in px, pulsePeriod in
+//   seconds per pulse) - values tuned in test/src/scene_test.js.
+// attachable: ghost slot, just semi-transparent, no coloring.
 const STATUS_APPEARANCE = {
-    correct:    { tint: 0x22bb44, tintStrength: 0.25, opacity: 1.0 },   // green
-    wrong:      { tint: 0xcc2222, tintStrength: 0.5,  opacity: 1.0 },   // red
-    unexpected: { tint: 0xcc2222, tintStrength: 0.5,  opacity: 1.0 },   // red
-    attachable: { tint: 0x3388ff, tintStrength: 0.4,  opacity: 0.35 },  // transparent blue ghost
+    correct:    { edgeColor: 0x117E2F, edgeStrength: 10, edgeGlow: 3.0, edgeThickness: 10, pulsePeriod: 4 },  // green
+    wrong:      { edgeColor: 0xcc2222, edgeStrength: 10, edgeGlow: 3.0, edgeThickness: 10, pulsePeriod: 2 },  // red
+    unexpected: { edgeColor: 0xcc2222, edgeStrength: 10, edgeGlow: 3.0, edgeThickness: 10, pulsePeriod: 2 },  // red
+    attachable: { opacity: 0.8 },
 };
 
-// tints the cloned model per status; materials must be cloned too,
+// makes ghost slots semi-transparent; materials must be cloned,
 // because clone(true) on an Object3D copies meshes but SHARES their
-// materials - without cloning them, coloring one cube would recolor
+// materials - without cloning them, fading one cube would fade
 // every cube in the scene
 function applyStatusAppearance(visualModel, view) {
     const appearance = STATUS_APPEARANCE[view.status];
 
-    if (!appearance) {
-        return;  // unknown status: leave the model in its original look
+    // only ghost slots change the cube body itself
+    if (!appearance || appearance.opacity === undefined || appearance.opacity >= 1.0) {
+        return;
     }
 
     visualModel.traverse((object) => {
@@ -264,36 +333,25 @@ function applyStatusAppearance(visualModel, view) {
             ? object.material
             : [object.material];
 
-        const tinted = materials.map((material) => {
+        const faded = materials.map((material) => {
             const clone = material.clone();
 
-            // emissive = color the surface "glows" with, independent of
-            // lighting - a reliable way to tint without repainting textures
-            if (clone.emissive !== undefined) {
-                clone.emissive = new THREE.Color(appearance.tint);
-                clone.emissiveIntensity = appearance.tintStrength;
-            }
-
-            if (appearance.opacity < 1.0) {
-                clone.transparent = true;
-                clone.opacity = appearance.opacity;
-                clone.depthWrite = false; // avoids transparency sorting artifacts
-            }
+            clone.transparent = true;
+            clone.opacity = appearance.opacity;
+            clone.depthWrite = false; // avoids transparency sorting artifacts
 
             return clone;
         });
 
-        object.material = Array.isArray(object.material) ? tinted : tinted[0];
+        object.material = Array.isArray(object.material) ? faded : faded[0];
 
-        if (appearance.opacity < 1.0) {
-            object.castShadow = false; // ghost slots should not throw shadows
-        }
+        object.castShadow = false; // ghost slots should not throw shadows
     });
 }
 
 // decorate hook for tree_builder: everything only the live view needs
 // per cube - a readable name + userData for debugging in the browser
-// console (scene.getObjectByName), and the status tint
+// console (scene.getObjectByName), ghost transparency and the halo
 function decorateCube(cubeObject, view) {
     cubeObject.name = view.isGhost
         ? (view.port === null || view.port === undefined
@@ -307,6 +365,18 @@ function decorateCube(cubeObject, view) {
     cubeObject.userData.errorMask = view.errorMask;
 
     applyStatusAppearance(cubeObject, view);
+
+    // statuses with a halo color go into the matching outline pass.
+    // children[0] is the cube's GLB model - at this point it is the
+    // ONLY child (child cubes are attached after decorate), and taking
+    // the whole group would make the entire subtree glow along
+    const appearance = STATUS_APPEARANCE[view.status];
+    if (appearance !== undefined && appearance.edgeColor !== undefined) {
+        const selection = view.status === "correct"
+            ? correctSelection
+            : wrongSelection;
+        selection.push(cubeObject.children[0]);
+    }
 }
 
 
@@ -319,6 +389,11 @@ function decorateCube(cubeObject, view) {
 export function clearTree() {
     latestTree = null;
     cubeGroup.clear();
+
+    correctSelection = [];
+    wrongSelection = [];
+    outlineCorrect.selectedObjects = [];
+    outlineWrong.selectedObjects = [];
 }
 
 
@@ -335,5 +410,12 @@ export function redrawTree(rootNode) {
 
     cubeGroup.clear();
 
+    // decorateCube fills these while the tree is built
+    correctSelection = [];
+    wrongSelection = [];
+
     cubeGroup.add(buildTreeGroup(rootNode, decorateCube));
+
+    outlineCorrect.selectedObjects = correctSelection;
+    outlineWrong.selectedObjects = wrongSelection;
 }

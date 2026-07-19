@@ -35,12 +35,12 @@ const MODEL_SCALE = 25.0;
 //   the cube's silhouette (edgeStrength = brightness, edgeGlow = how
 //   far the glow bleeds, edgeThickness in px, pulsePeriod in seconds
 //   per pulse, 0 = steady glow without pulsing).
-// attachable: transparent blue ghost, as in src/scene_glb.js.
+// attachable: semi-transparent ghost, no coloring, as in src/scene_glb.js.
 const STATUS_APPEARANCE = {
     original:   null,
     correct:    { edgeColor: 0x117E2F, edgeStrength: 10, edgeGlow: 3.0, edgeThickness: 10, pulsePeriod: 4 },  // green
     wrong:      { edgeColor: 0xcc2222, edgeStrength: 10, edgeGlow: 3.0, edgeThickness: 10, pulsePeriod: 2 },  // red
-    attachable: { tint: 0x3388ff, tintStrength: 0.4, opacity: 0.35 },  // transparent blue ghost
+    attachable: { opacity: 0.5 },  // ghost: just transparent, an optional tint would still work
 };
 
 // button id in index.html  ->  status name above
@@ -242,10 +242,12 @@ function applyStatus(statusName) {
 
     const appearance = STATUS_APPEARANCE[statusName]; // null = original
 
-    // body tint only applies to the ghost; correct/wrong/original all
+    // body changes only apply to the ghost; correct/wrong/original all
     // keep the untinted GLB materials (correct/wrong glow via outline)
     const tintBody = appearance !== null && appearance.tint !== undefined;
-    const isGhost = tintBody && appearance.opacity < 1.0;
+    const isGhost = appearance !== null
+        && appearance.opacity !== undefined
+        && appearance.opacity < 1.0;
 
     cubeModel.traverse((object) => {
         if (!object.isMesh) {
@@ -256,18 +258,14 @@ function applyStatus(statusName) {
         const tinted = object.userData.originalMaterials.map((material) => {
             const clone = material.clone();
 
-            if (!tintBody) {
-                return clone;
-            }
-
             // emissive = color the surface "glows" with, independent of
             // lighting - tints without repainting the textures
-            if (clone.emissive !== undefined) {
+            if (tintBody && clone.emissive !== undefined) {
                 clone.emissive = new THREE.Color(appearance.tint);
                 clone.emissiveIntensity = appearance.tintStrength;
             }
 
-            if (appearance.opacity < 1.0) {
+            if (isGhost) {
                 clone.transparent = true;
                 clone.opacity = appearance.opacity;
                 clone.depthWrite = false; // avoids transparency sorting artifacts

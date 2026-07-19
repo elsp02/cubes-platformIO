@@ -100,7 +100,7 @@
 // relays the frame sequentially, one hop per cube. Factor 2 = safety margin for loop overhead and deaf windows (log flushing). (ca 88 ms. für 3 cubes)
 #define FEEDBACK_FINISHED_TIMEOUT_US (2 * CUBES_AMOUNT * FB_HOP_US)
 
-#define SERIAL_WRITING 1
+#define SERIAL_WRITING 0
 #define SERIAL_DEBUG   0
 #define SERIAL_DEBUG_END 0
 
