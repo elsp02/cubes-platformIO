@@ -1,14 +1,14 @@
 // page while connecting with server - dissapears when connected
 // ???? what if connection breaks? - maybe text with reload window
-//const MIN_LOADER_TIME = 1000; // ms
+const MIN_LOADER_TIME = 3000; // ms
 
 //adress components
-const loader = document.getElementById("loader-container");
-const page = document.getElementById("page");
+const loader = document.getElementById("loader");
+const page = document.getElementById("dashboard");
 const loaderGif = document.getElementById("loader-gif");
 
 //get start time (for e.g breaking connecting attempt)
-//const startTime = performance.now();
+const startTime = performance.now();
 
 // Lock scrolling as long as loader is visible
 document.documentElement.style.overflow = "hidden";
@@ -20,8 +20,8 @@ if (typeof gsap !== "undefined"){
     gsap.fromTo(loaderGif, {opacity:0}, {opacity: 1, duration: 1, ease: "power2.out"}); //gif fade in within 1 sec 
 }
 
-// condition when to remove loader window - time dependent
-/*window.addEventListener("load", ()=>{
+// condition when to remove loader window (currently time dependent)- change this to condition server connected
+window.addEventListener("load", ()=>{
     const elapsed = performance.now() -startTime;
     const remaining = Math.max(0, MIN_LOADER_TIME-elapsed);
 
@@ -29,15 +29,14 @@ if (typeof gsap !== "undefined"){
     setTimeout(() => {
     hideLoader();
   }, remaining);
-})*/
+})
 
-
-export function hideLoader (){
+function hideLoader (){
     //allow scrolling again
     document.documentElement.style.overflow = "";
     document.body.style.overflow = "";
 
-  const timeline = gsap.timeline({
+  const i = gsap.timeline({
     onComplete: () => {
       loader.remove();
 
@@ -65,8 +64,7 @@ export function hideLoader (){
   });
 
   //when time is expired/connection is valid - loader dissappears and page appears 
-  timeline
-  .to(loader, {
+  i.to(loader, {
     opacity: 0,
     duration: 0.6,
     ease: "power2.inOut"

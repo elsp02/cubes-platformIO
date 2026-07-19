@@ -79,7 +79,7 @@ async function showTargetTreeThumbnails() {
     try {
         await loadCubeTemplate();
 
-        const scrollContainer = document.querySelector(".scroll-container");
+        const scrollContainer = document.getElementById("scroll-container-dashboard");
 
         for (const { id, name, tree } of TARGET_TREES) {
             const dataUrl = renderTreeToImage(tree);
@@ -92,11 +92,11 @@ async function showTargetTreeThumbnails() {
             img.src = dataUrl;
             img.alt = `Zielbaum: ${name}`;
 
-            const label = document.createElement("p");
-            label.className = "typo-handwriting";
-            label.textContent = name;
+            //const label = document.createElement("p");
+            //label.className = "typo-handwriting";
+            //label.textContent = name;
 
-            card.append(img, label);
+            card.append(img);
             scrollContainer.append(card);
         }
 

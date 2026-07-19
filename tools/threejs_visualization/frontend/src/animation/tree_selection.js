@@ -6,11 +6,13 @@
 // the cards are created asynchronously by selected_tree_visualization.js
 // and may not exist yet when this script runs.
 
-const scrollContainer = document.querySelector(".scroll-container");
-const levelWindow = document.getElementById("preview-section");
+import { showTargetTreePreview } from "../visualization/tree_preview.js";
+
+const scrollContainer = document.querySelector("#scroll-container-dashboard");
+const levelWindow = document.getElementById("preview-overlay");
 const levelContainer = document.getElementById("level-container");
 const okButton = document.getElementById("ok-button");
-const zurueckButton = document.getElementById("zurück");
+const zurueckButton = document.getElementById("zurück-button");
 const dotsContainer = document.getElementById("dots-container");
 
 let cards = [];
@@ -93,10 +95,10 @@ function initCarousel() {
 }
 
 document.addEventListener("cards-ready", initCarousel);
-
+//initCarousel();
 //------------------------------------
 // double-click a card -> remember its tree id, open the level window
-scrollContainer.addEventListener("dblclick", (event) => {
+scrollContainer.addEventListener("click", (event) => {
     const card = event.target.closest(".card");
     if (!card) {
         return;
@@ -104,6 +106,7 @@ scrollContainer.addEventListener("dblclick", (event) => {
 
     selectedTreeId = card.id.replace("card-", "");
     levelWindow.classList.add("is-open");
+    showTargetTreePreview(selectedTreeId);
 });
 
 // click a level -> select it exclusively
@@ -120,7 +123,7 @@ levelContainer.addEventListener("click", (event) => {
     selectedLevel = level.id.replace("level-", "");
 });
 
-// OK -> navigate to the live preview page for the chosen tree + level
+// OK -> navigate to the live page for the chosen tree + level
 okButton.addEventListener("click", () => {
     if (selectedTreeId === null || selectedLevel === null) {
         console.warn("Pick a level before continuing.");
@@ -128,7 +131,7 @@ okButton.addEventListener("click", () => {
     }
 
     const params = new URLSearchParams({ tree: selectedTreeId, level: selectedLevel });
-    window.location.href = `tree_preview.html?${params}`;
+    window.location.href = `bauen.html?${params}`;
 });
 
 // zurück -> close the window, let the user pick another card
