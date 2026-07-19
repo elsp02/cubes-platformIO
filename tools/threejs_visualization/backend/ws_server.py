@@ -23,7 +23,7 @@ import websockets
 from binary_serial_reader import iter_trees_from_binary_serial
 from compare_core import compare
 from feedback_output import build_evaluated_tree, build_feedback_frame, led_states
-from target_tree import TARGET_TOWER_3
+from target_tree import TARGET_TOWER_3, target_node_from_json
 
 #--------------------------------
 # Configuration
@@ -90,39 +90,77 @@ def tree_worker() -> None:
         print(f"Tree worker stopped because of an error: {error}")
 
 
-#websocket handler -> runs once per connected browser: sends the newest
+#send loop -> runs as a background task per connection: sends the newest
 #evaluated tree whenever one appears in the queue
+async def send_trees(websocket) -> None:
+    while True:
+        try:
+            # non-blocking check; Queue has no async interface, so
+            # polling + short sleep is the simplest bridge between
+            # the thread world and the asyncio world
+            tree = tree_queue.get_nowait()
+
+        except Empty:
+            # nothing new yet: yield control to the event loop for
+            # 20 ms so this loop does not burn a CPU core
+            await asyncio.sleep(0.02)
+            continue
+
+        payload = {
+            "type": "evaluated_tree",
+            "tree": tree,
+        }
+        # send evaluated tree to websocket client
+        await websocket.send(json.dumps(payload))
+
+
+#websocket handler -> runs once per connected browser: receives messages
+#from the client (start_session with the chosen target tree) while a
+#background task streams evaluated trees to it
 async def handler(websocket) -> None:
     print("Browser connected.")
 
-    try:
-        while True:
-            try:
-                # non-blocking check; Queue has no async interface, so
-                # polling + short sleep is the simplest bridge between
-                # the thread world and the asyncio world
-                tree = tree_queue.get_nowait()
+    sender = asyncio.create_task(send_trees(websocket))
 
-            except Empty:
-                # nothing new yet: yield control to the event loop for
-                # 20 ms so this loop does not burn a CPU core
-                await asyncio.sleep(0.02)
+    try:
+        # async for yields every incoming message until the client
+        # disconnects (this is the receive loop)
+        async for raw in websocket:
+            try:
+                message = json.loads(raw)
+            except json.JSONDecodeError:
+                print(f"Ignoring non-JSON message: {raw!r}")
                 continue
 
-            payload = {
-                "type": "evaluated_tree",
-                "tree": tree,
-            }
-            # send evaluated tree to websocket client
-            await websocket.send(json.dumps(payload))
+            msg_type = message.get("type")
 
-    #connection closed correctly
-    except websockets.ConnectionClosedOK:
-        print("Connection closed")
+            if msg_type == "start_session":
+                # parse the target tree the user selected in the
+                # frontend (currently only logged - the serial session
+                # is not yet tied to it, that is the next step)
+                try:
+                    target = target_node_from_json(message["tree"])
+                except (KeyError, TypeError, ValueError) as error:
+                    print(f"Invalid start_session message: {error}")
+                    continue
 
-    #connection closed with error
+                print(
+                    f"start_session received: "
+                    f"level={message.get('level')}, target={target}"
+                )
+
+            else:
+                print(f"Unknown message type: {msg_type}")
+
+    #a clean disconnect just ends the async-for loop WITHOUT raising,
+    #so this except only catches abnormal closes (crash, network drop)
     except websockets.ConnectionClosedError:
         print("Connection closed with error")
+
+    finally:
+        # the send task must not outlive this connection
+        sender.cancel()
+        print("Browser disconnected.")
 
 
 async def main()-> None:

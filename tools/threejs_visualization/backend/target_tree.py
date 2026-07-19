@@ -38,6 +38,36 @@ class TargetNode:
     orientation: int
     children: dict[int, "TargetNode"] = field(default_factory=dict)
 
+#new for client sending target tree to server
+def target_node_from_json(data: dict) -> TargetNode:
+    """Parse a frontend target-tree JSON node into a TargetNode.
+
+    Frontend format (tree1.json etc., sent by bauen.js in the
+    start_session message):
+        {"orientation": int, "children": [{"port": int, ...}, ...]}
+    Children are a LIST with an embedded "port" field, while
+    TargetNode.children is a dict port -> TargetNode.
+    cube_type is optional and defaults to 0 - the current prototype
+    cubes (0x10..0x12) are all type 0 anyway (see module docstring).
+    """
+    if not isinstance(data, dict):
+        raise ValueError(f"tree node must be an object, got {type(data).__name__}")
+
+    children: dict[int, TargetNode] = {}
+    for child in data.get("children", []):
+        if "port" not in child:
+            raise ValueError("child node is missing its 'port' field")
+        port = int(child["port"])
+        if port in children:
+            raise ValueError(f"duplicate child port {port}")
+        children[port] = target_node_from_json(child)
+
+    return TargetNode(
+        cube_type=int(data.get("cube_type", 0)),
+        orientation=int(data.get("orientation", 0)),
+        children=children,
+    )
+
 
 # ----------------------------------------------------------------
 # Predefined target trees for testing (later: loaded per build step)

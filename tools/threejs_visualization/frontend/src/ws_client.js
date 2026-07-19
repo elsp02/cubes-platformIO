@@ -7,11 +7,28 @@
 const WEBSOCKET_URL = "ws://localhost:8765";
 const RECONNECT_DELAY_MS = 2000;
 
+// the socket of the most recent connectWebSocket() call, so that
+// sendMessage() always talks to the current connection (after a
+// reconnect the old socket object is dead)
+let activeSocket = null;
+
+// send a JSON message to the server (e.g. start_session from bauen.js);
+// returns false if the connection is not open right now
+export function sendMessage(payload) {
+    if (activeSocket && activeSocket.readyState === WebSocket.OPEN) {
+        activeSocket.send(JSON.stringify(payload));
+        return true;
+    }
+    console.warn("Cannot send, WebSocket is not open:", payload);
+    return false;
+}
+
 // function is called in main.js to connect to the websocket server and receive tree data
 // onTreeReceived(tree) is called for every valid tree message
 // onDisconnected (optional) is called when the connection closes or fails
 export function connectWebSocket(onTreeReceived, onDisconnected, onConnected) {
     const socket = new WebSocket(WEBSOCKET_URL);
+    activeSocket = socket;
 
     // true once onopen has fired for THIS socket, so onclose can tell a
     // "never connected" failure apart from a real disconnect afterwards
