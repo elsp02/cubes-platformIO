@@ -5,21 +5,32 @@
 // where tree is what feedback_output.build_evaluated_tree() produced
 // (node_id, status, error_mask, orientation, port, children, ...).
 const WEBSOCKET_URL = "ws://localhost:8765";
+const RECONNECT_DELAY_MS = 2000;
 
 // function is called in main.js to connect to the websocket server and receive tree data
 // onTreeReceived(tree) is called for every valid tree message
 // onDisconnected (optional) is called when the connection closes or fails
-export function connectWebSocket(onTreeReceived, onDisconnected) {
+export function connectWebSocket(onTreeReceived, onDisconnected, onConnected) {
     const socket = new WebSocket(WEBSOCKET_URL);
+
+    // true once onopen has fired for THIS socket, so onclose can tell a
+    // "never connected" failure apart from a real disconnect afterwards
+    let didConnect = false;
 
     // if connection is opened succesfully
     socket.onopen = () => {
+        didConnect = true;
         console.log("WebSocket connected:", WEBSOCKET_URL);
 
         // update status element in index.html
         const statusElement = document.getElementById("status");
         if (statusElement) {
             statusElement.textContent = "WebSocket connected";
+        }
+
+        //to hide loader page
+        if (onConnected){
+            onConnected();
         }
     };
 
@@ -56,14 +67,21 @@ export function connectWebSocket(onTreeReceived, onDisconnected) {
         console.log("WebSocket disconnected.");
 
         // update status element in index.html
-        const statusElement = document.getElementById("status");
-        if (statusElement) {
-            statusElement.textContent = "WebSocket disconnected";
-        }
+        //const statusElement = document.getElementById("status");
+        /*if (statusElement) {
+            statusElement.textContent = didConnect
+                ? "WebSocket disconnected"
+                : "Verbindung fehlgeschlagen - erneuter Versuch...";
+        }*/
 
         if (onDisconnected) {
             onDisconnected();
         }
+
+        // keep retrying to connect with server - no manual relaod necessary
+        setTimeout(() => {
+            connectWebSocket(onTreeReceived, onDisconnected, onConnected);
+        }, RECONNECT_DELAY_MS);
     };
 
     // if error occurs
@@ -71,10 +89,10 @@ export function connectWebSocket(onTreeReceived, onDisconnected) {
         console.error("WebSocket error:", error);
 
         // update status element in index.html
-        const statusElement = document.getElementById("status");
-        if (statusElement) {
-            statusElement.textContent = "WebSocket error";
-        }
+        //const statusElement = document.getElementById("status");
+        //if (statusElement) {
+            //statusElement.textContent = "WebSocket error";
+        //}
     };
 
     return socket;

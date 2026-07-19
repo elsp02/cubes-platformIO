@@ -150,6 +150,7 @@
         margin-bottom: auto;
     }
 
+    /*to hide page first*/
     #page {
         opacity: 0;
     }
@@ -217,6 +218,10 @@
 
        .aspect-ratio-3-4{
         aspect-ratio: 3/4;
+       }
+
+        .aspect-ratio-4-3{
+        aspect-ratio: 4/3;
        }
 
        .card{

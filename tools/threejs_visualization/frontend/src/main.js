@@ -8,11 +8,12 @@
 //
 // After that everything is event-driven: each received tree triggers
 // one redraw, a lost connection clears the scene.
-import { initScene, redrawTree, clearTree } from "./scene_glb.js";
+import { initScene, redrawTree, clearTree } from "./visualization/scene_glb.js";
 import { connectWebSocket } from "./ws_client.js";
+import { hideLoader } from "./animation/loader_page.js"
 
 
-initScene();
+//initScene();
 
 //connect to websocket server and redraw tree when data is received
 connectWebSocket(
@@ -25,5 +26,11 @@ connectWebSocket(
     () => {
         console.log("Connection lost - clearing scene.");
         clearTree(); //no stale cubes when the server is gone
+    },
+
+    //called when websocket connection is established - for loader page
+    () => {
+        console.log("Connection established - hiding loader");
+        hideLoader();
     }
 );

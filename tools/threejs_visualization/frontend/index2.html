@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Cube Visualization</title>
+
+    <style>
+        /* the three.js canvas fills the whole window */
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            background: #f2f2f2;
+        }
+
+        /* small connection-status box in the top-left corner,
+           its text is updated by ws_client.js */
+        #status {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            z-index: 10;
+
+            padding: 6px 10px;
+            border-radius: 4px;
+
+            background: rgba(255, 255, 255, 0.85);
+            color: #222;
+
+            font-size: 14px;
+        }
+
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="status">WebSocket not connected</div>
+
+    <!-- entry point: main.js starts the scene and the websocket client -->
+    <script type="module" src="/src/main.js"></script>
+</body>
+</html>

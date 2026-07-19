@@ -1,0 +1,359 @@
+:root{
+    --font-family: "Inter", Arial, sans-serif;
+
+    --fs-title: 2rem;
+    --fw-title: 700;
+    --fs-title-section: 1.5rem;
+    --fs-text: 1rem;
+    --fw-text: 400;
+    --fw-text-bold: 600; /*bold*/
+
+
+    /* Special Effects
+    --stroke-thin: 0.1px; */
+
+    /* Colors */
+    --font-color: #323131;  
+    --background-color: #fbfaf2;
+    --green: #868656;
+    --light-green: #DBDBB6;
+    --red: #5C2B2B;
+    --blue: #4E5F83;
+
+    /* Spacing */
+    --page-padding: clamp(1.25rem, 5vw, 2rem);
+    --img-overlap: clamp(1.25rem, 5vw, 3rem);
+    --overlap: clamp(24px, 8vw, 120px);
+
+
+    /*images*/
+    --img-h: clamp(250px, 60vw, 450px); /* image width */
+    --img-r: 3/4; /* image aspect ratio */
+    --img-border: 8px;
+    --stage-overlap: calc((var(--fs-title) * 0.65));
+    }
+
+     *{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    }
+
+    body {
+        /*background-color: var(--background-color);*/
+        font-family: var(--font-family);
+        font-weight: var(--fw-text);
+        font-size: var(--fs-text);
+        text-align: center;
+        color: var(--font-color);
+        overflow-x: hidden; /*clip: verhindert horizontales scrollen, wenn Elemente über die Seite hinausragen*/
+        width: 100%;
+        background-color: var(--background-color);
+    }
+
+    .typo-title {
+        font-size: var(--fs-title);
+        font-weight: var(--fw-title);
+        background-color: lightcoral;
+        align-self: center;
+    }
+
+    .typo-title-section{
+        font-size: var(--fs-title-section);
+        font-weight: var(--fw-title);
+    }
+
+    .typo-text{
+        background-color: #807f7f;
+    }
+
+    .typo-text-bold{
+        font-weight: var(--fw-text);
+    }
+
+    /*-----------------------------------------------------------
+    Main Container
+    ------------------------------------------------------------*/
+    .main-container {
+        display: flex;
+        flex-direction: column;
+        min-height: 100vh;
+        height: fit-content;
+        overflow-x: hidden;
+        padding-inline: var(--page-padding);
+        padding-block: var(--page-padding);
+    }
+
+    .loader-container {
+        display: flex;
+        flex-direction: column;
+        height: fit-content;
+        overflow-x: hidden;
+        padding-inline: var(--page-padding);
+        padding-block: var(--page-padding);
+    }
+
+    /* ---------------------------------------------------------
+       Loader
+    --------------------------------------------------------- */
+    .centered-section {
+        margin: auto;
+        width: 100%;
+        height: max-content;
+        background-color: var(--green);
+        display: flex;
+        flex-direction: column;
+        justify-items: center;
+        align-items: center; 
+        overflow: hidden;
+        /*padding-inline: var(--page-padding);
+        padding-block: var(--page-padding);*/
+    }
+
+    .centered-container {
+        width: 100%;
+        min-width: 0;
+        max-width: 100%;
+        background-color: var(--blue);
+        z-index: 999;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        /*justify-content: center;*/
+    }
+
+    #page {
+        opacity: 0;
+    }
+    /*-----------------------------------------------------------
+    Loader
+    -------------------------------------------------------------*/
+    #loader{
+        position: fixed;
+        inset: 0;
+        z-index: 999;
+    }
+
+     /* ---------------------------------------------------------
+       Tree selection cards
+       --------------------------------------------------------- */   
+        .scroll-section {
+        width: 100%;
+        max-width: 100%;
+        height: max-content;
+        overflow: hidden;
+        position: relative;
+        background-color: lightblue;
+        }
+
+        .scroll-container {
+        display: flex;
+        justify-self: start;
+        width: 100%;
+        /*margin-top: 20vh;*/
+        gap: 1.5rem;
+        overflow-x: auto;
+        overscroll-behavior-x: contain;
+        scroll-behavior: smooth;
+        background-color: rgb(156, 156, 119);
+        touch-action: pan-x;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        justify-content: flex-start; /* default: links starten */
+        }
+
+        /* Wenn alles reinpasst -> zentrieren */
+        .scroll-container.is-centered{
+        justify-content: center;
+        }
+
+        /*no scroll line*/
+        .scroll-container::-webkit-scrollbar {
+            display: none;
+        }
+
+       .aspect-ratio-3-4{
+        aspect-ratio: 4/3;
+       }
+
+       .card{
+        background-color: var(--light-green);
+        width: fit-content;
+        display: flex;
+        flex-direction:column;
+        align-items: center;
+        transition: transform 0.25s ease;
+        scroll-snap-align: center;
+        }
+
+        /*.card.is-active {
+        transform: scale(1.12);
+        z-index: 1;
+        }*/
+
+        .card img {
+        height: var(--img-h);
+        object-fit: contain;
+        display: block;
+        border-radius: var(--img-border);
+        background-color: lightpink;
+        }
+        
+        .horizontal img{
+        height: calc(var(--img-h)*0.8);
+        }
+
+        .dots-container {
+            display: flex;
+            justify-content: center;
+            gap: 0.6rem;
+            margin-top: 1rem;
+        }
+
+        .dot {
+            width: 0.7rem;
+            height: 0.7rem;
+
+            flex-shrink: 0;
+            padding: 0;
+            border: none;
+            border-radius: 999px;
+
+            background-color: var(--light-green);
+            cursor: pointer;
+
+            transition:
+                width 0.35s ease,
+                background-color 0.35s ease;
+        }
+
+        .dot.is-active {
+            width: 1.5rem;
+            background-color: var(--green);
+        }
+
+    /* ---------------------------------------------------------
+       Level selection window
+       --------------------------------------------------------- */
+    #centered-container-level {
+        height: 100vh;
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 500;
+        align-items: center;
+        justify-content: center;
+        background-color: rgba(0, 0, 0, 0.4); /*blurren*/
+    }
+
+    #centered-container-level.is-open {
+        display: flex;
+    }
+
+    #preview-section{
+        display:none;
+        position:fixed;
+    }
+
+    #preview-section.is-open {
+    display: flex;
+}
+
+    .window-container {
+        background-color: var(--background-color);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+        padding: 2rem;
+        border-radius: var(--img-border);
+    }
+
+    #level-container {
+        background-color: #e2e609;
+        display: flex;
+        gap: 1rem;
+        justify-content: start;
+    }
+
+    .level {
+        font-family: var(--font-text);
+        font-weight: var(--fw-text);
+        font-size: var(--fs-text-small);
+        color: var(--font-color);
+
+        padding: 0.4em 1.4em;
+        border: 2px solid var(--font-color);
+        border-radius: 10px;
+        background-color: var(--light-green);
+        cursor: pointer;
+    }
+
+    .level:hover {
+        background-color: var(--blue);
+        color: var(--background-color);
+    }
+
+    .level.active {
+        background-color: var(--green);
+        color: var(--background-color);
+    }
+
+    /* ---------------------------------------------------------
+       Layout of the appearance test page
+       --------------------------------------------------------- */
+
+     
+
+    .button-section {
+        background-color: var(--red);
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    .button {
+        font-family: var(--font-text);
+        font-weight: var(--fw-text);
+        font-size: var(--fs-text-small);
+        color: var(--font-color);
+
+        padding: 0.4em 1.4em;
+        border: 2px solid var(--font-color);
+        border-radius: 10px;
+        background-color: var(--light-green);
+        cursor: pointer;
+    }
+
+    .button:hover {
+        background-color: var(--blue);
+        color: var(--background-color);
+    }
+
+    /* currently selected appearance */
+    .button.active {
+        background-color: var(--green);
+        color: var(--background-color);
+    }
+
+    /* the three.js canvas is placed inside .cube (#würfel) */
+    #orbit-container {
+        background-color: #4E5F83;
+        flex: 1;                 /* take the remaining page height */
+        min-height: 100vh;
+        display: flex;
+    }
+
+    .cube {
+        flex: 1;
+        border: 2px solid var(--font-color);
+        border-radius: 12px;
+        overflow: hidden;
+    }
+
+    .cube canvas {
+        display: block;
+    }
+

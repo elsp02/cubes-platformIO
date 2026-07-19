@@ -14,7 +14,7 @@ import {
     localPoseForRoot,
     localPoseForChild,
     CUBE_SIZE
-} from "./layout.js";
+} from "../layout.js";
 
 
 // ------------------------------------------------------------
