@@ -25,6 +25,7 @@ stays free of any compare/target knowledge.
 The main entry point is iter_trees_from_binary_serial() at the bottom;
 ws_server.py runs it in a worker thread and consumes the yielded trees.
 """
+import threading
 from typing import Callable, Optional
 
 import serial
@@ -162,6 +163,10 @@ def iter_trees_from_binary_serial(
     # builds the feedback frame for a tree (None = nothing built);
     # supplied by ws_server so this file needs no compare/target imports
     feedback_builder: Optional[Callable[[Optional[CubeNode]], bytes]] = None,
+    # set from another thread to end the session: the loop checks it once
+    # per iteration, so the reader stops within ~1 s (the serial timeout)
+    # even when the line is idle; the finally block then sends CMD_STOP
+    stop_event: Optional[threading.Event] = None,
 ):
 
 
@@ -182,8 +187,22 @@ def iter_trees_from_binary_serial(
         last_payload: Optional[bytes] = None         # snapshot of last answered payload
         last_feedback_frame: Optional[bytes] = None  # its frame, resent on heartbeats
 
+        # START can get lost when sessions follow each other quickly:
+        # the firmware's stop_received() drains its WHOLE input buffer
+        # while processing the previous session's STOP, eating a START
+        # that is already buffered behind it - the baseplate then idles
+        # forever. But after a successful START the firmware always
+        # sends a frame within its first cycle, so silence before the
+        # FIRST sync byte means the START never arrived -> resend it.
+        got_first_sync = False
+        idle_timeouts_since_start = 0
+
         try:
             while True:
+                # session ended (end_session or browser disconnect)?
+                if stop_event is not None and stop_event.is_set():
+                    break
+
                 # scan for the start of the next frame; False = 1 s passed
                 # with no bytes at all (normal while the tower is unchanged)
                 found_sync = wait_for_valid_sync_cmd(ser, verbose)
@@ -191,7 +210,21 @@ def iter_trees_from_binary_serial(
                 if not found_sync:
                     if verbose:
                         print("Idle: no data received in the last second.")
+
+                    if not got_first_sync:
+                        idle_timeouts_since_start += 1
+                        if idle_timeouts_since_start >= 3:
+                            # harmless if the baseplate IS running: in
+                            # idle it only reacts to START anyway, and
+                            # while running it would have sent a frame
+                            # long before 3 s of silence
+                            ser.write(bytes([CMD_START]))
+                            idle_timeouts_since_start = 0
+                            print("No frame since START - START sent again.")
+
                     continue            # keep scanning for the next SYNC
+
+                got_first_sync = True   # baseplate is talking, START arrived
 
                 payload = rx_frame(ser)
                 if payload is None:

@@ -326,6 +326,13 @@ bauen------------------------------------*/
 
 }
 
+/* .tree-container is height:fit-content, so without content the canvas
+   would collapse to 0 - give the bauen tree view an explicit height
+   for the three.js renderer to fill */
+#main-tree{
+    height: 70vh;
+}
+
 #main-tree-canvas img,
 #main-tree-canvas canvas {
     display: block;

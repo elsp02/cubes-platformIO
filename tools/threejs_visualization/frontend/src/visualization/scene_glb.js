@@ -40,6 +40,23 @@ let cubeGroup;  // parent group of the whole cube construction
 let cubeTemplate = null;  // loaded GLB model, cloned per cube (see loadCubeModel)
 let latestTree = null;    // last received tree, kept for a redraw after the model loads
 
+// container element the scene renders into; null = legacy fullscreen
+// mode (renderer on <body>, sized to the window - used by index2.html)
+let viewContainer = null;
+
+// current drawing size: the container's inner size, or the window size
+// in fullscreen mode ("|| 1" avoids a zero-size renderer/aspect while
+// the container is still laying out)
+function viewSize() {
+    if (viewContainer) {
+        return {
+            width: viewContainer.clientWidth || 1,
+            height: viewContainer.clientHeight || 1,
+        };
+    }
+    return { width: window.innerWidth, height: window.innerHeight };
+}
+
 
 // Use Z as the vertical axis, similar to your Meshcat / NumPy logic.
 // (three.js default is Y-up; this must match the math in layout.js)
@@ -51,8 +68,10 @@ THREE.Object3D.DEFAULT_UP.set(0, 0, 1);
 //-----------------------------------------------------------
 // add camera -
 function addCamera(){
+    const { width, height } = viewSize();
+
     //create a new camera with positions and angles - fov, aspect, closest visible distance from camera, farest ...
-    camera = new THREE.PerspectiveCamera(60, window.innerWidth/window.innerHeight, 0.1, 1000 );
+    camera = new THREE.PerspectiveCamera(60, width/height, 0.1, 1000 );
 
     //set how far the camera will be from the 3D model - should depend on the construction size, always all cubes in scene visible
     camera.position.set(4, -6, 4);
@@ -70,7 +89,9 @@ function addRenderer(){
     // parameters: alpha: transparent background, antialias: Kantenglättung
     //https://threejs.org/docs/#Renderer
     renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    const { width, height } = viewSize();
+    renderer.setSize(width, height);
 
     // match the render resolution to the screen's physical pixel density
     // (capped at 2: sharper on high-DPI displays without rendering 3-4x
@@ -81,9 +102,9 @@ function addRenderer(){
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-    //Add the renderert o the DOM - complete screen and not within a container
-    document.body.appendChild(renderer.domElement);
-    // if scene should be in a container: document.getElementById("container").appendChild(renderer.domElement)
+    //Add the renderer to the DOM: into the given container (bauen.html),
+    //or directly onto <body> in legacy fullscreen mode (index2.html)
+    (viewContainer ?? document.body).appendChild(renderer.domElement);
 
 }
 
@@ -124,12 +145,15 @@ function addControls(){
 
 }
 
-//window resize handling for when the browser window changes size, the camera aspect ratio must be updated. Otherwise the image becomes stretched.
-function onWindowResize() {
-    camera.aspect = window.innerWidth / window.innerHeight;
+//resize handling for when the container / browser window changes size,
+//the camera aspect ratio must be updated. Otherwise the image becomes stretched.
+function onResize() {
+    const { width, height } = viewSize();
+
+    camera.aspect = width / height;
     camera.updateProjectionMatrix();
 
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setSize(width, height);
 }
 
 // render loop: requestAnimationFrame schedules this function again for
@@ -144,9 +168,13 @@ function animate() {
 }
 
 //------------------------------------------------------------
-// Scene initialization - main function, called once from main.js
+// Scene initialization - main function, called once per page.
+// container: element to render into (e.g. #main-tree-canvas on
+// bauen.html); without it the scene fills the whole window (index2.html)
 //------------------------------------------------------------
-export function initScene(){
+export function initScene(container = null){
+    viewContainer = container;
+
 //create a Threejs Scene
     scene = new THREE.Scene();
 
@@ -168,8 +196,14 @@ export function initScene(){
 
     loadCubeModel();
 
-//Add a listener to the window, so we can resize the window and the camera
-    window.addEventListener("resize", onWindowResize);
+//keep renderer and camera in sync with the drawing size: the container
+//is watched directly (same pattern as tree_preview.js), fullscreen mode
+//keeps the window listener
+    if (viewContainer) {
+        new ResizeObserver(onResize).observe(viewContainer);
+    } else {
+        window.addEventListener("resize", onResize);
+    }
 
     animate();
 

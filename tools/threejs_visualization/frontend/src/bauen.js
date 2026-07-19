@@ -5,13 +5,14 @@
 // the loader with the connection state. On every (re)connect the full
 // target tree JSON is sent as a start_session message - the server
 // keeps no state across connections, so a reconnect simply restarts
-// the session.
+// the session. Every evaluated tree the server sends back is rendered
+// into #main-tree-canvas.
 //
-// Later steps: render evaluated trees into #main-tree-canvas, wire the
-// X button (end_session).
+// Later steps: wire the X button (end_session).
 
 import { connectWebSocket, sendMessage } from "./ws_client.js";
 import { showLoader, hideLoader } from "./animation/loader_bauen.js";
+import { initScene, redrawTree, clearTree } from "./visualization/scene_glb.js";
 import { TARGET_TREES } from "./target-tree/index.js";
 
 const params = new URLSearchParams(window.location.search);
@@ -26,11 +27,15 @@ if (!targetEntry) {
     console.warn(`Unknown tree id "${treeId}" - returning to dashboard.`);
     window.location.href = "index.html";
 } else {
+    initScene(document.getElementById("main-tree-canvas"));
+
     connectWebSocket(
         (tree) => {
-            console.log("evaluated tree received:", tree);
+            redrawTree(tree);
         },
         () => {
+            // connection lost: never show stale build state
+            clearTree();
             showLoader();
         },
         () => {
