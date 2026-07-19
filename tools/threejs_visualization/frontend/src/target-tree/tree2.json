@@ -1,8 +1,9 @@
 {
+    "cube_type": 0,
     "orientation": 0,
     "children": [
-        { "port": 4, "orientation": 1, "children": [
-            {"port": 4, "orientation":2, "children":[] }
+        { "cube_type": 0, "port": 4, "orientation": 1, "children": [
+            {"cube_type": 0, "port": 4, "orientation":2, "children":[] }
         ] }
     ]
 }

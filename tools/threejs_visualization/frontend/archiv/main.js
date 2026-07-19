@@ -8,9 +8,9 @@
 //
 // After that everything is event-driven: each received tree triggers
 // one redraw, a lost connection clears the scene.
-import { initScene, redrawTree, clearTree } from "./visualization/scene_glb.js";
-import { connectWebSocket } from "./ws_client.js";
-import { hideLoader } from "./animation/loader_page.js"
+import { initScene, redrawTree, clearTree } from "../src/visualization/scene_glb.js";
+import { connectWebSocket } from "../src/ws_client.js";
+import { hideLoader } from "../src/animation/loader_page.js"
 
 
 //initScene();

@@ -23,9 +23,10 @@ export function sendMessage(payload) {
     return false;
 }
 
-// function is called in main.js to connect to the websocket server and receive tree data
+// function is called in bauen.js to connect to the websocket server and receive tree data
 // onTreeReceived(tree) is called for every valid tree message
 // onDisconnected (optional) is called when the connection closes or fails
+// onConnected is called on EVERY successful (re)connect - (re)send start_session
 export function connectWebSocket(onTreeReceived, onDisconnected, onConnected) {
     const socket = new WebSocket(WEBSOCKET_URL);
     activeSocket = socket;
@@ -40,10 +41,10 @@ export function connectWebSocket(onTreeReceived, onDisconnected, onConnected) {
         console.log("WebSocket connected:", WEBSOCKET_URL);
 
         // update status element in index.html
-        const statusElement = document.getElementById("status");
-        if (statusElement) {
-            statusElement.textContent = "WebSocket connected";
-        }
+        //const statusElement = document.getElementById("status");
+        //if (statusElement) {
+         //   statusElement.textContent = "WebSocket connected";
+        //}
 
         //to hide loader page
         if (onConnected){

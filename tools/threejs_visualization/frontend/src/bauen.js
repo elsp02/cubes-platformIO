@@ -1,12 +1,10 @@
 // bauen.js - entry module for bauen.html.
 //
-// Reads the tree/level the user picked on the dashboard (URL params set
-// by tree_selection.js), connects to the websocket server and drives
-// the loader with the connection state. On every (re)connect the full
-// target tree JSON is sent as a start_session message - the server
-// keeps no state across connections, so a reconnect simply restarts
-// the session. Every evaluated tree the server sends back is rendered
-// into #main-tree-canvas.
+// 1. Reads the tree/level the user picked on the dashboard (URL params set
+// by tree_selection.js)
+// 2. connects to the websocket server and drives the loader with the connection state. 
+// On every (re)connect the full target tree JSON is sent as a start_session message - the server
+// 3. Every evaluated tree the server sends back is rendered into #main-tree-canvas.
 //
 // Later steps: wire the X button (end_session).
 
@@ -29,7 +27,7 @@ if (!targetEntry) {
 } else {
     initScene(document.getElementById("main-tree-canvas"));
 
-    connectWebSocket(
+    connectWebSocket( //exported function from ws_client.js 
         (tree) => {
             redrawTree(tree);
         },
@@ -41,7 +39,7 @@ if (!targetEntry) {
         () => {
             // fires on every (re)connect: (re)start the session first,
             // only then reveal the page
-            sendMessage({
+            sendMessage({ //exported function from ws_client.js 
                 type: "start_session",
                 tree: targetEntry.tree,
                 level: level,

@@ -1,21 +1,25 @@
-// tree_builder.js - shared core for turning a target tree definition
-// into a three.js object: load the cube model once, build a nested
-// THREE.Group from a tree definition, and fit a camera to it.
+// tree_builder.js - shared core for turning a tree definition into a
+// three.js object: load the cube model once, build a nested THREE.Group
+// from a tree, and fit a camera to it.
 //
-// Used by BOTH tree_thumbnail.js (one-shot thumbnails for
-// the cards) and tree_preview.js (the live, orbit-able view) - same
-// code builds the tree in both places, so a card's preview and the
-// live scene it opens are guaranteed to match.
+// Used by tree_thumbnail.js (one-shot thumbnails for the cards),
+// tree_preview.js (the live, orbit-able view) AND scene_glb.js (the
+// live build scene on bauen.html) - the same code builds the tree
+// everywhere, so all views are guaranteed to match.
+//
+// Views that need extra per-cube styling (e.g. the status tinting on
+// bauen.html) pass a `decorate(cubeObject, view)` callback to
+// buildTreeGroup(); plain views just call buildTreeGroup(tree).
 import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 
 import {
     localPoseForRoot,
     localPoseForChild,
-} from "../../src/layout.js";
+} from "../layout.js";
 
-// page-relative: the html lives in /test/, the model in /test/assets/
-const CUBE_MODEL_URL = "./assets/cube_model_z.glb";
+// absolute URL: works from every html page under the vite root
+const CUBE_MODEL_URL = "/assets/cube_model_z.glb";
 const MODEL_SCALE = 25.0;
 
 // Z axis as the vertical axis
@@ -23,10 +27,20 @@ THREE.Object3D.DEFAULT_UP.set(0, 0, 1);
 
 //--------------------------------------------------------
 // Cube Model Loading
+//
+// Loading the GLB file is asynchronous (it is an HTTP request), so the
+// template is null until the load finishes. Every drawn cube is a CLONE
+// of this template. The promise is cached: no matter how many modules
+// call loadCubeTemplate(), the file is fetched exactly once per page.
 let cubeTemplate = null;
+let templatePromise = null;
 
 export function loadCubeTemplate() {
-    return new Promise((resolve, reject) => {
+    if (templatePromise !== null) {
+        return templatePromise;
+    }
+
+    templatePromise = new Promise((resolve, reject) => {
         const loader = new GLTFLoader();
 
         loader.load(
@@ -51,16 +65,49 @@ export function loadCubeTemplate() {
             (error) => reject(error)
         );
     });
+
+    return templatePromise;
+}
+
+export function isCubeTemplateLoaded() {
+    return cubeTemplate !== null;
+}
+
+//--------------------------------------------------------
+// node normalization
+/*
+ * Normalizes one node so the builder works with every tree format:
+ *   target tree JSON: cube_type, orientation, port, children
+ *   evaluated tree (server): node_id, status, error_mask, expected_*
+ * Ghost = empty target slot (attachable): no physical cube, so no own
+ * orientation -> the expected one is used.
+ * (?? is the "nullish coalescing" operator: use the right side only
+ * when the left side is null or undefined)
+ */
+function nodeView(node) {
+    const id = node.node_id ?? node.id ?? null;
+
+    return {
+        id: id,
+        isGhost: id === null,
+        status: node.status ?? "correct",
+        errorMask: node.error_mask ?? 0,
+        cubeType: node.cube_type ?? node.expected_type ?? 0,
+        orientation: node.orientation ?? node.expected_orientation ?? 0,
+        port: node.port,
+        children: node.children ?? [],
+    };
 }
 
 //represents one cube
-function createCubeObject(node) {
+function createCubeObject(view) {
     const cubeObject = new THREE.Group();
 
     if (cubeTemplate === null) {
         throw new Error("cube model is not loaded yet");
     }
 
+    // clone(true) = deep clone including all child meshes
     const visualModel = cubeTemplate.clone(true);
     visualModel.scale.setScalar(MODEL_SCALE);
     cubeObject.add(visualModel);
@@ -70,29 +117,45 @@ function createCubeObject(node) {
 
 //--------------------------------------------------------------
 //building functions
-function addCubeRecursive(node, parentObject, isRoot) {
-    const cubeObject = createCubeObject(node);
+//
+// walks the tree depth-first and mirrors it as nested three.js groups:
+// each cube object is added as a CHILD of its parent's object, so the
+// local poses from layout.js are automatically stacked up the chain
+function addCubeRecursive(node, parentObject, isRoot, decorate) {
+    const view = nodeView(node);
+
+    // blocked slots (and everything below them) are not buildable yet
+    // -> hidden (target trees have no status, so nothing is skipped there)
+    if (view.status === "blocked") {
+        return;
+    }
+
+    const cubeObject = createCubeObject(view);
+
+    if (decorate) {
+        decorate(cubeObject, view);
+    }
 
     const pose = isRoot
-        ? localPoseForRoot(node)
-        : localPoseForChild(node);
+        ? localPoseForRoot(view)
+        : localPoseForChild(view);
 
     cubeObject.position.copy(pose.position);
     cubeObject.quaternion.copy(pose.quaternion);
 
     parentObject.add(cubeObject);
 
-    for (const child of node.children ?? []) {
-        addCubeRecursive(child, cubeObject, false);
+    for (const child of view.children) {
+        addCubeRecursive(child, cubeObject, false, decorate);
     }
 }
 
-//recursive main function
-export function buildTreeGroup(rootNode) {
+//recursive main function; decorate is optional per-cube styling
+export function buildTreeGroup(rootNode, decorate = null) {
     const treeGroup = new THREE.Group();
     treeGroup.name = "targetTreeGroup";
 
-    addCubeRecursive(rootNode, treeGroup, true);
+    addCubeRecursive(rootNode, treeGroup, true, decorate);
 
     return treeGroup;
 }

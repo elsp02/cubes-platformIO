@@ -2,29 +2,20 @@
 // renders the evaluated tree with the exported GLB cube model.
 //
 // Position in the frontend:
-//   main.js calls initScene() once at startup, then redrawTree(tree)
-//   for every tree that ws_client.js receives. Poses come from
-//   layout.js; this file handles everything visual (camera, lights,
-//   model loading, status colors, nesting).
+//   bauen.js calls initScene() once at startup, then redrawTree(tree)
+//   for every tree that ws_client.js receives. The tree itself is built
+//   by the shared tree_builder.js (same code as thumbnails/preview);
+//   this file adds everything only the live view needs: camera, lights,
+//   ground, controls and the per-cube status colors.
 import * as THREE from "three";
-import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
+import { CUBE_SIZE } from "../layout.js";
 import {
-    localPoseForRoot,
-    localPoseForChild,
-    CUBE_SIZE
-} from "../layout.js";
-
-
-// ------------------------------------------------------------
-// Configuration
-// ------------------------------------------------------------
-
-const CUBE_MODEL_URL = "/assets/cube_model_z.glb";
-
-// Change this only if your exported cube model is not 1 x 1 x 1 units.
-const MODEL_SCALE = 25.0;
+    loadCubeTemplate,
+    isCubeTemplateLoaded,
+    buildTreeGroup,
+} from "./tree_builder.js";
 
 
 // ------------------------------------------------------------
@@ -37,7 +28,6 @@ let renderer;
 let controls;   // OrbitControls (mouse rotation/zoom)
 let cubeGroup;  // parent group of the whole cube construction
 
-let cubeTemplate = null;  // loaded GLB model, cloned per cube (see loadCubeModel)
 let latestTree = null;    // last received tree, kept for a redraw after the model loads
 
 // container element the scene renders into; null = legacy fullscreen
@@ -56,11 +46,6 @@ function viewSize() {
     }
     return { width: window.innerWidth, height: window.innerHeight };
 }
-
-
-// Use Z as the vertical axis, similar to your Meshcat / NumPy logic.
-// (three.js default is Y-up; this must match the math in layout.js)
-THREE.Object3D.DEFAULT_UP.set(0, 0, 1);
 
 
 //-----------------------------------------------------------
@@ -194,7 +179,16 @@ export function initScene(container = null){
     cubeGroup.name = "cubeGroup";
     scene.add(cubeGroup);
 
-    loadCubeModel();
+// shared GLB loading from tree_builder.js; if a tree arrived before the
+// model finished loading, draw it now
+    loadCubeTemplate()
+        .then(() => {
+            console.log("Cube model loaded.");
+            if (latestTree !== null) {
+                redrawTree(latestTree);
+            }
+        })
+        .catch((error) => console.error("Could not load cube model:", error));
 
 //keep renderer and camera in sync with the drawing size: the container
 //is watched directly (same pattern as tree_preview.js), fullscreen mode
@@ -236,79 +230,11 @@ function addGround() {
 
 
 // ------------------------------------------------------------
-// loads a template mesh for the cube
-//
-// Loading the GLB file is asynchronous (it is an HTTP request), so the
-// template is null until the callback below fires. Every drawn cube is
-// a CLONE of this template - the file is fetched exactly once.
+// status appearance (live view only - thumbnails/preview stay untinted)
 // ------------------------------------------------------------
-
-function loadCubeModel() {
-    const loader = new GLTFLoader();
-
-    loader.load(
-        CUBE_MODEL_URL,
-
-        // success callback, runs when the file has arrived
-        function (gltf)  {
-            //sets glb file as cubeTemplate model
-            cubeTemplate = gltf.scene;
-
-            // enable shadows on every mesh inside the model
-            // (traverse visits the model's whole object hierarchy)
-            cubeTemplate.traverse((object) => {
-                if (object.isMesh) {
-                    object.castShadow = true;
-                    object.receiveShadow = true;
-                }
-            });
-
-            console.log("Cube model loaded:", CUBE_MODEL_URL);
-
-            // If a tree arrived before the model finished loading, draw it now.
-            if (latestTree !== null) {
-                redrawTree(latestTree);
-            }
-        },
-        undefined,   // progress callback, not needed
-
-        // error callback
-        function (error) {
-            console.error("Could not load cube model:", error);
-        }
-    );
-}
-
-
-// ------------------------------------------------------------
-// evaluated-tree node view + status appearance
-// ------------------------------------------------------------
-
-/*
- * Normalizes one node so the renderer works with both formats:
- *   evaluated tree (new): node_id, status, error_mask, expected_orientation
- *   raw detection tree (old): id, no status
- * Ghost = empty target slot (attachable): no physical cube, so no own
- * orientation -> the expected one is used.
- * (?? is the "nullish coalescing" operator: use the right side only
- * when the left side is null or undefined)
- */
-function nodeView(node) {
-    const id = node.node_id ?? node.id ?? null;
-
-    return {
-        id: id,
-        isGhost: id === null,
-        status: node.status ?? "correct",
-        errorMask: node.error_mask ?? 0,
-        orientation: node.orientation ?? node.expected_orientation ?? 0,
-        port: node.port,
-        children: node.children ?? [],
-    };
-}
 
 // mirror of the physical LEDs plus ghost slots; "blocked" is not listed
-// because blocked slots are not rendered at all
+// because blocked slots are not rendered at all (tree_builder skips them)
 const STATUS_APPEARANCE = {
     correct:    { tint: 0x22bb44, tintStrength: 0.25, opacity: 1.0 },   // green
     wrong:      { tint: 0xcc2222, tintStrength: 0.5,  opacity: 1.0 },   // red
@@ -365,23 +291,10 @@ function applyStatusAppearance(visualModel, view) {
     });
 }
 
-
-// ------------------------------------------------------------
-// creates one cube instance
-// ------------------------------------------------------------
-
-function createCubeObject(view) {
-    /*
-     * This group represents one logical cube node.
-     *
-     * The GLB model is added as a visual child.
-     * Other cube nodes can then be added as children of this group.
-     */
-
-    const cubeObject = new THREE.Group();
-
-    // readable name + userData: not used for rendering, but they make
-    // debugging in the browser console much easier (scene.getObjectByName)
+// decorate hook for tree_builder: everything only the live view needs
+// per cube - a readable name + userData for debugging in the browser
+// console (scene.getObjectByName), and the status tint
+function decorateCube(cubeObject, view) {
     cubeObject.name = view.isGhost
         ? (view.port === null || view.port === undefined
             ? "slot_root"
@@ -393,26 +306,12 @@ function createCubeObject(view) {
     cubeObject.userData.status = view.status;
     cubeObject.userData.errorMask = view.errorMask;
 
-
-    if (cubeTemplate === null) {
-        throw new Error("Cube model is not loaded yet.");
-    }
-
-    //uses the template cube defined in loadCubeModel as the visual model
-    // clone(true) = deep clone including all child meshes
-    const visualModel = cubeTemplate.clone(true);
-    visualModel.scale.setScalar(MODEL_SCALE);
-
-    applyStatusAppearance(visualModel, view);
-
-    cubeObject.add(visualModel);
-
-    return cubeObject;
+    applyStatusAppearance(cubeObject, view);
 }
 
 
 // ------------------------------------------------------------
-// Nested tree rendering
+// Tree rendering
 // ------------------------------------------------------------
 
 // removes all cubes from the scene (used when the server connection is lost,
@@ -428,41 +327,13 @@ export function clearTree() {
 export function redrawTree(rootNode) {
     latestTree = rootNode; //von hier wird der evaluated tree zum visualisieren gelesen
 
-    if (cubeTemplate === null) {
-        // GLB still loading; loadCubeModel's callback redraws latestTree later
+    if (!isCubeTemplateLoaded()) {
+        // GLB still loading; the loadCubeTemplate().then() in initScene redraws latestTree later
         console.warn("Cube model not loaded yet. Tree will be drawn after loading.");
         return;
     }
 
     cubeGroup.clear();
 
-    addCubeRecursive(rootNode, cubeGroup, true);
-}
-
-
-// walks the tree depth-first and mirrors it as nested three.js groups:
-// each cube object is added as a CHILD of its parent's object, so the
-// local poses from layout.js are automatically stacked up the chain
-function addCubeRecursive(node, parentObject, isRoot) {
-    const view = nodeView(node);
-
-    // blocked slots (and everything below them) are not buildable yet -> hidden
-    if (view.status === "blocked") {
-        return;
-    }
-
-    const cubeObject = createCubeObject(view);
-
-    const pose = isRoot
-        ? localPoseForRoot(view)
-        : localPoseForChild(view);
-
-    cubeObject.position.copy(pose.position);
-    cubeObject.quaternion.copy(pose.quaternion);
-
-    parentObject.add(cubeObject); //this is where nesting and child parent relationship happens
-
-    for (const child of view.children) {
-        addCubeRecursive(child, cubeObject, false);
-    }
+    cubeGroup.add(buildTreeGroup(rootNode, decorateCube));
 }

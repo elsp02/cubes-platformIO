@@ -1,13 +1,4 @@
-# WebSocket server: the glue between baseplate, comparison and frontend.
-#
-# Position in the pipeline:
-#
-#   real baseplate (binary_serial_reader)
-#       --CubeNode tree--> compare against the session target
-#           --evaluated dict--> --JSON over websocket--> three.js frontend
-#   and back: compare result --feedback frame--> baseplate --> cube LEDs
-#
-# Session lifecycle (since the frontend picks the target tree itself):
+# WebSocket server: Interface between baseplate comparison and client/brwoser.
 #
 #   browser connects
 #       -> sends {"type": "start_session", "tree": ..., "level": ...}
@@ -16,9 +7,9 @@
 #   browser sends end_session OR disconnects (tab closed, reload, crash)
 #       -> serial worker stops, CMD_STOP goes to the baseplate
 #
-# Architecture: the serial reader blocks on the serial port, so it runs
-# in its own worker THREAD (one per session). The websocket part runs in
-# the asyncio event loop of the main thread. The two sides only meet at
+# worker thread: serial reader and cimmunication with baseplate(one per session) 
+# asyncio event loop: The websocket 
+# The two sides only meet at
 # the session's queue.
 #
 # (just for one client, no broadcasting)
@@ -39,7 +30,7 @@ from target_tree import TargetNode, target_node_from_json
 #--------------------------------
 # Configuration
 #--------------------------------
-SERIAL_PORT = 'COM4'  # Change this to your serial port
+SERIAL_PORT = 'COM4'
 BAUDRATE = 115200  # must match Serial.begin() in the baseplate firmware
 WEBSOCKET_HOST = 'localhost'
 WEBSOCKET_PORT = 8765

@@ -1,16 +1,11 @@
-"""Derives the two outputs from one compare result:
+"""Derives two outputs from one compare result:
 
 1. LED feedback frame (binary, PC -> baseplate -> cubes):
    SYNC | LEN | [NODE_ID, LED_STATE] x n | CHECKSUM
-   Contains only physically present cubes - a missing cube has no LED.
+    currently: green while correct, red while wrong - later: green only for newly attached cubes
 
 2. Evaluated tree (dict, PC -> websocket -> three.js frontend):
    the full merged view including attachable/blocked ghost slots.
-
-led_states is the persistent v1 mapping (green while correct, red
-while wrong). The transition version ("green only for newly attached
-cubes") will replace exactly this function later:
-derive_led_states(prev_result, curr_result).
 """
 from compare_core import CompareEntry, NodeStatus, iter_entries
 from framing import build_frame
@@ -19,9 +14,8 @@ from framing import build_frame
 LED_GREEN = 0x01
 LED_RED   = 0x02
 
-
+"""(node_id, led_state) for every physically present cube, DFS order."""
 def led_states(result: CompareEntry) -> list[tuple[int, int]]:
-    """(node_id, led_state) for every physically present cube, DFS order."""
     entries = []
 
     for entry in iter_entries(result):
@@ -35,9 +29,8 @@ def led_states(result: CompareEntry) -> list[tuple[int, int]]:
 
     return entries
 
-
+"""Complete feedback frame ready to send to the baseplate."""
 def build_feedback_frame(entries: list[tuple[int, int]]) -> bytes:
-    """Complete feedback frame ready to send to the baseplate."""
     payload = bytearray()
 
     for node_id, led_state in entries:
@@ -46,9 +39,8 @@ def build_feedback_frame(entries: list[tuple[int, int]]) -> bytes:
 
     return build_frame(bytes(payload))
 
-
+"""JSON-ready dict of the merged actual/target view for the frontend."""
 def build_evaluated_tree(result: CompareEntry) -> dict:
-    """JSON-ready dict of the merged actual/target view for the frontend."""
     return {
         "status": result.status.value,
         "error_mask": result.error_mask,
@@ -57,5 +49,6 @@ def build_evaluated_tree(result: CompareEntry) -> dict:
         "port": result.port, #real port
         "expected_type": result.expected_type,
         "expected_orientation": result.expected_orientation,
+        "expected_port": result.expected_port, #None for unexpected cubes
         "children": [build_evaluated_tree(child) for child in result.children],
     }

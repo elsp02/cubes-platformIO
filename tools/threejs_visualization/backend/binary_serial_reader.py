@@ -1,11 +1,6 @@
-"""Serial tree source: talks to the real baseplate over the UART link.
+"""Serial tree source: enables communication between reader/server and hardware (baseplate)
 
-Position in the pipeline:
-
-    baseplate firmware (uart_main_baseplate.cpp)
-        --serial--> THIS FILE --> CubeNode tree --> ws_server.py
-
-Implements the PC side of the building-sequence protocol:
+building-sequence protocol:
 
     PC -> baseplate : CMD_START ('S')   baseplate begins detection
     baseplate -> PC : payload frame  SYNC | LEN | PAYLOAD | CHECKSUM
@@ -18,12 +13,7 @@ Implements the PC side of the building-sequence protocol:
     PC -> baseplate : CMD_STOP ('X')    on shutdown; the baseplate then
                       relays an empty frame (all LEDs off) and idles
 
-The feedback frame itself is built by the caller: ws_server.py passes
-a `feedback_builder` callable (tree -> frame bytes), so this file
-stays free of any compare/target knowledge.
-
-The main entry point is iter_trees_from_binary_serial() at the bottom;
-ws_server.py runs it in a worker thread and consumes the yielded trees.
+connection to ws_server.py: iter_trees_from_binary_serial() -> ws_server.py runs it in a worker thread and consumes the yielded trees
 """
 import threading
 from typing import Callable, Optional
@@ -47,10 +37,9 @@ from framing import (
     Reads the rest of a data frame (LEN | PAYLOAD | CHECKSUM) after a
     valid SYNC byte has already been consumed by the caller.
 
-    Returns the payload bytes, or None if the frame was broken
-    (timeout in the middle of the frame, or checksum mismatch).
-    On any failure the input buffer is flushed so no half-frame bytes
-    are left behind to misalign the next read.
+    Returns the payload bytes, or None if the frame was broken (timeout in the middle of the frame, or checksum mismatch)
+
+    same structure as in hardware rx_frame
 """
 def rx_frame(ser:serial.Serial) ->Optional[bytes]:
 
@@ -68,8 +57,6 @@ def rx_frame(ser:serial.Serial) ->Optional[bytes]:
 
         received_checksum = ser.read(1)[0]
 
-        # recompute the checksum over LEN + payload and compare with the
-        # one the sender attached (same XOR algorithm as in wire_bus.cpp)
         calculated_checksum = calc_checksum(payload_len, payload)
 
         if received_checksum != calculated_checksum:
@@ -85,13 +72,9 @@ def rx_frame(ser:serial.Serial) ->Optional[bytes]:
 """
     Reads single bytes until a SYNC byte is found, or the read times out
     with nothing arriving at all (idle = normal, since the sender only
-    transmits on change).
+    transmits on change) -> Returns True if SYNC was found, False on idle timeout.
 
-    Returns True if SYNC was found, False on idle timeout.
-
-    This byte-by-byte scanning is what re-aligns the reader after a
-    broken frame: any leftover bytes are consumed and reported here
-    until the next real frame start (SYNC) comes along.
+    same structure as in hardware wait_for_valid_sync_cmd()
 """
 def wait_for_valid_sync_cmd(ser: serial.Serial, verbose: bool) -> bool:
 
@@ -112,10 +95,7 @@ def wait_for_valid_sync_cmd(ser: serial.Serial, verbose: bool) -> bool:
     Answers a payload frame: sends the complete feedback frame and
     checks the baseplate's status reply.
 
-    The firmware waits up to PC_REPLY_TIMEOUT_MS for this reply after
-    EVERY frame it sends (heartbeats included), so this must be called
-    for every valid frame - otherwise each frame stalls for 2 seconds.
-    A missing/failed status byte is only reported, never fatal.
+    The firmware waits up to PC_REPLY_TIMEOUT_MS for this reply after EVERY frame it sends (heartbeats included)
 """
 def send_feedback_frame(ser: serial.Serial, frame: bytes, verbose: bool) -> None:
 
@@ -157,12 +137,14 @@ def send_feedback_frame(ser: serial.Serial, frame: bytes, verbose: bool) -> None
     leave stray bytes behind to misalign the next read.
 """
 def iter_trees_from_binary_serial(
-    port: str,  # port defined as string, e.g. "COM3"
+    port: str, 
     baudrate: int = 115200,  # must match Serial.begin() in the firmware
     verbose: bool = True,   # False silences the idle/resync/heartbeat chatter
+
     # builds the feedback frame for a tree (None = nothing built);
     # supplied by ws_server so this file needs no compare/target imports
     feedback_builder: Optional[Callable[[Optional[CubeNode]], bytes]] = None,
+
     # set from another thread to end the session: the loop checks it once
     # per iteration, so the reader stops within ~1 s (the serial timeout)
     # even when the line is idle; the finally block then sends CMD_STOP
@@ -175,7 +157,7 @@ def iter_trees_from_binary_serial(
         # first frame we parse really belongs to this session
         ser.reset_input_buffer()
 
-        # the baseplate idles until it receives the start command
+        # send CMD Start: baseplate starts with its program
         ser.write(bytes([CMD_START]))
         print(f"Connected to {port} at {baudrate} baud, START sent.")
 
@@ -199,7 +181,7 @@ def iter_trees_from_binary_serial(
 
         try:
             while True:
-                # session ended (end_session or browser disconnect)?
+                # look for session ended info (end_session message or browser disconnect from client)?
                 if stop_event is not None and stop_event.is_set():
                     break
 
@@ -252,12 +234,6 @@ def iter_trees_from_binary_serial(
                         tree = parse_tree(payload)
 
                     except ValueError as error:
-                        # parse_tree raises ValueError when the payload does
-                        # not form a valid tree (truncated node header,
-                        # child_mask promising children that are missing,
-                        # leftover bytes). No tree = no feedback frame; send
-                        # nothing, the firmware's reply timeout covers this
-                        # rare case.
                         print(f"Parser error: {error}")
                         print(f"Payload: {payload.hex(' ')}")
                         ser.reset_input_buffer()
@@ -274,9 +250,7 @@ def iter_trees_from_binary_serial(
                 yield tree   # hand the tree to the consumer, pause here
 
         finally:
-            # on generator close or error: send the baseplate back to idle
-            # (best effort - if this never runs, the firmware survives via
-            # its reply timeout and the next START flushes stray state)
+            # on generator close or error: send CMD Stop: the baseplate back to idle
             try:
                 ser.write(bytes([CMD_STOP]))
             except serial.SerialException:
