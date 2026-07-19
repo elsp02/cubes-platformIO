@@ -97,6 +97,12 @@
     opacity:0
 }
 
+/* bauen.html starts invisible under the loader and is faded in by
+   hideLoader() in loader_bauen.js once the websocket is connected */
+#bauen{
+    opacity:0
+}
+
 .main-section{
     position: relative;
     height: fit-content;
