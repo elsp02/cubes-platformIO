@@ -11,6 +11,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
 import { loadCubeTemplate, buildTreeGroup, fitCameraToBox } from "./tree_builder.js";
+import { addSceneEnvironment, placeGroundUnderBox } from "./scene_environment.js";
 import { TARGET_TREES } from "../target-tree/index.js";
 
 // ------------------------------------------------------------
@@ -23,7 +24,6 @@ if (!container) {
 }
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color(0xfbfaf2);
 
 const camera = new THREE.PerspectiveCamera(60, 1, 0.1, 1000);
 camera.up.set(0, 0, 1);
@@ -49,26 +49,10 @@ ro.observe(container);
 
 
 // ------------------------------------------------------------
-// Lights + ground
+// Lights + ground (shared environment, same as thumbnail + live view)
 // ------------------------------------------------------------
 
-scene.add(new THREE.AmbientLight(0xffffff, 0.7));
-
-const topLight = new THREE.DirectionalLight(0xffffff, 1.2);
-topLight.position.set(4, -5, 8);
-topLight.castShadow = true;
-scene.add(topLight);
-
-const ground = new THREE.Mesh(
-    new THREE.PlaneGeometry(1000, 1000),
-    new THREE.MeshStandardMaterial({
-        color: 0x757575,
-        roughness: 0.8,
-        metalness: 0.0,
-    })
-);
-ground.receiveShadow = true;
-scene.add(ground);
+const { ground } = addSceneEnvironment(scene);
 
 
 // ------------------------------------------------------------
@@ -78,6 +62,8 @@ scene.add(ground);
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
 controls.enablePan = false;
+// Kamera nie unter die Bodenebene kippen lassen (Z-up: PI/2 = horizontal)
+controls.maxPolarAngle = Math.PI / 2;
 
 controls.touches = {
     ONE: THREE.TOUCH.ROTATE,
@@ -123,7 +109,7 @@ export async function showTargetTreePreview(treeId) {
     scene.add(currentTreeGroup);
 
     const box = new THREE.Box3().setFromObject(currentTreeGroup);
-    ground.position.z = box.min.z - 0.001;
+    placeGroundUnderBox(ground, box);
 
     fitCameraToBox(camera, box);
     controls.target.copy(box.getCenter(new THREE.Vector3()));

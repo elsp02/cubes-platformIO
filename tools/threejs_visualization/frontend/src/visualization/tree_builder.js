@@ -19,7 +19,7 @@ import {
 } from "../layout.js";
 
 // absolute URL: works from every html page under the vite root
-const CUBE_MODEL_URL = "/assets/cube_model_z.glb";
+const CUBE_MODEL_URL = "/assets/cube_model_z_v2.glb";
 const MODEL_SCALE = 25.0;
 
 // Z axis as the vertical axis
@@ -168,7 +168,7 @@ export function fitCameraToBox(camera, box) {
     const maxDim = Math.max(size.x, size.y, size.z);
     const fov = THREE.MathUtils.degToRad(camera.fov);
     let dist = (maxDim / 2) / Math.tan(fov / 2);
-    dist *= 2.5; // distance from the construction
+    dist *= 2; // distance from the construction
 
     const dir = new THREE.Vector3(0.3, -1, 0.2).normalize(); //front shot
     camera.position.copy(center).addScaledVector(dir, dist);

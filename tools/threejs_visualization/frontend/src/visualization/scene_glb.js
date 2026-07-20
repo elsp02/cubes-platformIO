@@ -18,12 +18,13 @@ import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
 import { OutlinePass } from "three/addons/postprocessing/OutlinePass.js";
 import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
 
-import { CUBE_SIZE } from "../layout.js";
 import {
     loadCubeTemplate,
     isCubeTemplateLoaded,
     buildTreeGroup,
+    fitCameraToBox,
 } from "./tree_builder.js";
+import { addSceneEnvironment, placeGroundUnderBox } from "./scene_environment.js";
 
 
 // ------------------------------------------------------------
@@ -35,6 +36,7 @@ let camera;
 let renderer;
 let controls;   // OrbitControls (mouse rotation/zoom)
 let cubeGroup;  // parent group of the whole cube construction
+let ground;     // shared shadow plane, repositioned under every drawn tree
 
 let composer;        // post-processing chain: render -> outlines -> output
 let outlineCorrect;  // green pulsing halo around correct cubes
@@ -46,6 +48,7 @@ let correctSelection = [];
 let wrongSelection = [];
 
 let latestTree = null;    // last received tree, kept for a redraw after the model loads
+let cameraFitted = false; // fitCameraToBox only on the FIRST tree, afterwards the user's OrbitControls position stays untouched
 
 // container element the scene renders into; null = legacy fullscreen
 // mode (renderer on <body>, sized to the window - used by index2.html)
@@ -150,23 +153,9 @@ function makeOutlinePass(size, appearance) {
     return pass;
 }
 
-// add light
-function addLights() {
-    //illuminates every surface equally from all directions, providing a flat base brightness
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.7); //color, intensity
-    scene.add(ambientLight);
-
-    //simulates rays from an infinitely distant source (like the sun)
-    // position = direction the rays come FROM; above and diagonally in
-    // front of the tower, so every visible face gets some light and the
-    // shadow falls behind the construction
-    const topLight = new THREE.DirectionalLight(0xffffff, 1.2);
-    topLight.position.set(4, -5, 8);
-    scene.add(topLight);
-    topLight.castShadow = true;
-}
-
 // add axes (x=red, y=green, z=blue) and a ground grid for orientation
+// (debug only - not called in the normal scene, so the live view looks
+// exactly like thumbnails and preview)
 function addHelpers() {
     const axes = new THREE.AxesHelper(2);
     scene.add(axes);
@@ -180,6 +169,8 @@ function addHelpers() {
 // touchscreen: One finger usually rotates, two fingers zoom/pan.
 function addControls(){
     controls = new OrbitControls(camera, renderer.domElement);
+    // Kamera nie unter die Bodenebene kippen lassen (Z-up: PI/2 = horizontal)
+    controls.maxPolarAngle = Math.PI / 2;
     //target is point the camera orbits around
     controls.target.set(0,0,0);
     //update() applies the target and internal control state
@@ -221,19 +212,16 @@ export function initScene(container = null){
 //create a Threejs Scene
     scene = new THREE.Scene();
 
-    // explicit background matching the page color: the composer renders
-    // into a texture, where a transparent canvas is unreliable
-    scene.background = new THREE.Color(0xfbfaf2);
-
     addCamera();
     addRenderer();
     addControls();
     addComposer();
 
-//add helpers
-    addLights();
-    addHelpers();
-    addGround();
+// shared environment (background, lights, shadow ground) - identical
+// to tree_thumbnail.js and tree_preview.js. The composer renders into
+// a texture, so the explicit background color is also what keeps the
+// canvas from being unreliably transparent.
+    ({ ground } = addSceneEnvironment(scene));
 
 // cubeGroup = contains the complete cube construction
 // (redrawTree only ever clears/fills this group, never the whole scene,
@@ -265,32 +253,6 @@ export function initScene(container = null){
     animate();
 
 }
-
-// large white plane just below the cubes that receives their shadows
-function addGround() {
-    const groundSize = 1000;
-
-    const groundGeometry = new THREE.PlaneGeometry(
-        groundSize,
-        groundSize
-    );
-
-    const groundMaterial = new THREE.MeshStandardMaterial({
-        color: 0xffffff,
-        roughness: 0.8,   // mostly matte surface
-        metalness: 0.0,
-    });
-
-    const ground = new THREE.Mesh(groundGeometry, groundMaterial);
-
-    // top of the ground exactly at the bottom face of the root cube
-    ground.position.set(0, 0, -CUBE_SIZE / 2);
-
-    ground.receiveShadow = true;
-
-    scene.add(ground);
-}
-
 
 // ------------------------------------------------------------
 // status appearance (live view only - thumbnails/preview stay untinted)
@@ -388,6 +350,7 @@ function decorateCube(cubeObject, view) {
 // so the display never shows stale data)
 export function clearTree() {
     latestTree = null;
+    cameraFitted = false; // next tree starts a fresh session -> refit the camera
     cubeGroup.clear();
 
     correctSelection = [];
@@ -418,4 +381,18 @@ export function redrawTree(rootNode) {
 
     outlineCorrect.selectedObjects = correctSelection;
     outlineWrong.selectedObjects = wrongSelection;
+
+    // shadow plane exactly under the current construction (same helper
+    // as thumbnails/preview, so the ground behaves identically everywhere)
+    const box = new THREE.Box3().setFromObject(cubeGroup);
+    placeGroundUnderBox(ground, box);
+
+    // same camera framing as thumbnails/preview, but only once per
+    // session: later redraws must not fight the user's OrbitControls
+    if (!cameraFitted) {
+        fitCameraToBox(camera, box);
+        controls.target.copy(box.getCenter(new THREE.Vector3()));
+        controls.update();
+        cameraFitted = true;
+    }
 }

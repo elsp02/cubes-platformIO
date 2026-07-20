@@ -12,7 +12,7 @@ import * as THREE from "three";
 
 //cube geometry
 export const CUBE_SIZE = 1.0;
-export const GAP = 0.04; //each side
+export const GAP = 0.01; //each side
 export const PITCH = CUBE_SIZE + GAP; //dist from one cube center to next one
 
 

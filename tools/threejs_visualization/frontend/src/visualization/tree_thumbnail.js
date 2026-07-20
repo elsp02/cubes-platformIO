@@ -3,6 +3,7 @@
 import * as THREE from "three";
 
 import { loadCubeTemplate, buildTreeGroup, fitCameraToBox } from "./tree_builder.js";
+import { addSceneEnvironment, placeGroundUnderBox } from "./scene_environment.js";
 import { TARGET_TREES } from "../target-tree/index.js";
 
 //Resolution/ratio for the thumbnail snapshot to match the 3:4 ratio of the cards
@@ -20,17 +21,10 @@ function renderTreeToImage(treeDefinition) {
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-    //initialize scene
+    //initialize scene with the shared environment (background, lights,
+    //shadow ground), so the thumbnail looks exactly like preview + live view
     const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x757575);
-
-    // same light setup as scene_test.js, so the preview matches the look
-    scene.add(new THREE.AmbientLight(0xffffff, 0.7));
-
-    const topLight = new THREE.DirectionalLight(0xffffff, 1.2);
-    topLight.position.set(4, -5, 8);
-    topLight.castShadow = true;
-    scene.add(topLight);
+    const { ground } = addSceneEnvironment(scene);
 
     //add Tree construction
     const treeGroup = buildTreeGroup(treeDefinition);
@@ -38,17 +32,7 @@ function renderTreeToImage(treeDefinition) {
 
     // ground directly under the lowest cube, receives the shadows
     const box = new THREE.Box3().setFromObject(treeGroup);
-    const ground = new THREE.Mesh(
-        new THREE.PlaneGeometry(1000, 1000),
-        new THREE.MeshStandardMaterial({
-            color: 0x757575,
-            roughness: 0.0,
-            metalness: 0.0,
-        })
-    );
-    ground.receiveShadow = true;
-    ground.position.z = box.min.z - 0.001;
-    scene.add(ground);
+    placeGroundUnderBox(ground, box);
 
     // add camera - fit camera to box calculates the best position
     const camera = new THREE.PerspectiveCamera(

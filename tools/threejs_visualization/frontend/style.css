@@ -67,7 +67,7 @@
     .title-border{
         background-color: #5377FF;
         border: 2px solid #5377FF;
-        border-radius: 1rem;
+        border-radius: 0.8rem;
         padding: 0.4rem;
         margin-bottom: 1rem;
     }
