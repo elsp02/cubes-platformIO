@@ -38,7 +38,7 @@
 #define DATA_FRAME_TIME     (3 * (BYTE_US +INTER_FRAME_TIMEOUT_US) + (CUBES_AMOUNT+1) * (3 * (BYTE_US + INTER_FRAME_TIMEOUT_US))) // time for one child data frame transmission (when child has sent ack previously)
 
 //cubes_amount +1 since baseplate is with its current child polling principle also a cube, and + 5 for margin
-#define FRAME_TIMEOUT_US    (((CUBES_AMOUNT+6) * CHILD_COUNT * (((CHILD_RETRIES-1) * FAILED_ATTEMPT_US) + CMD_ACK_TIME + DATA_FRAME_TIME + TURNAROUND_US)) + 10* BAUD_US)      // allowed waiting time for receiving DATA_FRAME (start of SYNC) after child sent ACK, finished recursive polling and starts sending DATA_FRAME
+#define FRAME_TIMEOUT_US    (((CUBES_AMOUNT+6) * MAX_CHILD_COUNT * (((CHILD_RETRIES-1) * FAILED_ATTEMPT_US) + CMD_ACK_TIME + DATA_FRAME_TIME + TURNAROUND_US)) + 10* BAUD_US)      // allowed waiting time for receiving DATA_FRAME (start of SYNC) after child sent ACK, finished recursive polling and starts sending DATA_FRAME
 //frame timeout currently differs between baseplate and cubes since baseplate has just 1 child - needs to be the same for every component?
 
 #define INTER_FRAME_TIMEOUT_US (10 * BAUD_US)    // allowed waiting time for next byte in DATA_FRAME after SYNC when child already startet sending DATA_FRAME
@@ -100,7 +100,7 @@
 // relays the frame sequentially, one hop per cube. Factor 2 = safety margin for loop overhead and deaf windows (log flushing). (ca 88 ms. für 3 cubes)
 #define FEEDBACK_FINISHED_TIMEOUT_US (2 * CUBES_AMOUNT * FB_HOP_US)
 
-#define SERIAL_WRITING 0
+#define SERIAL_WRITING 1
 #define SERIAL_DEBUG   0
 #define SERIAL_DEBUG_END 0
 

@@ -11,7 +11,8 @@
 import { connectWebSocket, sendMessage } from "./ws_client.js";
 import { showLoader, hideLoader } from "./animation/loader_bauen.js";
 import { initScene, redrawTree, clearTree } from "./visualization/scene_glb.js";
-import { TARGET_TREES } from "./target-tree/index.js";
+import { TARGET_TREES, countBlocks } from "./target-tree/index.js";
+import { updateProgress } from "./progress_bar.js";
 
 const params = new URLSearchParams(window.location.search);
 const treeId = params.get("tree");
@@ -27,9 +28,18 @@ if (!targetEntry) {
 } else {
     initScene(document.getElementById("main-tree-canvas"));
 
-    connectWebSocket( //exported function from ws_client.js 
+    // total block count never changes during a session -> compute once
+    const totalBlocks = countBlocks(targetEntry.tree);
+
+    document.getElementById("zurück-button-dashboard").addEventListener("click", () => {
+    sendMessage({ type: "end_session" });
+    window.location.href = "index.html";
+    });
+
+    connectWebSocket( //exported function from ws_client.js
         (tree) => {
-            redrawTree(tree);
+            const { correctCount } = redrawTree(tree);
+            updateProgress(correctCount, totalBlocks);
         },
         () => {
             // connection lost: never show stale build state

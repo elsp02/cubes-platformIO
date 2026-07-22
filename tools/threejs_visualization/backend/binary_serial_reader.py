@@ -47,7 +47,6 @@ def rx_frame(ser:serial.Serial) ->Optional[bytes]:
         # port was opened); [0] converts the 1-byte bytes object to an int
         payload_len = ser.read(1)[0]
 
-
         payload= ser.read(payload_len)
         if len(payload) != payload_len:
             # read() returned fewer bytes than requested = timeout mid-frame

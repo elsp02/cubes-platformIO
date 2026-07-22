@@ -444,5 +444,5 @@ void loop()
         cycles_since_last_send = 0;
     }
 
-    delay(150); // pacing between detection cycles (same rhythm as the feedback2 firmware)
+    delay(550); // pacing between detection cycles (same rhythm as the feedback2 firmware)
 }

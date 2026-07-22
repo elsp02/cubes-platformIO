@@ -196,6 +196,10 @@
     content: url('img/kreuz_hover.png');
 }
 
+#zurück-button-dashboard:hover img{
+    content: url('img/kreuz_hover.png');
+}
+
 /*--------------------------------
 loader---------------------------*/
 #loader{
@@ -354,8 +358,20 @@ tree---------------------------------*/
 /*-----------------------------------------
 bauen------------------------------------*/
 #statusanzeige{
-    background-color: #807f7f;
-    width: 70%;
+    background-color: var(--background-color);
+    width: 90%;
+    height: 1rem;
+    align-self: center;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+#progress-bar-fill{
+    height: 100%;
+    width: 0%;
+    background-color: #117E2F; /* gleiches Grün wie der "correct"-Glow in scene_glb.js */
+    border-radius: 999px;
+    transition: width 0.35s ease;
 }
 
 #main-tree-window{

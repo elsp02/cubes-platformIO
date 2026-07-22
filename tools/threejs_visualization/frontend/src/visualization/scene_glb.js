@@ -78,14 +78,11 @@ function addCamera(){
     //create a new camera with positions and angles - fov, aspect, closest visible distance from camera, farest ...
     camera = new THREE.PerspectiveCamera(60, width/height, 0.1, 1000 );
 
-    //set how far the camera will be from the 3D model - should depend on the construction size, always all cubes in scene visible
-    camera.position.set(4, -6, 4);
-
-    //where the camera should look at
-    camera.lookAt(0,0,0);
-
     //z is vertikal -> camera also z as upward direction
     camera.up.set(0, 0, 1);
+
+    // position/near/far/lookAt are set by fitCameraToBox() once the first
+    // tree is drawn (see redrawTree) - same pattern as tree_preview.js
 }
 
 //add renderer
@@ -368,7 +365,7 @@ export function redrawTree(rootNode) {
     if (!isCubeTemplateLoaded()) {
         // GLB still loading; the loadCubeTemplate().then() in initScene redraws latestTree later
         console.warn("Cube model not loaded yet. Tree will be drawn after loading.");
-        return;
+        return { correctCount: 0 };
     }
 
     cubeGroup.clear();
@@ -387,12 +384,12 @@ export function redrawTree(rootNode) {
     const box = new THREE.Box3().setFromObject(cubeGroup);
     placeGroundUnderBox(ground, box);
 
-    // same camera framing as thumbnails/preview, but only once per
-    // session: later redraws must not fight the user's OrbitControls
     if (!cameraFitted) {
         fitCameraToBox(camera, box);
         controls.target.copy(box.getCenter(new THREE.Vector3()));
         controls.update();
         cameraFitted = true;
     }
+
+    return { correctCount: correctSelection.length };
 }

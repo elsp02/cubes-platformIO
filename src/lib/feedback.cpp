@@ -40,7 +40,7 @@ bool feedback_contains_own_id(const uint8_t *payload, uint8_t len)
 
 
 //predefined feedback payloads
-/*const  uint8_t predefined_feedback_payload[4][FB_MAX_PAYLOAD_LEN] = {
+const  uint8_t predefined_feedback_payload[4][FB_MAX_PAYLOAD_LEN] = {
     // Payload 0: only cube A green, B and C off
     { CUBE_A_ID, LED_GREEN },
 
@@ -64,5 +64,5 @@ const  uint8_t predefined_feedback_payload_len[] = {
     4,
     6,
     2,
-};*/
+};
 

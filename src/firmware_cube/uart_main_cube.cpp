@@ -50,10 +50,16 @@ static int upstream_count = sizeof(upstream) / sizeof(upstream[0]);
 
 static const wire_t child_0 = { &PORTB, PIN0_bm, 0 };  // PB0 — child port 0
 static const wire_t child_1 = { &PORTB, PIN1_bm, 1 };  // PB1 — child port 1
+static const wire_t child_2 = { &PORTC, PIN0_bm, 1 };  // PC0 — child port 1
+static const wire_t child_3 = { &PORTC, PIN1_bm, 1 };  // PC1 — child port 1
+static const wire_t child_4 = { &PORTC, PIN2_bm, 1 };  // PC2 — child port 1
 
 static const wire_t *children[CHILD_COUNT] = {
     &child_0,
-    &child_1
+    &child_1,
+    &child_2,
+    &child_3,
+    &child_4,
 };
 
 static bool last_child_present[CHILD_COUNT] = { false };
@@ -423,7 +429,7 @@ void setup()
 
 void loop()
 {
-    log_reset();
+    //log_reset();
     /*
      */
     static bool orientation_known = false;
