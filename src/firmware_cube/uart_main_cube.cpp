@@ -50,9 +50,9 @@ static int upstream_count = sizeof(upstream) / sizeof(upstream[0]);
 
 static const wire_t child_0 = { &PORTB, PIN0_bm, 0 };  // PB0 — child port 0
 static const wire_t child_1 = { &PORTB, PIN1_bm, 1 };  // PB1 — child port 1
-static const wire_t child_2 = { &PORTC, PIN0_bm, 1 };  // PC0 — child port 1
-static const wire_t child_3 = { &PORTC, PIN1_bm, 1 };  // PC1 — child port 1
-static const wire_t child_4 = { &PORTC, PIN2_bm, 1 };  // PC2 — child port 1
+static const wire_t child_2 = { &PORTC, PIN0_bm, 1 };  // PC0 — child port 2
+static const wire_t child_3 = { &PORTC, PIN1_bm, 1 };  // PC1 — child port 3
+static const wire_t child_4 = { &PORTC, PIN2_bm, 1 };  // PC2 — child port 4
 
 static const wire_t *children[CHILD_COUNT] = {
     &child_0,
