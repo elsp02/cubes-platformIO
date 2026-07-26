@@ -11,6 +11,8 @@
 
 //extern const uint8_t predefined_feedback_payload[FB_PAYLOAD_LEN];
 
+bool send_feedback_to_child(    const wire_t *w, const uint8_t *fb_payload, uint8_t fb_payload_len);
+
 bool feedback_contains_own_id(const uint8_t *payload, uint8_t len);
 //bool is_expected_feedback_payload(const uint8_t *payload, uint8_t len);
 

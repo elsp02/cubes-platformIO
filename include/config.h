@@ -63,7 +63,9 @@
 #define ACK_FINISHED        0x66
 #define ACK_FAILED          0x77
 
-// PC <-> baseplate UART link (independent of the wire-bus bytes above,
+//-----------------------------------------------------------
+// PC Communication
+//------------------------------------------------------------
 // ASCII on purpose so the link can be tested by hand in a serial monitor)
 #define PC_CMD_START        0x53 // 'S' PC -> baseplate: start detection
 #define PC_CMD_STOP         0x58 // 'X' PC -> baseplate: stop sequence (all LEDs off), back to idle
@@ -72,15 +74,6 @@
 
 #define PC_REPLY_TIMEOUT_MS      2000UL // how long the baseplate waits for the PC reply (first byte)
 #define PC_FRAME_BYTE_TIMEOUT_MS 100UL  // max gap between bytes inside the PC feedback frame
-
-#define LED_GREEN           0x01
-#define LED_RED             0x02
-
-// for predefined tree comparing and feedback sequence
-#define CUBE_A_ID  0x10
-#define CUBE_B_ID  0x11
-#define CUBE_C_ID  0x12
-
 
 //-----------------------------------------------------------
 // FEEDBACK SYSTEM
@@ -100,12 +93,17 @@
 // relays the frame sequentially, one hop per cube. Factor 2 = safety margin for loop overhead and deaf windows (log flushing). (ca 88 ms. für 3 cubes)
 #define FEEDBACK_FINISHED_TIMEOUT_US (2 * CUBES_AMOUNT * FB_HOP_US)
 
+#define GREEN_LED_PIN            PIN5_bm
+#define RED_LED_PIN              PIN4_bm
+
+// in feedback frame - which LED to turn on
+#define LED_GREEN           0x01
+#define LED_RED             0x02
+
+
 #define SERIAL_WRITING 1
 #define SERIAL_DEBUG   0
 #define SERIAL_DEBUG_END 0
-
-#define GREEN_LED_PIN            PIN5_bm
-#define RED_LED_PIN              PIN4_bm
 
 //for debugging feedback
 #define LOG_BUF_SIZE        192 // one ASCII character uses one byte -> because of appenln: letter + \r \n = letter+3 (im durchschnitt 2 zeichen pro text) :: 192/5 =
@@ -128,5 +126,39 @@
     #define SER_PRINTLN(x)
     #define SER_PRINTLN2(x, y)
 #endif
+
+//-------------------------------------------------------
+// Cube type definition and instance generation
+// NODE_ID: 
+// Bits 7..5 = Cube-Type (for tree comparison)
+// Bits 4..0 = Instance number
+//-------------------------------------------------------
+constexpr uint8_t TYPE_SHIFT   = 5;
+constexpr uint8_t INSTANCE_MASK = 0x1F;
+
+#if defined(CUBE_TYPE_NORMAL)
+    constexpr uint8_t CUBE_TYPE = 0x00
+
+#elif defined(CUBE_TYPE_SMASHED)
+    constexpr uint8_t CUBE_TYPE = 0x01
+
+#elif defined(CUBE_TYPE_PYRAMID)
+    constexpr uint8_t CUBE_TYPE = 0x02
+
+#else
+    #error "No cube variant selected"
+#endif
+
+// create NODE_ID - klappt das dann mit der baseplate???
+constexpr uint8_t NODE_ID =
+    static_cast<uint8_t>(
+        (CUBE_TYPE << TYPE_SHIFT) |
+        (CUBE_INSTANCE & INSTANCE_MASK)
+    );
+
+// for predefined tree comparing and feedback sequence
+#define CUBE_A_ID  0x10
+#define CUBE_B_ID  0x11
+#define CUBE_C_ID  0x12
 
 #endif // CONFIG_H

@@ -48,6 +48,7 @@ static const wire_t upstream[] = {
 //suggestion: replace UPSTREAM_COUNT with upstream_count to avoid hardcoding the count
 static int upstream_count = sizeof(upstream) / sizeof(upstream[0]);
 
+//brauche ich dank cube_hardware.cpp eigentlich nicht mehr
 static const wire_t child_0 = { &PORTB, PIN0_bm, 0 };  // PB0 — child port 0
 static const wire_t child_1 = { &PORTB, PIN1_bm, 1 };  // PB1 — child port 1
 static const wire_t child_2 = { &PORTC, PIN0_bm, 1 };  // PC0 — child port 2
@@ -276,66 +277,6 @@ static void handle_detection(const wire_t *active_upstream, uint8_t orientation_
     tx_frame(active_upstream, payload, payload_len);
 }
 
-//----------------------------------------------------------
-// Handle Feedback
-//----------------------------------------------------------
-//maybe to a new file becuase baseplate also uses this
-static bool send_feedback_to_child(
-    const wire_t *w,
-    const uint8_t *fb_payload,
-    uint8_t fb_payload_len
-){
-    uint8_t b = 0;
-
-    wire_release(w);
-    _delay_us(TURNAROUND_US);
-
-    // 1. Send feedback command == CMD_STATUS to child (detection sequence)
-    tx_byte(w, CMD_FEEDBACK);
-
-    wire_release(w);
-
-    // 3. wait for ACK_BUSY == same as in detection sequence
-    if (!rx_byte(w, &b, CHILD_TIMEOUT_US)) {
-        SER_PRINTLN("NFA");
-        return false;
-    }
-
-    if (b != ACK_BUSY) {
-        SER_PRINTLN("WFA");
-        return false;
-    }
-
-    // 3. Send feedback frame == nothing that could be compared to the identification sequence
-    _delay_us(TURNAROUND_US);
-    tx_frame(w, fb_payload, fb_payload_len);
-    wire_release(w);
-
-
-    // receive ack_finished valid/invalid == same as data frame from child (detection sequence)
-    // 3. Wait for child's recursive feedback completion
-    if (!rx_byte(w, &b, FEEDBACK_FINISHED_TIMEOUT_US)) {
-        SER_PRINTLN("NFF");   // no feedback finished
-        return false;
-    }
-
-    switch (b) {
-        case ACK_FINISHED:
-            SER_PRINTLN("CFF");
-            wire_release(w);
-            return true;
-
-        case ACK_FAILED:
-            SER_PRINTLN("FFF");
-            wire_release(w);
-            return false;
-
-        default:
-            SER_PRINTLN("WFF");
-            wire_release(w);
-            return false;
-    }
-}
 
 // handle feedback -> if CMD_FEEDBACK do feedback led sequence
 static void handle_feedback (const wire_t *active_upstream){
