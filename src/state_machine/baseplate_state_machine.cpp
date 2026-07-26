@@ -31,6 +31,8 @@
 #include "wire_bus.h"
 #include "serial_writing.h"
 #include "poll_child.h"
+#include "pc_communication.h"
+#include "feedback.h"
 
 #define HEARTBEAT_INTERVAL_CYCLE 50 // after 50 cycles payload is sent again even if it hasn´t changed
 static uint16_t cycles_since_last_send = 0;
@@ -355,6 +357,7 @@ void loop()
     for (uint8_t child = 0; child < CHILD_COUNT; child++) {
         last_child_present[child] = child_done[child] || child_acked[child];
     }
+//---------------------------------------------------
 
 // PAYLOAD BUILDING
     /*
