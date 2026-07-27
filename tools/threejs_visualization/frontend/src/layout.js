@@ -19,12 +19,21 @@ export const PITCH = CUBE_SIZE + GAP; //dist from one cube center to next one
 // maps every parent port index to direction in parent cubes local system - need to be changed
 // (a child on port N sits PITCH away from its parent, in this direction)
 export const PORT_DIRECTIONS = {
-    0: new THREE.Vector3(1.0, 0.0, 0.0),    // parent +X port / parent -x port
-    1: new THREE.Vector3(-1.0, 0.0, 0.0),   // parent -X port / parent -y port
-    2: new THREE.Vector3(0.0, 1.0, 0.0),    // parent +Y port / parent +z port
-    3: new THREE.Vector3(0.0, -1.0, 0.0),   // parent -Y port / parent x port 
-    4: new THREE.Vector3(0.0, 0.0, 1.0),    // parent +Z port / parent y port 
+    0: new THREE.Vector3(1.0, 0.0, 0.0),    //  parent -x port
+    1: new THREE.Vector3(-1.0, 0.0, 0.0),   //  parent -y port
+    2: new THREE.Vector3(0.0, 1.0, 0.0),    //  parent +z port
+    3: new THREE.Vector3(0.0, -1.0, 0.0),   //  parent x port 
+    4: new THREE.Vector3(0.0, 0.0, 1.0),    //  parent y port 
 };
+
+// Rotation that aligns the child cube's -Z side with the selected parent port.
+const ATTACHMENT_ROTATIONS = {
+    0: rotationY(Math.PI / 2.0),       // child -Z -> parent +X port
+    1: rotationY(-Math.PI / 2.0),      // child -Z -> parent -X port
+    2: rotationX(-Math.PI / 2.0),      // child -Z -> parent +Y port
+    3: rotationX(Math.PI / 2.0),       // child -Z -> parent -Y port
+    4: new THREE.Quaternion(),         // child -Z -> parent +Z port (identity: already aligned)
+}; //example: if child is connected to port 0 -> rotate +90 around Y axis
 
 
 // A cube's rotation is composed of TWO parts:
@@ -60,15 +69,6 @@ function rotationZ(angleRad) {
     );
 }
 
-
-// Rotation that aligns the child cube's -Z side with the selected parent port.
-const ATTACHMENT_ROTATIONS = {
-    0: rotationY(Math.PI / 2.0),       // child -Z -> parent +X port
-    1: rotationY(-Math.PI / 2.0),      // child -Z -> parent -X port
-    2: rotationX(-Math.PI / 2.0),      // child -Z -> parent +Y port
-    3: rotationX(Math.PI / 2.0),       // child -Z -> parent -Y port
-    4: new THREE.Quaternion(),         // child -Z -> parent +Z port (identity: already aligned)
-}; //example: if child is connected to port 0 -> rotate +90 around Y axis
 
 /*
 // Rotation that aligns the child cube's -Z side with the selected parent port.

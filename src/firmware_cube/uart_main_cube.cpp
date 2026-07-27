@@ -204,6 +204,11 @@ static void handle_detection(const wire_t *active_upstream, uint8_t orientation_
             )){
                 SER_PRINTLN("CV");
                 child_done[i] = true; //mark child as done -> no more polling of this child in next attempts
+
+                //special case. future improvement: define in cube_hardware
+                if(i == 1) { //out2, -y
+                    child_payload[i][1] = (child_payload[i][1] + 1u) % 4u; 
+                }
             } else {
                 if (acked) {
                     child_acked[i] = true; // present but frame failed -> full retry budget from now on
