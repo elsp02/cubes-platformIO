@@ -25,7 +25,7 @@ export const PORT_DIRECTIONS = {
     3: new THREE.Vector3(0.0, -1.0, 0.0),   //  parent x port 
     4: new THREE.Vector3(0.0, 0.0, 1.0),    //  parent y port 
 };
-
+/*
 // Rotation that aligns the child cube's -Z side with the selected parent port.
 const ATTACHMENT_ROTATIONS = {
     0: rotationY(Math.PI / 2.0),       // child -Z -> parent +X port
@@ -34,6 +34,16 @@ const ATTACHMENT_ROTATIONS = {
     3: rotationX(Math.PI / 2.0),       // child -Z -> parent -Y port
     4: new THREE.Quaternion(),         // child -Z -> parent +Z port (identity: already aligned)
 }; //example: if child is connected to port 0 -> rotate +90 around Y axis
+*/
+
+// Rotation that aligns the child cube's -Z side with the selected parent port.
+const ATTACHMENT_ROTATIONS = {
+    0: rotationY(-Math.PI / 2.0),       // child -Z -> parent -X port
+    1: rotationX(-Math.PI / 2.0),      // child -Z -> parent -Y port
+    2: new THREE.Quaternion(),         // child -Z -> parent +Z port (identity: already aligned)
+    3: rotationY(Math.PI / 2.0),       // child -Z -> parent -X port
+    4: rotationX(Math.PI/2.0)         // child -Z -> parent +Y port
+}; //example: if child is connected to port 0 -> rotate -90 around Y axis
 
 
 // A cube's rotation is composed of TWO parts:
@@ -68,18 +78,6 @@ function rotationZ(angleRad) {
         angleRad
     );
 }
-
-
-/*
-// Rotation that aligns the child cube's -Z side with the selected parent port.
-const ATTACHMENT_ROTATIONS = {
-    0: rotationY(-Math.PI / 2.0),       // child -Z -> parent -X port
-    1: rotationX(-Math.PI / 2.0),      // child -Z -> parent -Y port
-    2: new THREE.Quaternion(),         // child -Z -> parent +Z port (identity: already aligned)
-    3: rotationY(Math.PI / 2.0),       // child -Z -> parent -X port
-    4: rotationX(Math.PI/2.0)         // child -Z -> parent +Y port
-}; //example: if child is connected to port 0 -> rotate -90 around Y axis
-*/
 
 // converts detected orientation value into rotation matrix
 // values: 0=0°, 1=90°, 2=180°, 3=270° around Z axis
