@@ -16,47 +16,53 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import {
     localPoseForRoot,
     localPoseForChild,
+    nodeTypeFromId,
+    TYPE_CUBE,
+    TYPE_SMASHED,
+    //TYPE_WEDGE,
 } from "../layout.js";
 
-// absolute URL: works from every html page under the vite root
-const CUBE_MODEL_URL = "/assets/cube_model_z_v3.glb";
+// one GLB model per cube type; absolute URLs work from every html page
+// under the vite root. All models share the same conventions: 0.04
+// units edge length (MODEL_SCALE brings that to 1.0), origin 0.5 above
+// the -Z attachment face (see the origin convention note in layout.js).
+const CUBE_MODEL_URLS = {
+    [TYPE_CUBE]:    "/assets/cube_model_z_v3.glb",
+    [TYPE_SMASHED]: "/assets/cube_model_z_smashed.glb",
+    //[TYPE_WEDGE]:   "/assets/cube_model_z_pyramide.glb",
+};
 const MODEL_SCALE = 25.0;
 
 // Z axis as the vertical axis
 THREE.Object3D.DEFAULT_UP.set(0, 0, 1);
 
 //--------------------------------------------------------
+//--------------------------------------------------------
 // Cube Model Loading
 //
-// Loading the GLB file is asynchronous (it is an HTTP request), so the
-// template is null until the load finishes. Every drawn cube is a CLONE
-// of this template. The promise is cached: no matter how many modules
-// call loadCubeTemplate(), the file is fetched exactly once per page.
-let cubeTemplate = null;
+// Loading the GLB files is asynchronous (they are HTTP requests), so
+// the templates are missing until the load finishes. Every drawn cube
+// is a CLONE of its type's template. The promise is cached: no matter
+// how many modules call loadCubeTemplate(), each file is fetched
+// exactly once per page.
+const cubeTemplates = {};   // cube type -> loaded GLB scene
 let templatePromise = null;
 
-export function loadCubeTemplate() {
-    if (templatePromise !== null) {
-        return templatePromise;
-    }
-
-    templatePromise = new Promise((resolve, reject) => {
-        const loader = new GLTFLoader();
-
+function loadOneTemplate(loader, cubeType, url) {
+    return new Promise((resolve, reject) => {
         loader.load(
-            CUBE_MODEL_URL,
+            url,
 
             (gltf) => {
-                cubeTemplate = gltf.scene;
-
                 // enable shadows on every mesh inside the model
-                cubeTemplate.traverse((object) => {
+                gltf.scene.traverse((object) => {
                     if (object.isMesh) {
                         object.castShadow = true;
                         object.receiveShadow = true;
                     }
                 });
 
+                cubeTemplates[cubeType] = gltf.scene;
                 resolve();
             },
 
@@ -65,12 +71,29 @@ export function loadCubeTemplate() {
             (error) => reject(error)
         );
     });
+}
+
+export function loadCubeTemplate() {
+    if (templatePromise !== null) {
+        return templatePromise;
+    }
+
+    const loader = new GLTFLoader();
+
+    // load all type models in parallel; ready when every one arrived
+    templatePromise = Promise.all(
+        Object.entries(CUBE_MODEL_URLS).map(
+            ([cubeType, url]) => loadOneTemplate(loader, Number(cubeType), url)
+        )
+    );
 
     return templatePromise;
 }
 
 export function isCubeTemplateLoaded() {
-    return cubeTemplate !== null;
+    return Object.keys(CUBE_MODEL_URLS).every(
+        (cubeType) => cubeTemplates[cubeType] !== undefined
+    );
 }
 
 //--------------------------------------------------------
@@ -92,36 +115,51 @@ function nodeView(node) {
         isGhost: id === null,
         status: node.status ?? "correct",
         errorMask: node.error_mask ?? 0,
-        cubeType: node.cube_type ?? node.expected_type ?? 0,
+        // physically present cubes carry their type in the upper 3 bits
+        // of the NODE_ID; target/ghost nodes state it explicitly
+        cubeType: id !== null
+            ? nodeTypeFromId(id)
+            : (node.cube_type ?? node.expected_type ?? TYPE_CUBE),
         orientation: node.orientation ?? node.expected_orientation ?? 0,
         port: node.port,
         children: node.children ?? [],
     };
 }
 
-//represents one cube
+//represents one cube; the model is picked by the node's cube type
 function createCubeObject(view) {
     const cubeObject = new THREE.Group();
 
-    if (cubeTemplate === null) {
-        throw new Error("cube model is not loaded yet");
+    let template = cubeTemplates[view.cubeType];
+
+    if (template === undefined) {
+        // unknown type (e.g. corrupt node id): draw SOMETHING instead
+        // of crashing the whole redraw, but make it visible in the console
+        console.warn(`No model for cube type ${view.cubeType}, falling back to the normal cube.`);
+        template = cubeTemplates[TYPE_CUBE];
+    }
+
+    if (template === undefined) {
+        throw new Error("cube models are not loaded yet");
     }
 
     // clone(true) = deep clone including all child meshes
-    const visualModel = cubeTemplate.clone(true);
+    const visualModel = template.clone(true);
     visualModel.scale.setScalar(MODEL_SCALE);
     cubeObject.add(visualModel);
 
     return cubeObject;
 }
-
 //--------------------------------------------------------------
 //building functions
 //
 // walks the tree depth-first and mirrors it as nested three.js groups:
 // each cube object is added as a CHILD of its parent's object, so the
 // local poses from layout.js are automatically stacked up the chain
-function addCubeRecursive(node, parentObject, isRoot, decorate) {
+// parentType = cube type of the direct parent; it decides which port
+// geometry table in layout.js applies to this child (port numbers are
+// type-relative). The root has no parent, so parentType is null there.
+function addCubeRecursive(node, parentObject, isRoot, decorate, parentType) {
     const view = nodeView(node);
 
     // blocked slots (and everything below them) are not buildable yet
@@ -139,6 +177,7 @@ function addCubeRecursive(node, parentObject, isRoot, decorate) {
     const pose = isRoot
         ? localPoseForRoot(view)
         : localPoseForChild(view);
+        : localPoseForChild(view, parentType);
 
     cubeObject.position.copy(pose.position);
     cubeObject.quaternion.copy(pose.quaternion);
@@ -146,7 +185,7 @@ function addCubeRecursive(node, parentObject, isRoot, decorate) {
     parentObject.add(cubeObject);
 
     for (const child of view.children) {
-        addCubeRecursive(child, cubeObject, false, decorate);
+        addCubeRecursive(child, cubeObject, false, decorate, view.cubeType);
     }
 }
 
@@ -155,7 +194,7 @@ export function buildTreeGroup(rootNode, decorate = null) {
     const treeGroup = new THREE.Group();
     treeGroup.name = "targetTreeGroup";
 
-    addCubeRecursive(rootNode, treeGroup, true, decorate);
+    addCubeRecursive(rootNode, treeGroup, true, decorate, null);
 
     return treeGroup;
 }
