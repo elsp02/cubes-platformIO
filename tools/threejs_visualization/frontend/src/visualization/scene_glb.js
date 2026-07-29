@@ -318,6 +318,7 @@ function decorateCube(cubeObject, view) {
             : `slot_port_${view.port}`)
         : `cube_${view.id.toString(16).toUpperCase()}`;
     cubeObject.userData.cubeId = view.id;
+    cubeObject.userData.cubeType = view.cubeType;
     cubeObject.userData.orientation = view.orientation;
     cubeObject.userData.port = view.port;
     cubeObject.userData.status = view.status;
