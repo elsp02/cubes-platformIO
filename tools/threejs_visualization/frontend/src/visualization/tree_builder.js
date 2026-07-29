@@ -176,7 +176,6 @@ function addCubeRecursive(node, parentObject, isRoot, decorate, parentType) {
 
     const pose = isRoot
         ? localPoseForRoot(view)
-        : localPoseForChild(view);
         : localPoseForChild(view, parentType);
 
     cubeObject.position.copy(pose.position);

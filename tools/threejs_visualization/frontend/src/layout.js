@@ -242,7 +242,7 @@ export function localPoseForChild(childNode,parentType) {
         throw new Error(`Child cube ${childNode.id} has no port value.`);
     }
 
-    const const geometry = portGeometry(parentType, childNode.port);
+    const geometry = portGeometry(parentType, childNode.port);
 
 
     // .clone() so the shared PORT_GEOMETRY vector is not modified
