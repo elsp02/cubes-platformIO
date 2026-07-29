@@ -7,9 +7,9 @@ same port number can mean a different face on a different cube type.
 Target trees must use these per-type port numbers; the geometry lives
 in frontend/src/layout.js (PORT_GEOMETRY) - keep the two in sync:
 
-  type 0 = cube    (IDs 0x00-0x1F): 0=+X, 1=-X, 2=+Y, 3=-Y, 4=+Z
+  type 0 = cube    (IDs 0x00-0x1F): 0=-X, 1=-Z, 2=+Z, 3=X, 4=Y
   type 1 = smashed (IDs 0x20-0x3F): 0=+Z (only usable face)
-  type 2 = wedge   (IDs 0x40-0x5F): 0=+X (square face), 1=45deg slope
+  //type 2 = wedge   (IDs 0x40-0x5F): 0=+X (square face), 1=45deg slope -> currently not in use
 """
 from dataclasses import dataclass, field
 
