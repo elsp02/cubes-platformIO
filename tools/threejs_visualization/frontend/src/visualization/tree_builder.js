@@ -19,7 +19,7 @@ import {
 } from "../layout.js";
 
 // absolute URL: works from every html page under the vite root
-const CUBE_MODEL_URL = "/assets/cube_model_z_v2.glb";
+const CUBE_MODEL_URL = "/assets/cube_model_z_v3.glb";
 const MODEL_SCALE = 25.0;
 
 // Z axis as the vertical axis

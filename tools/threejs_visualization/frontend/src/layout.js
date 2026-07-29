@@ -19,11 +19,11 @@ export const PITCH = CUBE_SIZE + GAP; //dist from one cube center to next one
 // maps every parent port index to direction in parent cubes local system - need to be changed
 // (a child on port N sits PITCH away from its parent, in this direction)
 export const PORT_DIRECTIONS = {
-    0: new THREE.Vector3(1.0, 0.0, 0.0),    //  parent -x port
-    1: new THREE.Vector3(-1.0, 0.0, 0.0),   //  parent -y port
-    2: new THREE.Vector3(0.0, 1.0, 0.0),    //  parent +z port
-    3: new THREE.Vector3(0.0, -1.0, 0.0),   //  parent x port 
-    4: new THREE.Vector3(0.0, 0.0, 1.0),    //  parent y port 
+    0: new THREE.Vector3(-1.0, 0.0, 0.0),    //  parent -x port
+    1: new THREE.Vector3(0.0,-1.0, 0.0),   //  parent -y port
+    2: new THREE.Vector3(0.0, 0.0, 1.0),    //  parent +z port
+    3: new THREE.Vector3(1.0, 0.0, 0.0),   //  parent x port 
+    4: new THREE.Vector3(0.0, 1.0, 0.0),    //  parent y port 
 };
 /*
 // Rotation that aligns the child cube's -Z side with the selected parent port.
@@ -78,7 +78,7 @@ function rotationZ(angleRad) {
         angleRad
     );
 }
-
+/*
 // converts detected orientation value into rotation matrix
 // values: 0=0°, 1=90°, 2=180°, 3=270° around Z axis
 export function orientationToTwist(orientation) {
@@ -87,6 +87,28 @@ export function orientationToTwist(orientation) {
     // silent >360° rotation instead of an obviously wrong pose
     const normalizedOrientation = orientation % 4;
     return rotationZ(normalizedOrientation * Math.PI / 2.0);
+}
+
+// converts detected orientation value into rotation matrix
+// values: 0=90°, 1=180°, 2=270°, 3=0° around Z axis
+export function orientationToTwist(orientation) {
+    const normalizedOrientation = orientation % 4;
+
+    return rotationZ(
+        ((normalizedOrientation + 1) % 4) * Math.PI / 2.0
+    );
+}*/
+
+// converts detected orientation value into rotation matrix
+// values: 0=90°, 1=0°, 2=-90°, 3=-180° around Z axis
+export function orientationToTwist(orientation) {
+    const normalizedOrientation =
+        ((orientation % 4) + 4) % 4;
+
+    const angle =
+        (1 - normalizedOrientation) * Math.PI / 2.0;
+
+    return rotationZ(angle);
 }
 
 //calculates complete rotation of child cube: attachment rotation combined with twist rotation
