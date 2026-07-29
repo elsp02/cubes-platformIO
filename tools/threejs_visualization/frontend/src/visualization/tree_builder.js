@@ -28,7 +28,7 @@ import {
 // the -Z attachment face (see the origin convention note in layout.js).
 const CUBE_MODEL_URLS = {
     [TYPE_CUBE]:    "/assets/cube_model_z_v3.glb",
-    [TYPE_SMASHED]: "/assets/cube_model_z_smashed.glb",
+    [TYPE_SMASHED]: "/assets/cube_model_z_v3_smashed.glb",
     //[TYPE_WEDGE]:   "/assets/cube_model_z_pyramide.glb",
 };
 const MODEL_SCALE = 25.0;
