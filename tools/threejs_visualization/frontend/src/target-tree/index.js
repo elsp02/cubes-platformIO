@@ -5,6 +5,9 @@ import tree2 from "./tree2.json";
 import tree3 from "./tree3.json";
 import tree4 from "./tree4.json";
 import tree5 from "./tree5.json";
+import tree6 from "./tree6.json";
+import tree7 from "./tree7.json";
+
 
 
 export const TARGET_TREES = [
@@ -13,6 +16,9 @@ export const TARGET_TREES = [
     { id: "tree3", name: "Baum 3", tree: tree3 },
     { id: "tree4", name: "Baum 4", tree: tree4 },
     { id: "tree5", name: "Baum 5", tree: tree5 },
+    { id: "tree6", name: "Baum 6", tree: tree6 },
+    { id: "tree7", name: "Baum 7", tree: tree7 },
+
 
 ];
 
