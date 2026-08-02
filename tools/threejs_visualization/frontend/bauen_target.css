@@ -1,0 +1,60 @@
+:root {
+    font-family: "Inter", Arial, sans-serif;
+    background: #b9b9b9;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+html,
+body,
+#bauen-target,
+#target-tree-canvas {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+}
+
+html,
+body {
+    overflow: hidden;
+}
+
+#bauen-target,
+#target-tree-canvas {
+    position: fixed;
+    inset: 0;
+}
+
+#target-tree-canvas canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+#zurueck-button-target {
+    position: fixed;
+    top: calc(env(safe-area-inset-top) + 1.25rem);
+    right: calc(env(safe-area-inset-right) + 1.25rem);
+    z-index: 2;
+    display: block;
+    width: clamp(32px, 4vw, 40px);
+}
+
+#zurueck-button-target img {
+    display: block;
+    width: 100%;
+    height: auto;
+    transition: all 0.3s ease;
+}
+
+#zurueck-button-target:hover img {
+    content: url("img/kreuz_hover.png");
+}
+
+#zurueck-button-target:focus-visible {
+    border-radius: 0.25rem;
+    outline: 3px solid #5377ff;
+    outline-offset: 4px;
+}

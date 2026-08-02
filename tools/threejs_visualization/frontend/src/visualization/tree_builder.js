@@ -206,7 +206,7 @@ export function fitCameraToBox(camera, box) {
     const maxDim = Math.max(size.x, size.y, size.z);
     const fov = THREE.MathUtils.degToRad(camera.fov);
     let dist = (maxDim / 2) / Math.tan(fov / 2);
-    dist *= 2; // distance from the construction
+    dist *= 3; // distance from the construction
 
     const dir = new THREE.Vector3(0.3, -1, 0.2).normalize(); //front shot
     camera.position.copy(center).addScaledVector(dir, dist);

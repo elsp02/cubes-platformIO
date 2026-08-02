@@ -123,7 +123,8 @@ levelContainer.addEventListener("click", (event) => {
     selectedLevel = level.id.replace("level-", "");
 });
 
-// OK -> navigate to the live page for the chosen tree + level
+// OK -> navigate to the fullscreen target-tree page.
+// bauen.html remains available as the live evaluated-tree alternative.
 okButton.addEventListener("click", () => {
     if (selectedTreeId === null || selectedLevel === null) {
         console.warn("Pick a level before continuing.");
@@ -131,7 +132,7 @@ okButton.addEventListener("click", () => {
     }
 
     const params = new URLSearchParams({ tree: selectedTreeId, level: selectedLevel });
-    window.location.href = `bauen.html?${params}`;
+    window.location.href = `bauen_target.html?${params}`;
 });
 
 // zurück -> close the window, let the user pick another card
