@@ -1,9 +1,10 @@
 #set page(numbering: "1")
 #set par(justify: true)
 
-EINLEITUNG
+= TUI
 
-== From graphical to tangible user interfaces
+
+== graphical vs tangible user interface
 A user interface can be defined as the point of contact through which people communicate and interact with a technical system. The widely utilised form is the graphical user interface (GUI), in which digital information is visually represented on a screen and manipulated through input devices such as a mouse, keyboard, or touchscreen. (quelle)
 
 Shaer and Hornecker (2019) contrast this mode of interaction with people’s everyday experience of the physical environment: (pookkottuvariam)
@@ -14,7 +15,7 @@ The quotation highlights the separation between traditional computer interaction
 
 The concept of Ishii and Ullmer’s Tangible Bits responds to this separation by coupling digital information with everyday physical and graspable objects and the surrounding environment. Its central aim is to bridge the divide between the digital domain of bits and the physical world of atoms, thereby making digital information directly accessible through physical manipulation (vgl. Ishii & Ullmer, [year], p. [X]). Tangible Bits consequently provided an important conceptual foundation for the development of Tangible User Interfaces (TUIs) (Tangible Bits).
 
-=== Tangible User Interfaces
+=== (Tangible User Interfaces) - vlt weglassen
 Different to a GUI, in a TUI, the computer becomes a natural extension of the physical environment. Interaction does not occur exclusively through graphical elements on a screen; instead, users manipulate real world objects, reffered to physical icons or phicons in order to interact with the digital system. These phicons do not merely serve as input devices but they also fulfil a representational function. (Pookkottuvariam).
 
 The fundamental principle of a TUI is predicated on two closely related characteristics (token and constraints)
@@ -22,20 +23,17 @@ The fundamental principle of a TUI is predicated on two closely related characte
 + Physical objects (phicons) are used as representations of digital information and computational operations.
 + The physical manipulation of these objects is used to interact with the associated computational operations.
 
-Unlike a GUI, in which representation and input are commonly distributed between the screen and a separate input device, a TUI partially unites representation of digital content and control for interacting with that content within the same physical artifact.
-This integration enables TUIs to provide a suitable technological basis for the constructivist and constructionist learning approaches discussed in Section X. They enable learners to explore relationships through active manipulation and to externalise their ideas by constructing tangible, directly modifiable artefacts. (vlt eher in kapitelfazit??)
-
 Because different types of information or functions can be represented by separate physical elements, multiple phicons may remain available for simultaneous manipulation. They may also be operated in parallel or with both hands. This principle, known as _space multiplexing_, can improve interaction efficiency and facilitate collaborative use by groups, which is typically more restricted in conventional GUI-based interaction.
 
-== MVC and MCRpd Model (emerging frameworks)
+=== MVC and MCRpd Model (emerging frameworks)
 vlt auch unterkategire von "From Graphical to Tangible User Interfaces" kapitel
 
 The difference between these styles of user interfaces becomes more obvious when comparing their undelying interaction models shown in the figure @MVC_MCRpd_Model.
 
-=== MVC - model for GUI (emerging frameworks)
+==== MVC - model for GUI (emerging frameworks)
 Within the Model–View–Controller (MVC) architecture, an interactive software system is divided into three functional components: The _model_ represents the underlying data and the current state of the system, the _view_ presents this information graphically, while the _control_ processes user input and translates it into changes to the model. Therefore, in the interaction model of GUIs, there is a clear separation between the control devices, such as the mouse and keyboard and the digital representation displayed on the screen.
 
-=== MCRpd model for TUI
+==== MCRpd model for TUI
 The interaction model for TUIs retains the MVC _model_ and _control_ components but replaces the exclusively graphical _view_ with both a physical representation (_rep-p_) and a digital representation (_rep-d_). It thereby accounts for the fact that, in a TUI, digital information is not represented solely on a screen but is also given a tangible physical form. The ?structure? of the physical components can be characterised by three central properties:
 
 + The physical representation is coupled with digital information
@@ -51,11 +49,19 @@ The distinctive characteristic of a TUI therefore lies in the close coupling bet
   caption: [a) interaction model of GUI: MVC model; b) interaction Model of TUI: MCRpd model],
 ) <MVC_MCRpd_Model>
 
+=== Conclusion - hier oder ganz am ende?
+Unlike a GUI, in which representation and input are commonly distributed between the screen and a separate input device, a TUI partially unites representation of digital content and control for interacting with that content within the same physical artifact.
+This integration enables TUIs to provide a suitable technological basis for the constructivist and constructionist learning approaches discussed in Section X. They enable learners to explore relationships through active manipulation and to externalise their ideas by constructing tangible, directly modifiable artefacts.
+
+
 == Coupling objects with digital information (emerging framework)
+?? in diesem kapitel überschriten ändern bzw schauen wie man inhalt logisch gliedert
+
 But how does digital information become linked to physical objects? And what format can this link be presented? Ullmer and Ishii answer these questions by providing an overview of the various types of digital bindings,coupling methods and approaches to physical representation (see Ullmer & Ishii 2001, pp. 7–9).
 
 === Types of digital Bindings
 Physical objects can be associated with different types of digital information. These include static media, such as images and three-dimensional models; dynamic content, such as video streams or computationally generated graphics; and digital attributes, including colours or material properties. Physical objects may also represent computational operations or data structures such as lists and trees and can also be linked to remote devices, locations, or people (cf. Ullmer & Ishii, 2001, pp. 7–8).
+BEISPIEL!!
 
 Within a TUI, a physical object does not necessarily correspond to a single digital file but can have different digital meanings. For example, it can represent individual pieces of content or a collection of media, or it can trigger a function or control another technical device. What matters most to users is the meaning of the object and the possible actions associated with it, rather than how the underlying data is processed.
 
@@ -73,7 +79,7 @@ _Static bindings_ therefore provide a stable and often more easily understandabl
 === Approaches to physical representation
 Not only the temporal precision of coupling influences how clearly its digital meaning and potential interactions can be understood but also the appearance of it. There are four approaches to choose from:
 
-Beispiele für jedes einfügen??
+Beispiele für jedes einfügen- JAAA
 
 The _found objects_ approach involves taking everyday objects and augmenting them with technology before placing them within a new digital context. This gives a familiar object an additional representational or control function.
 
@@ -83,9 +89,7 @@ In contrast to this is the _design-driven_ approach, where aesthetic qualities a
 
 The last approach is based on established _work practices_. Here, the design draws on existing physical artefacts from specific professional or application contexts, building upon familiar procedures, conventions and meanings.
 
-=== (technical realisation)
-
-KAPITELFAZIT
+=== Conclusion
 
 The coupling between physical objects and digital information can differ in content, flexibility, and physical representation. Selecting an appropriate approach therefore requires a careful consideration of the intended users and their abilities, as well as the specific application context. Regardless of the chosen approach, an effective TUI requires a clear and immediately perceptible relationship between the physical object and the associated digital meaning. The design of this coupling therefore directly influences the system’s comprehensibility, usability, and flexibility.
 
@@ -106,7 +110,7 @@ The _Manipulate_ phase starts once the phicon has been physically engaged with t
 
 === Interaction Qualities
 Physical constraints influence not only the digital interpretation of an action but also its haptic and perceptual qualities:
-Mechanical constraints are known to generate immediate haptic feedback and can physically guide the movement of the user's hand. This makes it possible to perform certain actions without continuously directing visual attention towards a graphical display like with a GUI. Furthermore, the physical syntax renders some of the available interaction possibilities directly perceivable. In this context, syntax refers to the rules according to which individual phicons can be combined to form an input that can be meaningfully interpreted by the system. The configuration and mechanical configuration of the constraints function as a physical grammar by directly indicating which actions are possible and which are prevented. This supports the creation of physical configurations that are interpretable both by the user and by the underlying computational system. By reducing the range of possible manipulations, invalid states can be avoided and the available courses of action can be made easier to understand.
+Mechanical (sind alle physical constraints mechanical constraints??) constraints are known to generate immediate haptic feedback and can physically guide the movement of the user's hand. This makes it possible to perform certain actions without continuously directing visual attention towards a graphical display like with a GUI. Furthermore, the physical syntax renders some of the available interaction possibilities directly perceivable. In this context, syntax refers to the rules according to which individual phicons can be combined to form an input that can be meaningfully interpreted by the system. The configuration and mechanical configuration of the constraints function as a physical grammar by directly indicating which actions are possible and which are prevented. This supports the creation of physical configurations that are interpretable both by the user and by the underlying computational system. By reducing the range of possible manipulations, invalid states can be avoided and the available courses of action can be made easier to understand.
 
 === Styles of mapping
 ÜBERLEITUNG

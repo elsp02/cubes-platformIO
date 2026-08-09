@@ -24,13 +24,13 @@ The mathematician and psychologist Seymour Papert extends the constructivist app
 
 The constructed artefact fulfils several functions: On the one hand, it makes abstract theoretical considerations concrete, tangible, and, in the literal sense, comprehensible. Relationships that may be difficult to understand when represented solely through language or graphics can become visible through the spatial arrangement of a physical model. On the other hand, modifying the model enables learners to test different assumptions and directly observe their effects. Austausch??
 
-?But that is not enough?? Papert goes beyond the physical act of construction by emphasising the importance of personal meaning. Following the principle that “love is a better master than duty” (von einstein, Papert, p. 1), he argues that learning is enhanced when children create something that is personally meaningful to them.
+Papert even goes beyond the physical act of construction by emphasising the importance of personal meaning. Following the principle that “love is a better master than duty” (von einstein, Papert, p. 1), he argues that learning is enhanced when children create something that is personally meaningful to them.
 
-??WIE SOLL ICH KAPITELFAZITE ERKENNTLICH MACHEN- DOPPELABSATZ??
+== Comparison/Conclusion/Summary
 
 Within the context of constructivism and constructionism, success is as important as failure and the occurrence of errors. Learning does not result merely from carrying out an activity. Instead, it develops through cognitive engagement with the constructed object and with the problems encountered during the construction process. Such difficulties create an opportunity for learners to review their planning and procedures and to reflect consciously on how the situation can be resolved and how their actions might be coordinated more effectively in future attempts (Vollmers, p. 79).
 
-This conception of learning consequently also brings about a transformation in the role of the teacher. Rather than being responsible for transmitting knowledge in its entirety, the teacher is expected to create appropriate learning opportunities, prepare didactically structured tasks, and support learners when difficulties arise without anticipating or prescribing the complete solution.
+This conception of learning consequently also brings about a transformation in the role of the teacher ?compared to instuvtivism?. Rather than being responsible for transmitting knowledge in its entirety, the teacher is expected to create appropriate learning opportunities, prepare didactically structured tasks, and support learners when difficulties arise without anticipating or prescribing the complete solution.
 
 However, the theoretical perspectives are not necessarily mutually exclusive in practical educational settings. Instructive elements may provide essential background knowledge or initial guidance, while constructivist and constructionist activities allow learners to actively apply, examine, and further develop this knowledge. The appropriate combination therefore depends on the learning objective, the learners’ prior knowledge, and the degree of guidance required.
 
@@ -71,6 +71,6 @@ Dourish (2011) distinguishes between two dimensions of embodiment: physical pres
 The aim of embodied interaction is therefore to design computer systems that do not restrict users to purely abstract forms of interaction but instead make effective use of their natural, everyday abilities and established ways of acting (Embodied Interaction)
 
 
-??KAPITELFAZIT??
+== Comparison/Conclusion
 
 Taken together, these theories indicate that the educational value of a tangible learning system does not result from physical activity or digital technology alone. It emerges from the coherent relationship between the learning objective, the actions performed by learners and the physical artefacts being manipulated. A suitable learning environment should therefore combine structured guidance with opportunities for independent exploration, construction, and meaningful bodily interaction.
