@@ -45,7 +45,7 @@ Förderschwerpunkten jedoch mehrere gemeinsame Prinzipien für die Gestaltung ge
     [Klare Teilaufgaben, Wiederholungen und verständliche Rückmeldungen],
 
     [Geistige Entwicklung],
-    [Umfassender Unterstützungsbedarf beim Lernen und der kognitiven Entwicklung],
+    [unterschiedliche Ausprägungen der kognitiven Entwicklung, Motorik und Wahrnehmung],
     [Konkrete, handlungsorientierte Zugänge, individuelle Hilfen und ausreichend Zeit],
 
     [Autismus-Spektrum],

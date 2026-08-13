@@ -44,7 +44,7 @@ konstruktionismus
 
 aus einleitung ( wie sollen aufgaben aufgebaut sein )
 - aus unterschiedlichen Lernvoraussetzungen der Zielgruppe ergibt sich anforderung, dass aufgaben klar strukturiert und in ihrem Umfang begrenzt sein sollen. 
-- Visualisierung von Abläufen und Handlungsschritten, 
+- Visualisierung von Abläufen und Handlungsschritten,
 - ausreichend Zeit und Wiederholungsmöglichkeiten,
 - unmittelbare und verständliche Rückmeldungen,
 

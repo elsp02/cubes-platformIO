@@ -1,13 +1,16 @@
 // ============================================================
 // Bachelor Thesis – General Typst Template
 // ============================================================
+#import "@preview/abbr:0.3.1"
 
+#show: abbr.show-rule
 
 // ------------------------------------------------------------
 // DOCUMENT INFORMATION
 // ------------------------------------------------------------
 
-#let thesis-title = [Title of the Bachelor Thesis]
+#let thesis-title = [Design and Development of a Tangible Learning System for
+Special Education]
 #let thesis-subtitle = none
 
 #let author = [Elena Spitzer]
@@ -19,9 +22,9 @@
 #let thesis-type = [Bachelor Thesis]
 
 #let supervisor = [Claudia Meitinger]
-#let second-supervisor = [Second Supervisor]
+#let second-supervisor = [Christoph Zeuke]
 
-#let submission-date = [August 2026]
+#let submission-date = [18. August 2026]
 
 
 // ------------------------------------------------------------
@@ -52,6 +55,9 @@
   leading: 0.65em,
 )
 
+// Figures nicht im Blocksatz
+#show figure: set par(justify: false)
+
 
 // ------------------------------------------------------------
 // HEADINGS
@@ -69,7 +75,7 @@
 }
 
 #show heading.where(level: 2): it => {
-  set text(size: 14pt, weight: "bold")
+  set text(size: 15pt, weight: "bold")
   block(
     above: 1.2em,
     below: 0.7em,
@@ -78,11 +84,20 @@
 }
 
 #show heading.where(level: 3): it => {
+  set text(size: 13pt, weight: "bold")
+  block(
+    above: 1.2em,
+    below: 0.8em,
+    it, // oder it.body wenn level 3 keine Nummerierung mehr haben soll
+  )
+}
+
+#show heading.where(level: 4): it => {
   set text(size: 11pt, weight: "bold")
   block(
-    above: 1em,
-    below: 0.5em,
-    it,
+    above: 1.1em,
+    below: 0.8em,
+    it.body, // oder it.body wenn level 3 keine Nummerierung mehr haben soll
   )
 }
 
@@ -91,7 +106,8 @@
 // FIGURES AND TABLES
 // ------------------------------------------------------------
 
-#show figure.caption: set text(size: 9pt)
+#show figure.caption: set text(size: 10pt)
+
 
 
 // ============================================================
@@ -99,6 +115,8 @@
 // ============================================================
 
 #set page(numbering: none)
+
+#place(top + right, image("figures/THA-Logo.png", width: 30%))
 
 #align(center)[
 
@@ -143,15 +161,18 @@
 
   #v(1.5cm)
 
-  #table(
-    columns: (auto, 1fr),
-    stroke: none,
-    column-gutter: 1cm,
+  #align(center)[
+    #table(
+      columns: (auto, auto),
+      stroke: none,
+      column-gutter: 4cm,
+      //align: (right + horizon, left + horizon),  // aligned text jeweils in die mitte
 
-    [Supervisor:], [#supervisor],
-    [Second Supervisor:], [#second-supervisor],
-    [Submission Date:], [#submission-date],
-  )
+      [Supervisor:], [#supervisor],
+      [Second Supervisor:], [#second-supervisor],
+      [Submission Date:], [#submission-date],
+    )
+  ]
 ]
 
 #pagebreak()
@@ -184,6 +205,10 @@ This thesis ...
 // TABLE OF CONTENTS
 // ------------------------------------------------------------
 
+#show outline.entry.where(level: 1): it => {
+  strong(it)
+}
+
 #outline(
   title: [Table of Contents],
   depth: 2,
@@ -215,34 +240,117 @@ This thesis ...
 
 // #pagebreak()
 
-
 // ============================================================
 // MAIN MATTER
 // ============================================================
 
-#set page(numbering: "1")
+#set page(
+  numbering: "1",
+
+  // ----------------------------------------------------------
+  // HEADER
+  // ----------------------------------------------------------
+
+  header: context {
+    let current-page = here().page()
+
+    // All level-1 headings in the document
+    let chapters = query(
+      heading.where(level: 1)
+    )
+
+    // Check whether a new chapter starts on this page
+    let chapter-start-page = chapters.any(
+      chapter => chapter.location().page() == current-page
+    )
+
+    // No header on the first page of a chapter
+    if not chapter-start-page {
+
+      // Find the most recent level-1 heading
+      let previous-chapters = query(
+        selector(heading.where(level: 1)).before(here())
+      )
+
+      if previous-chapters.len() > 0 {
+        let chapter = previous-chapters.last()
+
+        [
+          #set text(size: 10pt)
+
+          #align(center)[
+          #emph[#chapter.body]
+          ]
+
+          #v(3pt)
+
+          #line(
+            length: 100%,
+            stroke: 0.5pt,
+          )
+        ]
+      }
+    }
+  },
+
+  // ----------------------------------------------------------
+  // FOOTER
+  // ----------------------------------------------------------
+
+  footer: context [
+    #line(
+      length: 100%,
+      stroke: 0.5pt,
+    )
+
+    #v(3pt)
+
+    #align(center)[
+      #counter(page).display()
+    ]
+  ],
+)
+
 #counter(page).update(1)
+// ============================================================
+// Abbreviations
+// ============================================================
+#abbr.make(
+  ("ASD", "Autism Spectrum Disorder"),
+  ("GUI", "Graphical User Interface"),
+  ("GE", "Special education focus on intellectual development"),
+  ("LE", "Special education focus on learning"),
+  ("LED", "Light-Emitting Diode"),
+  ("MVC", "Model View Controller"),
+  ("MCRpd", "Model-Control-Representation (physical and digital"),
+  ("rep_p", "Physical Representation"),
+  ("rep_d", "Digital Representation"),
+  ("TUI", "Tangible User Interface"),
+  ("UI", "User Interface")
 
-
+)
 // ------------------------------------------------------------
 // CHAPTERS
 // ------------------------------------------------------------
 
 #include "sonderpädagogischer_kontext_engl.typ"
 
+#pagebreak()
+
 #include "lerntheorethische_grundlagen_engl.typ"
 
 #include "tui_engl.typ"
 
-#include "verwandte_systeme.typ"
+//#include "verwandte_systeme.typ"
+#pagebreak()
 
 #include "anforderungsanalyse_engl.typ"
 
 
 // Weitere Kapitel später beispielsweise:
 //
-// #include "konzept.typ"
-// #include "implementierung.typ"
+//#include "systemkonzept2.typ"
+ //#include "implementierung.typ"
 // #include "evaluation.typ"
 // #include "discussion.typ"
 // #include "conclusion.typ"
@@ -254,8 +362,12 @@ This thesis ...
 
 #pagebreak()
 
+#abbr.list(
+  title: "List of Abbreviations",
+)
+
 #bibliography(
-  "bib.bib",
+  ("bib.bib", "bib_manual.bib"),
   title: [References],
   style: "ieee",
 )
