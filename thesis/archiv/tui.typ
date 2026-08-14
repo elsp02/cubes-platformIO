@@ -272,9 +272,10 @@ Die Wirksamkeit von Feedback hängt nicht allein von seiner technischen Form ab,
 Gerade bei unterschiedlichen sensorischen, kognitiven und kommunikativen Voraussetzungen sind anpassbare und redundante Rückmeldungen relevant.
 
 === belottis 5 fragen zur Gestaltung von Feedback (token and constraints)
+=== Belottis 5 fragen zur Gestaltung von Feedback (token and constraints)
 vlt vorverschieben
 Für sensorbasierte und greifbare Interaktionssysteme entwickelten Bellotti et al. fünf Fragen, anhand derer sich die Verständlichkeit einer Interaktion systematisch untersuchen lässt. Wechselspiel zwischen Sytsem und Nutzende
-Das Modell betrachtet dabei, ob einob Nutzende die Aufmerksamkeit, Interpretation und Reaktion des Systems nachvollziehen können (vgl. Bellotti et al., 2002).
+Das Modell betrachtet dabei, ob ein Nutzender die Aufmerksamkeit, Interpretation und Reaktion des Systems nachvollziehen können (vgl. Bellotti et al., 2002).
 TABELLE
 + Address	Wie erkennt das System, dass eine Handlung an das System gerichtet ist?
 + Attention	Woran erkennen die Nutzenden, dass das System aufmerksam ist und die Eingabe registriert?
@@ -282,9 +283,6 @@ TABELLE
 + Alignment	Woran erkennen die Nutzenden, dass das System ihre Absicht korrekt verstanden und ausgeführt hat?
 + Accident	Wie können Fehlinterpretationen, unbeabsichtigte Handlungen und technische Fehler erkannt und korrigiert werden?
 -> Die fünf Fragen verdeutlichen, dass eine technisch erfolgreiche Erkennung allein nicht ausreicht. Die Interpretation des Systems muss für die Nutzenden nachvollziehbar sein, und Missverständnisse müssen ohne unverhältnismäßigen Aufwand korrigiert werden können.
-
-
-fünf Fragen verdeutlichen, dass eine technisch erfolgreiche Erkennung allein nicht genügt. Nutzende müssen sowohl den aktuellen Zustand des Systems als auch dessen Interpretation ihrer Handlung nachvollziehen können.
 
 === pädagogisches Feedback
  Während Interaktionsfeedback in erster Linie bestätigt, ob eine Handlung technisch erfasst wurde, bezieht sich pädagogisches Feedback auf die Bedeutung dieser Handlung innerhalb eines Lernprozesses. Es soll Lernende dabei unterstützen, den aktuellen Bearbeitungsstand einzuschätzen und Abweichungen von einem angestrebten Ergebnis zu erkennen, damit die Lernenden ihr weiteres Vorgehen anpassen können.

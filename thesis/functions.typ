@@ -1,3 +1,4 @@
+//Table nach APA style
 #let apa-table(
   columns: 3,
   header: (),
@@ -69,3 +70,17 @@
   }
 }
 }
+
+// ID verknüpfen
+// Requirement ID inside a table.
+// Creates the destination for the hyperlink.
+#let req-target(id) = [
+  #box[#id] #label("req-" + id)
+]
+
+// Clickable requirement ID used in the text.
+#let req(id) = link(
+  label("req-" + id)
+)[
+  #text("[" + id + "]")
+]

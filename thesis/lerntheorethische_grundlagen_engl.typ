@@ -23,7 +23,7 @@ Vollmers illustrates a fundamental principle of Piaget's theory of learning usin
 
 Based on Piaget's theory, learning is therefore described as an “interactive process between the learner and the external world” @LEARNINGDOING[p. 75]. New knowledge does not emerge solely through the presentation of information, but primarily through active engagement with the object of learning.
 
-=== Constructionism
+=== Constructionism <constructionism>
 The mathematician and psychologist Seymour Papert extends the constructivist approach by adding an external dimension in his constructionist theory of learning. He argues that the construction of knowledge in the mind is most effective when it is supported by the construction of a tangible object in the physical world. Following the principle of “learning by making,” learners reconstruct knowledge while creating something of their own, thereby connecting the external construction of an artefact with the internal construction of knowledge @SituatingConstructionism.
 
 The constructed artefact fulfils several functions: On the one hand, it makes abstract theoretical considerations concrete, tangible, and, in the literal sense, comprehensible. Relationships that may be difficult to understand when represented solely through language or graphics can become visible through the spatial arrangement of a physical model. On the other hand, modifying the model enables learners to test different assumptions and directly observe their effects @Constructionism@MindstormsChildren. 

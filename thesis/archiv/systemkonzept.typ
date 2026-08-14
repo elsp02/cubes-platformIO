@@ -1,3 +1,5 @@
+#import "../functions.typ": req
+
 #set page(numbering: "1")
 #set par(justify: true)
 // Figures nicht im Blocksatz
@@ -526,7 +528,7 @@ Das Aufgaben- und Interaktionskonzept konkretisiert, wie die Lernenden die Nachb
 - Für die Bewertung sind deshalb bausteintyp, Verbindungsseite, räumliche Position und Orientierung relevant
 -> individuelle Identität eines Bausteins ist dabei nur für seine technische Erkennung und die Zuordnung des lokalen Feedbacks erforderlich, Bausteine desselben Typs sind also für die Lösung grundsätzlich austauschbar.
 
-- Die Baureihenfolge ist nicht vollständig vorgegeben, es führen also mehrere Baureihenfolgen? zum selben Zielergebnis [TUI1] -> ein untergeordneter Baustein kann jedoch erst angebracht werden, wenn sein übergeordneter Baustein bereits vorhanden ist
+- Die Baureihenfolge ist nicht vollständig vorgegeben, es führen also mehrere Baureihenfolgen? zum selben Zielergebnis #req("TUI1") -> ein untergeordneter Baustein kann jedoch erst angebracht werden, wenn sein übergeordneter Baustein bereits vorhanden ist
 
 - Die Aufgabe ist abgeschlossen, sobald die Ist-Konstruktion vollständig mit der Zielkonstruktion übereinstimmt
 
@@ -537,12 +539,12 @@ Das Aufgaben- und Interaktionskonzept konkretisiert, wie die Lernenden die Nachb
   - an einer anderen Aufnahmeseite angebracht
   - durch einen anderen Baustein des erforderlichen Typs ersetzt werden
 
--> Fehlerhafte Handlungsschritte führen nicht zum Abbruch oder Neustart der gesamten Aufgabe [IA5]
+-> Fehlerhafte Handlungsschritte führen nicht zum Abbruch oder Neustart der gesamten Aufgabe #req("IA5")
 
--Da die physische Konstruktion während der Bearbeitung sichtbar, überprüfbar und unmittelbar veränderbar bleibt,  entsteht eine strukturierte Offenheit [TUI1:
+-Da die physische Konstruktion während der Bearbeitung sichtbar, überprüfbar und unmittelbar veränderbar bleibt,  entsteht eine strukturierte Offenheit #req("TUI1")
 
 === Anpassung des Schwierigkeitsgrades
-- Der Schwierigkeitsgrad soll an unterschiedliche Lernvoraussetzungen angepasst werden können [TUI2].
+- Der Schwierigkeitsgrad soll an unterschiedliche Lernvoraussetzungen angepasst werden können #req("TUI2").
 
 - Eine Anpassung ist insbesondere über folgende Merkmale möglich:
   - Anzahl der Bausteine: wenige Bausteine für einfache, mehr Bausteine für umfangreichere Aufgaben
@@ -567,7 +569,7 @@ Das Aufgaben- und Interaktionskonzept konkretisiert, wie die Lernenden die Nachb
 
 === Visualisierung der Zielkonstruktion
 - Zu Beginn der Bauaufgabe wählt das Kind in der Lernanwenung eine Zielkonstruktion aus, die während der Bearbeitung als visuelle Referenz verfügbar bleibt
-- abhängig vom gewählten Schwierigkeitsgrad kann die Zielkonstruktion vollständig oder schrittweise dargestellt werden [TUI2, FB4]
+- abhängig vom gewählten Schwierigkeitsgrad kann die Zielkonstruktion vollständig oder schrittweise dargestellt werden #req("TUI2"), #req("FB4")
   - Vollständige Darstellung ermöglicht den Lernenden, den Aufbau eigenständig zu analysieren und eine eigene Vorgehensweise zu planen
   - schrittweise Darstellung kann  den jeweils nächsten Teil der Konstruktion hervorheben und dadurch zusätzliche Orientierung bieten
 -Die Zielkonstruktion und die erkannte Ist-Konstruktion müssen visuell eindeutig voneinander unterscheidbar sein -> darstellung entweder in getrennten Ansichten oder räumlich klar voneinander abgegrenzt
@@ -577,10 +579,10 @@ FRAGE: in der aktuellen Darstellung wird die Visualisierung der Zielkonstruktion
 === Visualisierung der erkannten Ist-Konstruktion
 - Nach jedem Erfassungsvorgang wird die von Lernanwendung rekonstruierte Ist-Konstruktion dreidimensional dargestellt 
 -> jeder erkannte Baustein wird entsprechen seines Typs, seiner berechneten Position und Orientierung so wie sein vom feedback abhängigen Aussehens in die Szene eingefügt
-- indem die digitale Darstellung den Lernenden zeigt, welche Konstruktion das System aus ihren Handlungen abgeleitet hat, wird die Anforderung des Interaktionsfeedbacks erfüllt [FB1]:
+- indem die digitale Darstellung den Lernenden zeigt, welche Konstruktion das System aus ihren Handlungen abgeleitet hat, wird die Anforderung des Interaktionsfeedbacks erfüllt #req("FB1"):
   beispiel: Erscheint ein hinzugefügter Baustein an der tatsächlich positionierten Position, ist erkennbar, dass seine Verbindung technisch verarbeitet wurde. Fehlt ein Baustein oder wird er anders dargestellt als physisch angeordnet, weist dies auf ein mögliches Erkennungsproblem hin
 
-- Da die Darstellung die physische Konstruktion möglichst konsistent abbilden muss [TUI3], orientieren sich die digitalen Bausteinmodelle an der Form und dem Aussehen der realen Bausteine
+- Da die Darstellung die physische Konstruktion möglichst konsistent abbilden muss #req("TUI3"), orientieren sich die digitalen Bausteinmodelle an der Form und dem Aussehen der realen Bausteine
 - die zwei unterschiedlichen Bausteintypen Würfelbaustein und smashed Bausein werden durch entsprechende digitale Modelle repräsentiert, wodurch die Zuordnung zwischen physischem Gegenstand und digitaler Darstellung nachvollziehbar bleibt
 
 - Um die dreidimensionale Szene aus unterschiedlichen Perspektiven betrachten zu können, unterstützt die Ansicht Dreh- und Skalierfunktion. So können insbesondere bei verzweigten Konstruktionen die räumlichen Beziehungen besser wahrgenommen werden
@@ -601,7 +603,7 @@ Um die unterschiedlichen Zustände für die lernenden sichtbar zu machen, werden
   - Mögliche nächste Positionen lassen sich als transparente Platzhalter beziehungsweise sogenannte Ghost Cubes darstellen
   - Noch nicht zugängliche Positionen werden nicht angezeigt, damit keine Handlungsmöglichkeiten suggeriert werden, die zu diesem Zeitpunkt noch nicht möglich sind
 
-so kann die Rückmeldung eindeutig dem jeweils betroffenen Baustein zugeordnet werden [FB2]
+so kann die Rückmeldung eindeutig dem jeweils betroffenen Baustein zugeordnet werden #req("FB2")
 
 === Feedbackebenen
 Neben dem visualisierten digitalen Feedback in der Lernanwendung wird außerdem an jedem baustein lokal mit hilfe einer lichtanzeige das digitale Feedback wieder aufgegriffen
@@ -610,12 +612,12 @@ Neben dem visualisierten digitalen Feedback in der Lernanwendung wird außerdem 
   - intrinsisches physisches Feedback: entsteht durch die mechanische Führung und magnetische Unterstützung der Verbindung -> Beim Verbinden können die Lernenden unmittelbar wahrnehmen, dass zwei Bausteine mechanisch miteinander verbunden wurden -> feedback bestätigt jedoch weder elektronische Erkennung noch inhatliche Korrektheit der Platzierung
   - lokales digitales Feedback: wird direkt an den betreffenden Bausteinen ausgegeben. Durch ein grünes oder rotes Licht wird angezeigt, ob der verbundene Baustein korrekt platziert wurde oder überprüft werden muss
   - globales digitales Feedback: wird in der Lernanwendung ausgegeben. kann neben dem Zustand einzelner Bausteine auch die gesamte Konstruktion, den Aufgabenfortschritt und mögliche nächste Handlungsschritte darstellen -> ermöglicht damit ausführlichere Rückmeldungen, als sie durch die begrenzten Ausgabemöglichkeiten eines einzelnen Bausteins möglich wären
--> dadurch erfolgt das Feedback zwar nicht multidimensional [IA6], aber auf mehreren Ebenen
+-> dadurch erfolgt das Feedback zwar nicht multidimensional #req("IA6"), aber auf mehreren Ebenen
 
 - Lokales und globales Feedback müssen jedoch inhaltlich übereinstimmen -> wird Baustein lokal als korrekt gekennzeichnet, muss er auch in der digitalen Konstruktion denselben Zustand besitzen
 
 === Arten des Feedbacks
-- Auf Grundlage des theoretischen Hintergrunds wird zwischen Interaktionsfeedback und päfagogischem Feedback unterschieden (kapitel) [FB1]
+- Auf Grundlage des theoretischen Hintergrunds wird zwischen Interaktionsfeedback und päfagogischem Feedback unterschieden (kapitel) #req("FB1")
 
 - Interaktionsfeedback
   - zeigt, ob und wie die physische Handlung technisch erfasst wurde, indem der in kapitel x beschriebene erkannte Ist-Zustand der Konstruktion visualisiert wird 
@@ -649,8 +651,8 @@ TABELLE WO EINBINDEN
 ) <rückmeldungsfälle>
 
 ==== abgestufte Unterstützung
-- Das Interaktionsfeedback soll zeitnah nach der auslösenden handlung erfolgen [DET7], damit die Systemreaktion einfeutig der Verbindung zugeordnet werden kann. - Auch das Ergebnisfeedback soll zeitnah anzeigen, ob die erkannte Verbindung mit der Zielkonstruktion übereinstimmt.
-- Weiterführende Hilfestellungen werden dagegen wie in den Anforderungen FB3 und FB4 gefordert abhängig vom Unterstützungsbedarf abgestuft angeboten:
+- Das Interaktionsfeedback soll zeitnah nach der auslösenden handlung erfolgen #req("DET7"), damit die Systemreaktion einfeutig der Verbindung zugeordnet werden kann. - Auch das Ergebnisfeedback soll zeitnah anzeigen, ob die erkannte Verbindung mit der Zielkonstruktion übereinstimmt.
+- Weiterführende Hilfestellungen werden dagegen wie in den Anforderungen #req("FB3") und #req("FB4") gefordert abhängig vom Unterstützungsbedarf abgestuft angeboten:
   - zunächst wird lediglich eine Abweichung am Baustein durch die farbliche Hervorhebung angezeigt
   (- anschließend kann weitere Hilfe in Form einer Erklärung bereitgestellt werden)  
   - bei weiterem Unterstützungsbedarf können zusätzlich die zulässigen nächsten Bausteine/Ghost Cubes dargestellt werden = Feedforward

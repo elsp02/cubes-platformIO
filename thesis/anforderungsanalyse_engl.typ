@@ -1,209 +1,223 @@
-#show table.cell.where(y: 0): set text(weight: "bold")
-#set page(numbering: "1")
+#import "functions.typ": apa-table, req, req-target
 
-= Anforderungsanalyse
-Überblick über inhalt des kapitels
+= Requirements Analysis
+The requirements analysis translates the findings from the theoretical background and the design principles derived from the special educational context into concrete requirements for the prototype. Following a constructionist approach, the objective is to develop a modular, cube-based @TUI in the form of a learning game suitable for use in special education. The prototype is intended to enable students to complete three-dimensional construction tasks independently while receiving immediate feedback on whether their construction corresponds to the target structure or not.
+
+The requirements are derived from three perspectives:
+- The learning prerequisites of the target group and the resulting educational implications
+- The characteristics and design principles of tangible user interfaces discussed in the theoretical background
+- The technical, financial, and time constraints of prototype development
+
+The following sections describe the context of use, the application scenario, and the core requirements guiding the system’s design and development.
+
+== Context of Use and Didactic Application Scenario
+The primary target group consists of students with special educational needs related to @GE, @LE, and @ASD. Teachers and other educational professionals represent a further key stakeholder group, as they integrate the learning game into classroom activities and support the learning process.
+
+By enabling students to complete three-dimensional construction tasks independently, the learning game is intended to address the following competencies:
+- Primary: spatial thinking, action planning, and self-directed learning
+- Secondary: problem-solving, error detection, and self-correction
+- Additional: fine motor skills, concentration, and hand–eye coordination
+
+The primary application scenario is a spatial reconstruction task, where students select a three-dimensional target structure appropriate to their individual level and attempt to recreate it using the available bricks. Although this type of task can also be carried out using conventional construction materials, the proposed system extends the building process through automated feedback and can indicate whether the construction is correct or needs to be modified. selbstständiges bearbeiten
+
+The level of difficulty can be varied through the number of bricks, their spatial arrangement and the required rotations. Simple tasks may consist of a small number of bricks connected primarily in a linear arrangement, whereas more challenging tasks may involve multiple spatial directions, different orientations, and branching structures. Future task types could include completing unfinished structures, identifying incorrect connections, or constructing freely without a predefined target.
+
+== Educational and Interaction-related Requirements
+In accordance with the constructionist understanding of learning described in Chapter @constructionism, the active creation of a physical artefact must form the core of the learning activity #req("TASK1"). Learners must be able to observe, inspect, and directly modify the emerging construction throughout the task #req("IA1"). This enables them to translate their mental representation into a concrete spatial structure through which the effects of individual actions become observable. To support independent use, the system must also be operable without technical or programming knowledge and without requiring recalibration #req("IA2").
+
+At the same time, the tasks must  must accommodate the diverse learning prerequisites of the target group and thus provide a clear and manageable framework for action #req("IA3"), without describing every individual action. Processes and sub-goals must be presented in a way that is easy to follow, whilst allowing sufficient time for completion #req("IA4") and opportunities for repetition #req("IA5").
 
 
-== Ziel und Vorgehen
-Die Anforderungsanalyse überführt die Erkenntnisse des theorethischen Hintergrunds sowie der sich aus dem sonderpädagogischen Nutzungskontext erschlossenen Prinzipien für die Gestaltung geeigneter Lernangebote in konkrete Anforderungen an den Prototyp. Ziel ist es im Sinne des konstruktionistischen Gedanken ein modulares, würfelbasiertes tangible User Interface in Form eines Lernspiels zu entwickeln, das für den Einsatz im sonderpädagogischen Förderbeich geeignet ist. Der Prototyp soll Schüler:innen ermöglichen, selbstständig dreidimensionale Konstruktionsaufgaben zu bearbeiten und dabei direkt vom System Rückmeldung zu erhalten, ob die von ihnen gebaute Konstruktion der Zielkonstruktion entspricht oder nicht.
+The design factors described in @tui-children must also be considered. The principle of _structured openness_ requires tasks to provide a clear framework while allowing learners to explore different approaches and solution attempts #req("TUI1"). Tasks must be structured in such a way that the objective remains clear and step-by-step guidance can be accessed where necessary. The factors of _richness_, _complexity_, and _adaptability_ further require the learning game to accommodate different levels of ability. This can be achieved by adapting the level of difficulty and scope of the feedback to different learning requirements as far as possible, so that the same basic principle of interaction can be applied to tasks of varying difficulty levels #req("TUI2"). Finally, the bricks must provide sufficiently clear physical cues for learners to understand their meaning and possible uses. Their physical design and digital functions must therefore be consistently aligned #req("TUI3").
 
-Die genauen Anforderungen werden aus drei Perspektiven abgeleitet:
-  - den Lernvoraussetzungen der Zielgruppe und den daraus resultierenden pädagogischen Konsequenzen
-  - den im theoretischen Hintergrund beschriebenen Eigenschaften und Gestaltungsprinzipien von Tangible User Interfaces
-  - den technischen, wirtschaftlichen und zeitlichen Rahmenbedingungen der prototypischen Entwicklung
+#apa-table(
+  columns: (0.7fr, 5fr),
 
-Im Folgenden werden Nutzungskontext, Anwendungsszenario und die für Konzeption und Entwicklung maßgeblichen Kernanforderungen aufgeführt. ?Der vollständige Anforderungskatalog mit weiteren Detailanforderungen und Prüfkriterien befindet sich in Anhang X.?
+  table-label: <requirement-educational>,
 
-== Nutzungskontext und didaktisches Anwendungszenario
-Die primäre Zielgruppe stellen Schüler:innen in den Förderschwerpunkten geistige Entwicklung, Lernen und ASS dar. Eine weitere zentrale Personengruppe bilden Lehrkräfte und pädagogische Fachkräfte, die das Lernspiel in den Unterrichtsalltag einbinden und den Lernprozess begleiten. (Das System soll die Lehrkraft also nicht ersetzen, sondern insbesondere während selbstständiger Arbeitsphasen ergänzen.)
-Indem das Lernspiel die Kinder selbstständig dreidimensionale Konstruktionsaufgaben bearbeiten lassen soll, sollen jene Kompetenzbereiche gefördert/angesprochen werden: 
-  - Primar: räumliches Denken, Handlungsplanung und selbstgesteuertes Lernen
-  - Sekundär: Problemlösen, Fehlerkontrolle, Selbstkorrektur
-  - Begleitend: Feinmotorik, Konzentration, Auge-Hand-Koordination
+  header: (
+    [ID],
+    [Requirement],
+  ),
 
-Als Hauptanwendung ist eine räumliche Nachbauaufgabe vorgesehen, bei der die Schüler:innen aus mehreren dreidimensionalen Zielkonstruktionen eine ihrem individuellen Niveau entsprechende Aufgabe auswählen und diese mithilfe der Bausteine versuchen nachbilden. (Während eine solche Aufgabe grundsätzlich auch mit konventionellen Konstruktionsmaterialien wie xy durchgeführt werden kann, erweitert das System den Bauprozess um eine automatisierte Rückmeldung: Während des Bauens rekonstruiert das System fortlaufend die räumliche Gesamtkonfiguration und vergleicht sie mit der ausgewählten Zielstruktur. Dadurch wird unmittelbar angezeigt, ob die gebaute Konstruktion korrekt ist oder angepasst werden muss.)
+  caption: [Educational and interaction related requirements],
 
-Durch die Anzahl der Bausteine, die räumliche Anordnung und die erforderlichen Rotationen kann der Schwierigkeitsgrad variiert werden. So können einfache Aufgaben aus wenigen Bausteinen und überwiegend linearen Verbindungen bestehen, während anspruchsvollere Aufgaben mehrere Raumrichtungen, unterschiedliche Rotationen und verzweigte Konstruktionen umfassen können. Perspektivisch sind weitere Aufgabenformen wie das Ergänzen unvollständiger Konstruktionen, das Auffinden fehlerhafter Verbindungen oder das freie Konstruieren denkbar.
+  req-target("TASK1"),
+  [The task must be completed through the active construction and modification of a physical artefact],
 
-TABELLEN UND TEXT INHALTLICH MEHR VERKNÜPFEN - NACH UND NACH JEDEN EINTRAG DER TABELLE ERKLÄREN UND GGF NOCH ETWAS ANREICHERN 
-== Educational and interaction-related requirements
-Entsprechend dem in Kapitel X erläuterten konstruktionistischen Lernverständnis muss die aktive Herstellung eines physischen Artefakts im Mittelpunkt der Lernaktivität stehen. [Aufg1] Die Lernenden müssen die entstehende Konstruktion während der Bearbeitung betrachten, überprüfen und unmittelbar verändern können [IA1]. Dadurch wird ermöglicht, dass ihre gedankliche Vorstellung in eine konkrete räumliche Struktur überführt wird, an der sich die Auswirkungen einzelner Handlungsschritte nachvollziehen lassen. The system must be operable without any technical/programming knowledge and without the need for recalibration [IA2]
+  req-target("IA1"),
+  [The resulting construction must remain visible, inspectable, and modifiable throughout the task],
 
-Gleichzeitig müssen die Aufgaben die unterschiedlichen Lernvoraussetzungen? der Zielgruppe berücksichtigen und damit einen klaren und überschaubaren Handlungsrahmen bieten [IA3], ohne sämtliche Handlungsschritte vollständig vorzugeben. Abläufe und Teilziele müssen nachvollziehbar dargestellt werden und dabei ausreichend Zeit für die Bearbeitung [IA4] und Wiederholungsmöglichkeiten geben [IA5]. 
+  req-target("IA2"),
+  [The system must be usable without technical or programming knowledge and without requiring recalibration],
 
-Außerdem müssen die in Kapitel x beschriebenen Gestaltungsfaktoren berücksichtigt werden. Durch die darin beschriebene für die Zielgruppe so wichtige strukturierte Offenheit ergibt sich, dass die Kinder unterschiedliche Lösungsversuche durchführen und fehlerhafte Handlungsschritte korrigieren können sollen [TUI1]. Aufgaben müssen so strukturiert sein, dass das Ziel verständlich bleibt und bei Bedarf schrittweise Unterstützung abgerufen werden kann. Der Faktor Reichtum und Komplexität verlangt darüber hinaus dass sich das Lernspiel an unterschiedliche Lernniveaus anpassen kann. Dies soll dadurch realisiert werden, dass Schwierigkeitsgrad und Umfang der Rückmeldung möglichst an unterschiedliche Lernvoraussetzungen angepasst werden können, um mit dem selben grundlegenden Interaktionsprinzip für unterschiedlich anspruchsvolle Aufgaben zu realisieren [TUI2]. Die Bausteine dürfen nur bis zu dem Grad abstrakt gestaltet werden, dass die Bedeutung der physischen Repräsentationen (vergleiche coupling) und die durch sie ermöglichten Handlungen noch eindeutig erkennbar sind [TUI3]. 
+  req-target("IA3"),
+  [The objective and structure of the task must be presented clearly and comprehensibly],
 
-#figure(
-  table(
-    columns: 2,
-    stroke: none,
+  req-target("IA4"),
+  [Learners must be able to complete the task at their own pace],
 
-    table.header[ID][Requirement],
+  req-target("IA5"),
+  [Previously completed action steps must be correctable and repeatable],
 
-    [Aufg1],  [Die Bearbeitung der Aufgabe muss durch das aktive Konstruieren und Verändern eines physischen Artefakts erfolgen.],
+  req-target("TUI1"),
+  [The task should provide a structured framework while allowing different approaches and solution attempts within that framework],
 
-    [IA1],  [Die entstandene Konstruktion muss während der Bearbeitung sichtbar, überprüfbar und veränderbar bleiben],
+  req-target("TUI2"),
+  [The level of difficulty should be adaptable by varying the number of bricks, their spatial arrangement, and the required rotations],
+
+  req-target("TUI3"),
+  [The physical design of the bricks and their digital functions must be consistently aligned],
+)
+
+
+== Requirements for Feedback and Assistance
+To complete a construction task independently, learners must be able to determine whether their actions have been detected by the system and how those actions are evaluated within the learning task. In accordance with the distinction introduced in @feedback-tui, the system must therefore provide both interaction feedback and pedagogical feedback #req("FB1"). Each feedback signal must be clearly attributable to the action that triggered it or to the affected part of the construction, allowing learners to understand what it refers to #req("FB2"). In this context, feedback and assistance should be available in graduated levels according to the learner’s individual support needs #req("FB3"), #req("FB4").
+As discussed in relation to multimodal accessibility in @tui-children, providing feedback through multiple output modalities can improve accessibility which is therefore diserable #req("IA6"). But, when multiple modalities are used, their signals must be coordinated and consistent in order to avoid distraction.
+
+#apa-table(
+  columns: (0.7fr, 5fr),
+
+  table-label: <requirement-feedback>,
+
+  header: (
+    [ID],
+    [Requirement],
+  ),
+
+  caption: [Requirements for feedback and assistance],
+
+  req-target("FB1"),  [Interaction and educational feedback must be ensured],
+
+  req-target("FB2"),  [Feedback must be clearly linked to the action that triggered it or the area concerned],
+
+  req-target("FB3"),  [Feedback should be provided on a tiered basis, je nachdem ob der fehler schon mit weniger feedback ausgebessert werden kann],
+
+  req-target("FB4"),  [Assistance should be provided on a tiered basis, depending on the learners level],
+
+  req-target("IA6"), [Feedback can be provided through multiple output modalities],
+)
+
+== Geometrical and Ergonomic Requirements
+#apa-table(
+  columns: (0.7fr, 5fr),
+
+  table-label: <requirement-design>,
+
+  header: (
+    [ID],
+    [Requirement],
+  ),
+
+  caption: [Physical design requirements],
+
+    req-target("G1"),  [The body of the cube must be based on a square base],
+
+    req-target("G2"),  [One cube type must be a cube shaped cube with six sides/faces],
+
+    req-target("G3"), [Other cube types could also be implemented in other geometric shapes],
+
+    req-target("C1"),  [Each cube must have at least one defined docking side where to connect with other cubes (Docking side = the side via which the building block can connect to another building block)],
+
+    req-target("C2"),  [Other cubes must be able to connect with the cube via its remaining sides],
+
+    req-target("C3"),  [The cubes must be able to be  arranged or stacked in three dimensions],
+
+    req-target("C4"),  [The cubes must be able to be positioned relative to one another in different orientations],
+
+    req-target("C5"),  [The cubes must be graspable and connected with one hand],
+
+    req-target("C6"),  [Cube connections must be strong enough to hold the structure together and easy enough to disconnect with minimal effort],
+
+  )
+
+The building blocks form the central element of the learning game: They serve as physical representations of digital information while simultaneously functioning as controls for interacting with the system (phicons). Their geometric and mechanical design therefore influences both the range of possible constructions and the comprehensibility and accessibility of the interaction. As already established by the educational requirements, the shape and connection mechanisms must clearly indicate how and where the blocks can be connected #req("TUI3").
+
+For the prototype, each building block must have a square base #req("G1"), enabling the implementation of a cubic block with six square faces #req("G2"). Additional block types could subsequently be implemented using other geometric forms #req("G3"). Each block must have one defined docking face through which it connects to another block #req("C1"). The remaining faces serve as receiving connection faces to which additional blocks can be attached using their respective docking faces #req("C2"). This arrangement enables branching three-dimensional constructions along clearly defined directions while limiting the complexity of manufacturing and connection detection #req("C3"). The square faces also allow blocks to be connected in rotations of 90-degree increments #req("C4").
+
+In order to hold the structure together, the connection between the building blocks must be stable enough to be undone with minimal effort, while also being strong enough to be created without requiring precise positioning that demands fine motor skills #req("C6"). In addition, each block must be capable of being securely grasped, positioned, and connected using one hand #req("C5").
+
+   
+== Functional Requirements for Detection
+The functional requirements define which information the system must detect and process in order to reconstruct the physical three-dimensional structure digitally: Each building block must be uniquely identifiable to enable reliable construction detection and targeted feedback #req("DET1"). In addition, the system must also determine which blocks are connected, through which faces they are connected #req("DET2"), and how they are oriented relative to one another #req("DET3"). Only by combining these relationships can the system reconstruct the complete spatial configuration and compare it with the target structure #req("DET4"). This functionality should remain reliable when multiple blocks are connected simultaneously within a larger construction #req("DET5"). To prevent the system from providing misleading information to users, ambiguous or contradictory configurations should be recognised as error states #req("DET6").
+
+#apa-table(
+  columns: (0.7fr, 5fr),
+
+  table-label: <requirement-detection>,
+
+  header: (
+    [ID],
+    [Requirement],
+  ),
+
+  caption: [requirements for the construction detection],
+
+    req-target("DET1"),  [the system must be able to uniquely detect each cube],
+
+    req-target("DET2"),  [the system must be able to detect which cubes are connected with each other and on what side the connection occurs],
+
+    req-target("DET3"),  [the system must be able to detect the relative rotation of a two cubes in relation each other],
+
+    req-target("DET4"),  [the system must be able to compare the detected cube structure with a target structure],
+
+    req-target("DET5"),  [The system should continue to operate reliably even when multiple cubes are connected simultaneously],
+
+    req-target("DET6"),  [Configurations that cannot be clearly identified or are contradictory should be reported as technical faults],
+
+    req-target("DET7"),  [Connections and changes to the structure must be detected reliably and within a short time of max. 550ms],
+  )
+
+The maximum response time of 550 ms, which has been specified for detecting changes to the design, is initially a target value #req("DET7"). It is intended to ensure that an action and the resulting feedback are perceived as belonging together.
+
+
+== Electrical and Technical Requirements
+The technical implementation should be as simple, modular, and low-maintenance as possible, with individual components remaining replaceable at reasonable effort. To reduce maintenance requirements and avoid the need to charge multiple devices separately, the building blocks must operate without individual batteries or rechargeable power sources #req("EL1"). For the initial proof of concept, the prototype should include at least ten building blocks, as this number is sufficient to demonstrate multi-part and spatially branching constructions #req("EL2"). In the future, the system should be expandable with additional blocks without requiring changes to its fundamental operating principle #req("EL3").
+
+
+#apa-table(
+  columns: (0.7fr, 5fr),
+
+  table-label: <requirement-technical>,
+
+  header: (
+    [ID],
+    [Requirement],
+  ),
+
+  caption: [Electrical and technical requirements],
+
+    req-target("EL1"),  [The cubes must be operated without their own battery or individual rechargeable battery],
+
+    req-target("EL2"),  [The system must consist of at least 10 cubes],
+
+    req-target("EL3"),  [the system should be extendable without changing any basic operating principles],
+
+  )
+
+== Safety and Economic Requirements
+The prototype is not a certified toy and may therefore only be used under supervision. Nevertheless, potential risks must already be reduced through the physical design and electronic components and potentially detachable small parts must be enclosed and protected against direct access #req("S2"). The building blocks must also withstand repeated grasping, connecting, and disconnecting #req("S1"). In addition, each block should be easy to assemble and disassemble without damaging its components #req("S3").
+The cost per building block should preferably remain between one and three euros. However, the total system cost cannot yet be determined precisely, as it also depends on the base station, control electronics, and potential output devices #req("EC1").
+
+#apa-table(
+  columns: (0.7fr, 5fr),
+
+  table-label: <requirement-economic>,
+
+  header: (
+    [ID],
+    [Requirement],
+  ),
+
+  caption: [safety and Economic requirements],
+
+    req-target("S1"),  [The cubes must be able to withstand repeated gripping, connecting and disconnecting],
+
+    req-target("S2"),  [Electronic components and small parts that could come loose must be protected from direct access by the cube housing],
+
+    req-target("S3"),  [the cubes should be assembled and disassembled easily without being distroyed],
   
-    [IA2],  [The system must be operable without any technical/programming knowledge and without the need for recalibration],
-
-    [IA3],  [Ziel und Aufbau der Aufgabe müssen klar und überschaubar dargestellt werden],
-
-    [IA4],  [Die Aufgabe muss im individuellen Bearbeitungstempo durchgeführt werden können.],
-
-    [IA5],  [Bereits ausgeführte Handlungsschritte müssen korrigiert und wiederholt werden können],
-
-    [TUI1],  [Die Aufgabe soll einen strukturierten Handlungsrahmen bieten und innerhalb dieses Rahmens unterschiedliche Lösungsversuche ermöglichen],
-
-    [TUI2],  [Der Schwierigkeitsgrad soll durch die Anzahl der Bausteine, die räumliche Anordnung und die erforderlichen Rotationen variiert werden können],
+    req-target("EC1"),  [The total cost of a brick should not exceed 3 euros],
     
-    [TUI3],  [Die physische Gestaltung der Bausteine und ihre digitale Funktion müssen konsistent aufeinander abgestimmt sein.],
-  
-    
-  ),
-    caption: [requirements for educational and interactional context],
-) <requirement-educational>
+  )
 
-== Requirements for feedback and assistance
-Für die selbstständige Bearbeitung einer Konstruktionsaufgabe müssen die Lernenden erkennen können, ob ihre Handlung vom System erfasst wurde und welche Bedeutung ihr innerhalb der Lernaufgabe zukommt. Entsprechend der in Kapitel X vorgenommenen Unterscheidung muss das System deshalb sowohl Interaktionsfeedback als auch pädagogisches Feedback bereitstellen können [FB1]. Jede Rückmeldung muss dabei eindeutig der auslösenden Handlung beziehungsweise dem betroffenen Bereich der Konstruktion zugeordnet werden können, damit für die Lernenden erkennbar ist, worauf sie sich bezieht [FB2].
-
-??Während das Interaktionsfeedback darüber informiert, ob eine physische Handlung technisch erkannt wurde, kann das pädagogische Feedback drei verschiedene Funktionen erfüllen: Durch ein Ergebnisfeedback wird angezeigt, ob ein Baustein beziehungsweise ein Handlungsschritt mit der Zielkonstruktion übereinstimmt, fortschrittsfeedback macht sichtbar, welche Teile der Aufgabe bereits erfolgreich bearbeitet wurden und feedforward kann darüber hinaus einen Hinweis auf einen möglichen nächsten Handlungsschritt geben. Ziel soll es sein, alle drei Feedbackfunktionen im Prototyp zu realiseren. Das Ergebnisfeedback soll dabei einem abgestuften Rückmeldekonzept folgen, sodass die ganze Lösung nicht unmittelbar sondern in Schritten vorgegeben wird [FB4].
-#figure(
-  table(
-    columns: 2,
-    stroke: none,
-
-    table.header[ID][Requirement],
-
-    [FB1],  [Interaction and educational feedback must be ensured],
-
-    [FB2],  [Feedback must be clearly linked to the action that triggered it or the area concerned],
-
-    [FB3],  [Feedback should be provided on a tiered basis, je nachdem ob der fehler schon mit weniger feedback ausgebessert werden kann],
-
-    [FB4],  [Assistance should be provided on a tiered basis, depending on the learners level],
-    
-    [IA6],  [Feedback can be provided via several ausgabemedien],
-    
-  ),
-    caption: [requirements for feedback and assistance],
-) <requirement-feedback>
-
-Die Rückmeldung soll sowohl lokal an den physischen Bausteinen als auch global über die verbundene visuelle Darstellung angegeben werden können und muss unmittelbar, vollständig und konsistent erfolgen. Mehrere Ausgabemöglichkeiten können die Zugänglichkeit verbessern, müssen wenn verwendet, jedoch aufeinander abgestimmt sein [IA6]. Eine gleichzeitige Häufung von Licht-, Ton- und Bewegungssignalen ist zu vermeiden, da sie von der Aufgabe ablenken oder zu einer Reizüberlastung führen kann.
-
-== Geometrical and ergonomic requirements
-Die Bausteine bilden das zentrale Element der Lernspiels: sie stellen die physische Repräsentation der digitalen Informationen dar und dienen gleichzeitig als Bedienelemente. Ihre geometrische und mechanische Gestaltung beeinflusst deshalb sowohl die möglichen Konstruktionen als auch die Verständlichkeit und Zugänglichkeit der Interaktion. Wie schon in den pädagogischen Anforderungen beschrieben, müssen Form und Verbindungsstellen deshalb die vorgesehene Handhabung unmittelbar erkennen lassen und verdeutlichen, wo und wie die Bausteine miteinander verbunden werden können.
-
-Für den Prototyp muss außerdem eine quadratische Grundfläche angestrebt werden. Jeder Baustein muss eine definierte Andockseite besitzen, über die er mit einem anderen Baustein verbunden werden kann. Die übrigen Seiten dienen als aufnehmende Verbindungsseiten, an die weitere Bausteine mit ihrer jeweiligen Andockseite angeschlossen werden können.
-Dies ermöglicht verzweigte dreidimensionale Konstruktionen entlang klar definierter Richtungen und reduziert gleichzeitig den Herstellungs- und Erkennungsaufwand. Außerdem ermöglicht die quadratische Fläche die Rotation des bausteins in 90 Grad Schritten. Andere Grundflächenformen würden zusätzliche Verbindungsregeln und Gehäusevarianten erfordern, ohne für den grundlegenden Funktionsnachweis notwendig zu sein.  
-
-Um die Konstruktion zusammenzuhalten, muss die Verbindung zwischen den Bausteinen ausreichend stabil sein, allerdings nur so stark, dass sie noch mit geringem kraftaufwand lösen lässt und ohne feinmotorisch anspruchsvolle, exakte Positionierung hergestellt werden kann. Zudem muss ein Baustein mit einer Hand sicher gegriffen und positioniert werden können. 
-
-#figure(
-  table(
-    columns: 3,
-    stroke: none,
-
-    table.header[ID][Priority][Requirement],
-
-    [],  [The body of the cube must be based on a square base],
-
-    [],  [One cube type must be a cube shaped cube with six sides/faces],
-
-    [], [Other cube types could also be implemented in other geometric shapes],
-
-    [],  [Each cube must have at least one defined docking side where to connect with other cubes (Docking side = the side via which the building block can connect to another building block)],
-
-    [],  [Other cubes must be able to connect with the cube via its remaining sides],
-
-    [],  [The cubes must be able to be  arranged or stacked in three dimensions],
-
-    [],  [The cubes must be able to be positioned relative to one another in different orientations],
-
-    [],  [The cubes must be graspable and connected with one hand],
-
-    [],  [Cube connections must be strong enough to hold the structure together and easy enough to disconnect with minimal effort],
-
-    
-  ),
-    caption: [requirements for design],
-) <requirement-design>
-
-== Functional requirements for detection
-Welche Informationen das System erfassen und verarbeiten muss, um die physische dreidimensionale Konstruktion digital zu rekonstruieren, wird von den funktionalen Anforderungen beschrieben: Im Lernspiel werden die Bausteine zu räumlichen Strukturen zusammengesetzt, deren Aufbau sowohl durch die Verbindungen als auch durch die relativen Rotationen der Bausteine bestimmt wird.
-Für die digitale Erfassung und vor allem das gezielte Feedback muss deshalb jeder Baustein eindeutig identifizierbar sein [DET1]. Zusätzlich muss erkannt werden, welche Bausteine miteinander verbunden sind , über welche Seiten die Verbindung besteht [DET2] und wie sie zueinander ausgerichtet sind [DET3]. Erst aus der Gesamtheit dieser Beziehungen kann die räumliche Konstruktion digital rekonstruiert und mit der Zielkonstruktion verglichen werden [DET4]. Dies soll auch gewährleistet sein, wenn mehrere Bausteine gleichzeitig miteinander verbunden werden [DET5]. Nicht eindeutig erkennbare beziehungsweise widersprüchliche Konfigurationen sollten als Fehlerzustände erkannt werden, um die Nutzenden nicht zu verwirren [DET6]. 
-
-#figure(
-  table(
-    columns: 3,
-    stroke: none,
-
-    table.header[ID][Priority][Requirement],
-
-    [DET1],  [the system must be able to uniquely detect each cube],
-
-    [DET2],  [the system must be able to detect which cubes are connected with each other and on what side the connection occurs],
-
-    [DET3],  [the system must be able to detect the relative rotation of a two cubes in relation each other],
-
-    [DET4],  [the system must be able to compare the detected cube structure with a target structure],
-
-    [DET5],  [The system should continue to operate reliably even when multiple cubes are connected simultaneously],
-
-    [DET6],  [Configurations that cannot be clearly identified or are contradictory should be reported as technical faults],
-
-    [DET7],  [Connections and changes to the structure must be detected reliably and within a short time (of 1sec??)],
-  ),
-    caption: [requirements for detection],
-) <requirement-detection>
-
-Die maximale Reaktionszeit von einer Sekunde, die für Erfassung von Veränderungen an der Konstruktion festgelegt wurde, stellt zunächst einen Zielwert dar [DET7]. Sie soll sicherstellen, dass eine Handlung und die daraus folgende Rückmeldung als zusammengehörig wahrgenommen werden.
-
-
-== Electrical/technical requirements
-Die technische Realisierung soll möglichst einfach, modular und wartungsarm beziehungsweise mit vertretbarem Aufwand autauschbar sein. ?The cubes must be operated without their own battery or individual rechargeable battery [EL1].?
-
-Für den grundlegenden Funktionsnachweis sollte eine Anzahl von mindestens zehn Bausteinen erreicht werden, da sie völlig ausreicht um bereits mehrteilige und räumlich verzweigte Konstruktionen zu ermöglichen [EL2]. Perspektivisch soll das System aber ohne Veränderung des grundlegenden Funktionsprinzips um weitere Bausteine erweiterbar sein [EL3].
-
-#figure(
-  table(
-    columns: 3,
-    stroke: none,
-
-    table.header[ID][Priority][Requirement],
-
-    [EL1],  [The cubes must be operated without their own battery or individual rechargeable battery],
-
-    [EL2],  [10 cubes],
-
-    [EL3],  [the system should be extendable without changing any basic operating principles],
-
-  ),
-    caption: [requirements for technical],
-) <requirement-technical>
-
-== Safety and economic requirements
-Der Prototyp stellt kein zertifiziertes Spielzeug dar, weshalb er ausschließlich unter Aufsicht eingesetzt werden darf. Mögliche Risiken müssen dennoch bereits konstruktiv reduziert werden und elektronische komponenten und potenziell lösbare kleinteile durch gehäuse vor direktem zugriff geschützt sein [S1].
-[S2]??
-Ein Baustein sollte sich außerdem möglichst unkompliziert zusammen- und wieder auseinanderbauen lassen, ohne dabei kaputtzugehen. [S3]
-
-#figure(
-  table(
-    columns: 3,
-    stroke: none,
-
-    table.header[ID][Priority][Requirement],
-
-    [S1],  [The cubes must be able to withstand repeated gripping, connecting and disconnecting],
-
-    [S2],  [Electronic components and small parts that could come loose must be protected from direct access by the cube housing],
-
-    [S3],  [the cubes should be assembled and disassembled easily without being distroyed],
-  
-    [EC1],  [The total cost of materials for the system should not exceed 100 euros],
-    
-  ),
-    caption: [requirements for economic],
-) <requirement-economic>
-
-Die Kosten pro Baustein sollen nach Möglichkeit zwischen einem und drei Euro liegen. Da die Gesamtkosten zusätzlich von einer Basisstation, der Steuerelektronik und möglichen Ausgabegeräten abhängen.? [EC1] 

@@ -15,7 +15,7 @@ The quotation highlights the separation between traditional computer interaction
 
 The concept of Ishii and Ullmer’s Tangible Bits responds to this separation by coupling digital information with everyday physical and graspable objects and the surrounding environment. Its central aim is to bridge the divide between the digital domain of bits and the physical world of atoms, thereby making digital information directly accessible through physical manipulation. Tangible Bits consequently provided an important conceptual foundation for the development of @TUI @TangibleBits1997@TangibleBits2008.
 
-Different to a @GUI, in a @TUI, the computer becomes a natural extension of the physical environment. Interaction does not occur exclusively through graphical elements on a screen, instead, users manipulate real world objects, reffered to physical objects, so called phicons in order to interact with the digital system. These phicons do not merely serve as input devices but they also fulfill a representational function @TangibleUserInterface.
+Different to a @GUI, in a @TUI, the computer becomes a natural extension of the physical environment. Interaction does not occur exclusively through graphical elements on a screen, instead, users manipulate real world objects, reffered to physical objects, so called phicons in order to interact with the digital system. These phicons do not merely serve as input devices but they also fulfil a representational function @TangibleUserInterface.
 
 The fundamental principle of a @TUI is predicated on two closely related characteristics @TokenConstraint:
 
@@ -141,9 +141,9 @@ These mapping styles are not mutually exclusive and may be combined within a sin
 ==== Conclusion
 The _Token and Constraint_ framework demonstrates how physical actions can be translated into comprehensible digital operations. _Tokens_ enable direct manipulation, while constraints guide interaction and prevent invalid configurations. These characteristics can support constructivist and constructionist learning by enabling structured exploration and making the consequences of physical actions observable. However, their educational value ultimately depends on the design of the learning task.
 
-=== Child appropriate TUIs in the Field of Special Education (liang)
+=== Child appropriate TUIs in the Field of Special Education <tui-children>
 Whether a @TUI is perceived as accessible, exploratory, and supportive of learning depends
-not only on its general design, but also on its adaptation to the specific needs of children. A literature review of TUIs for children’s creative learning highlights the factors of abstractness, openness, richness and complexity, as well as a smooth experience. Since these factors were also not specifically formulated for students with a special educational focus, they are discussed below with consideration of the heterogeneous learning abilities and conditions for action within the defined target group.
+not only on its general design, but also on its adaptation to the specific needs of children. A literature review of TUIs for children’s creative learning highlights the factors of abstractness, openness, richness and complexity, as well as a smooth experience. Since these factors were also not specifically formulated for students with a special educational focus, they are discussed below with consideration of the heterogeneous learning abilities and conditions for action within the defined target group @TangibleInteraction.
 
 ==== Abstractness
 The factor of _Abstractness_ describes how concrete or ambiguous the meaning of a phicon is designed to be. While abstract and not fully predetermined representations can promote imagination and divergent thinking, an overly abstract design can lead to confusion, particularly among children without the required prior knowledge or additional explanation. The choice of physical representation and the manner in which it is coupled with digital information, explained in @coupling_objects, therefore directly influence how comprehensible the meaning of the phicon is perceived to be  @TangibleInteraction.
@@ -162,8 +162,7 @@ While _Richness_ refers to the variety of possible content, actions, and combina
 Due to the different learning conditions associated with the considered support needs, the complexity of the @TUI should not be reduced uniformly but should instead be individually adaptable. Different levels of difficulty can be designed to introduce new content and possibilities for action gradually. The objective should therefore not be to create the simplest possible design, but to provide an appropriate level of challenge for each child @Geistige_entwicklung @lernen @autismus.
 
 ==== Smooth Experience 
-BEZUG BELLOTTI 5 FRAGEN
-
+//BEZUG BELLOTTI 5 FRAGEN
 Faulty hardware or software can severely impair the learning experience. Unreliable systems make children feel uncertain and discourage them from learning from mistakes or taking risks, particularly when it is not clearly recognisable whether an error was caused by the system or by their own actions @TangibleInteraction. 
 
 For students with special educational needs, this can considerably reduce both motivation and confidence in acting independently. The in @feedback described Feedback should therefore be reliable, immediate, and clearly attributable. Multimodal feedback can provide access through different perceptual channels, but its intensity and quantity must remain limited or adaptable in order to prevent unnecessary sensory overload @Geistige_entwicklung @lernen @autismus.
@@ -186,79 +185,94 @@ The Design Factors show that there is no universally child-appropriate TUI. Its 
 
 
 == Feedback for TUI <feedback>
-bei TUI informiert das Feedback den Nutzenden darüber, ob eine handlung erkannt wurde, wie sie interpretiert wurde und welchen Zustand das System angenommen hat. Sie schließt damit den Wahrnehmungs- und Handlungskreislauf zwischen physischer Manipulation und digitaler Verarbeitung und gewährleistet die selbstständige Nutzung des Systems. 
+In a @TUI, feedback informs users whether an action has been detected, how it has been interpreted, and how it has affected the state of the system. It thereby closes the perception action loop between physical manipulation and digital processing and supports the independent use of the system.
 
-Bei lernorientierten Tangible User Interfaces sind zwei Ebenen des Feedbacks voneinander zu unterscheiden: 
-+ Interaktionsfeedback zeigt, ob und wie eine physische Handlung technisch erfasst und verarbeitet wurde. 
-+ Pädagogisches Feedback bewertet daraufhin die Handlung oder das erzielte Ergebnis im Hinblick auf die jeweilige Lernaufgabe. 
+=== Feedback Modalities
+As shown in @feedback-modalities, a system can communicate the consequences of an action through different output modalities. The physical properties of a @TUI already provide automatically intrinsic feedback that arises directly from manipulating its objects. Additional system-generated feedback may be presented visually, auditorily, haptically, or through a coordinated combination of these modalities. This multimodal feedback does not imply presenting as many signals as possible simultaneously since this may cause sensory overload. Instead, different modalities should offer alternative ways of accessing the same or complementary information, which can then be combined when a perceptual channel cannot be used, or can only be used to a limited extent.
 
-Ein System kann eine Handlung also technisch korrekt erkennen und sie trotzdem als inhaltlich falsch bewerten. Umgekehrt darf eine fehlerhafte oder ausbleibende technische Erkennung aber nicht als Fehler der lernenden Person dargestellt werden. Das Interaktionsfeedback bildet daher die Voraussetzung für verlässliches pädagogisches Feedback.  
+Regardless of its modality, feedback can also be characterised along several dimensions:
+- Local or global: presented directly at the manipulated object or through a separate display
+- Discrete or continuous: confirming an individual event or continuously indicating a state
+- Immediate or delayed: responding directly to an action or providing a later summary
+- Persistent or transient: remaining available until a correction is made or disappearing after a short period
 
-=== Interaktionsfeedback
+#apa-table(
+  columns: (1.2fr, 2fr, 2.2fr),
 
-=== Pädagogisches Feedback
- Während Interaktionsfeedback in erster Linie bestätigt, ob eine Handlung technisch erfasst wurde, bezieht sich pädagogisches Feedback auf die Bedeutung dieser Handlung innerhalb eines Lernprozesses. Es soll Lernende dabei unterstützen, den aktuellen Bearbeitungsstand einzuschätzen und Abweichungen von einem angestrebten Ergebnis zu erkennen, damit die Lernenden ihr weiteres Vorgehen anpassen können.
+  table-label: <feedback-modalities>,
 
-Sinnvolle Unterscheidung:
-+ Ergebnisfeedback: richtig oder falsch
-+ Prozessfeedback: Hinweis auf die Vorgehensweise oder Fehlerursache
-+ Feedforward: Orientierung für den nächsten Schritt
-+ Fortschrittsfeedback: Anzeige des bereits Erreichten
+  header: (
+    [Feedback Form],
+    [Function],
+    [Examples],
+  ),
 
-Für selbstgesteuertes Lernen ist eine reine Rückmeldung in Form von „richtig“ oder „falsch“ häufig nicht ausreichend, denn sie zeigt zwar, ob eine Abweichung vorliegt, unterstützt jedoch nur begrenzt dabei, deren Ursache zu erkennen um eine Lösung für den Fehler zu entwickeln. Gleichzeitig darf das System nicht jeden Handlungsschritt vollständig vorgeben, weil sonst die eigene Planung und Problemlösung reduziert werden.
-Eine geeignete Möglichkeit stellt deshalb abgestuftes Feedback dar, bei der die Unterstützung schittweise erweitert wird: Zunächst wird lediglich angezeigt, dass Fehler vorliegt. Wenn dies nicht ausreicht, kann kenntlich gemacht werden, auf welchen Teil der Handlung oder Konstruktion sich diese Abweichung bezieht. Bei weiterem Unterstützungsbedarf wird ein allgemeiner Lösungshinweis angeboten. Und erst wenn ein allgemeiner Lösungshinweis auch nicht ausreicht, folgt eine konkrete Hilfestellung.
-Auf diese Weise wird sichergestellt, dass die Möglichkeit zur selbstständigen Fehleranalyse erhalten bleibt, während zugleich verhindert wird, dass Lernende aufgrund einer unverständlichen Rückmeldung nicht weiterarbeiten können.
+  caption: [Feedback modalities in tangible user interfaces],
+
+  [_Intrinsic_],
+  [Provides information arising directly from the physical action],
+  [Mechanical resistance, form fit, or snapping into place],
+
+  [_Visual_],
+  [Communicates states, errors, and changes visually],
+  [LEDs, displays, projections, or animations],
+  
+
+  [_Auditory_],
+  [Attracts attention and communicates information autitory],
+  [Sounds, signals, or spoken information],
 
 
-=== Feedbackformen
-Wie Tabelle x zeigt, können die Folgen einer Handlung vom System durch unterschiedliche Ausgabemodalitäten vermittelt werden. Die physische Beschaffenheit einer TUI erzeugt dabei zunächst immer ein intrinsisches Feedback, das unmittelbar aus der Manipulation der Gegenstände hervorgeht. Zudem kann eine digitale Rückmeldung auch in Form  einer visuellen, auditiven, haptischen oder multimodalen Ausgabe erfolgen. Das multimodale Feedback definiert dabei jedoch nicht, möglichst viele Signale gleichzeitig auszugeben und dadurch womöglich eine Reizüberlastung zu verursachen. Unterschiedliche Modalitäten sollen vielmehr alternative Zugänge ermöglichen, die gezielt miteinander kombiniert werden könne, falls ein Wahrnehmungskanal von einem Nutzenden nicht oder nur eingeschränkt genutzt werden kann.
+  [_Haptic_],
+  [Makes system responses physically perceptible],
+  [Vibration, movement, or force feedback],
 
-Unabhängig von der Modalität lässt sich Feedback außerdem anhand mehrerer Dimensionen beschreiben:
-- Lokal oder global: direkt am Objekt oder auf einer separaten Anzeige,
-- Diskret oder kontinuierlich: Bestätigung eines Ereignisses oder fortlaufende Anzeige eines Zustands,
-- Unmittelbar oder verzögert: direkte Reaktion oder spätere zusammenfassende Rückmeldung,
-- Dauerhaft oder flüchtig: sichtbar, bis eine Korrektur erfolgt, oder nur kurz angezeigt.
 
-Feedbackformen
-+ intrinsisch: Formschluss, Widerstand oder Einrasten vermitteln unmittelbar Informationen über die Handlung
-+ visuell: LEDs, Displays, Projektionen oder Animationen zeigen Zustände, Fehler und Veränderungen
-+ auditiv: Töne oder Sprache können Aufmerksamkeit erzeugen und Informationen ohne Blickkontakt vermitteln
-+ haptisch/mechanisch: Vibration, Bewegung oder Force-Feedback machen Systemreaktionen körperlich wahrnehmbar
-+ multimodal: Mehrere aufeinander abgestimmte Modalitäten vermitteln dieselbe oder ergänzende Informationen über verschiedene Wahrnehmungskanäle
+  [_Multimodal_],
+  [Provides complementary or alternative access through different perceptual channels],
+  [Coordinated combinations of visual, auditory, or haptic signals],
 
-FAZIT
+)
 
-==== Qualitätskriterien verständlichen Feedbacks
-Die Wirksamkeit von Feedback hängt nicht allein von seiner technischen Form ab, sondern insbesondere davon, wie verständlich und handlungsrelevant es für die Nutzenden ist. Verständliches Feedback sollte deshalb folgende Kriterien erfüllen:
+=== Feedback learning TUI <feedback-tui>
+In learning-oriented @TUI, two levels of feedback should be distinguished:
+- _Interaction feedback_ communicates whether and how a physical action has been technically detected and processed
+- _Pedagogical feedback_ evaluates the action or its outcome in relation to the learning task
 
-+ Zeitnähe: Die Rückmeldung sollte in einem erkennbaren zeitlichen Zusammenhang mit der auslösenden Handlung stehen. Erfolgt sie zu spät, ist ihre Ursache möglicherweise nicht mehr eindeutig zuzuordnen.
-+ Eindeutigkeit: Es muss erkennbar sein, auf welche Handlung oder welches Objekt sich die Rückmeldung bezieht.
-+ Konsistenz: Gleiche Zustände und Ereignisse sollten durch gleichartige Signale dargestellt werden. Farbe, Ton oder Symbol dürfen ihre Bedeutung nicht ohne nachvollziehbaren Grund verändern.
-+ Wahrnehmbarkeit: Das Feedback muss ausreichend deutlich sein, ohne andere relevante Informationen zu überlagern.
-+ Angemessenheit: Intensität und Umfang der Rückmeldung sollten der Bedeutung des Ereignisses entsprechen. Eine gewöhnliche Bestätigung benötigt beispielsweise kein ebenso auffälliges Signal wie eine kritische Fehlermeldung.
-+ Handlungsorientierung: Das Feedback sollte nicht nur einen Zustand anzeigen, sondern gegebenenfalls auch erkennen lassen, wie die Interaktion fortgesetzt oder korrigiert werden kann.
-+ Zugänglichkeit: Wichtige Informationen sollten über geeignete beziehungsweise alternative Wahrnehmungskanäle zugänglich sein.
+A system may therefore detect an action correctly while evaluating it as incorrect in relation to the task. Conversely, a failure to detect an action must not be presented as an error made by the learner. Reliable interaction feedback is therefore a prerequisite for meaningful pedagogical feedback.  
+==== Interaction Feedback
+_Interaction Feedback_ makes the technical response of the system comprehensible. It should indicate wheter a physical action has been detected and interpreted correctly or not. If an action cannot be processed, the system should immediately distinguish a technical recognition problem from an incorrect solution to the learning task. Otherwise, learners may incorrectly attribute system failures to their own actions and become uncertain about how to proceed.
+
+==== Pedagogical Feedback
+While _interaction feedback_ primarily confirms whether an action has been technically processed, _pedagogical feedback_ concerns the meaning of that action within the learning process. It supports learners in assesing their current progress and recognising deviations from the intended outcome to adapt their subsequent actions. 
+
+_Pedagogical feedback_ can fulfil different functions: 
+- Outcome feedback indicates whether a result is correct or incorrect.
+- Process feedback provides information about the approach taken or a possible cause of error.
+- Feedforward offers guidance for the next step.
+- Progress feedback indicates what has already been achieved
+
+Additionally, as it would restrict independent planning and problem-solving, the system should not prescribe every step, but provide graduated feedback, in which support increases according to the learner’s needs. This preserves opportunities for independent error analysis while preventing learners from becoming unable to continue because the feedback is insufficient or incomprehensible.
+
+==== Criteria for Effective Feedback/design factors for children 
+The effectiveness of feedback depends not only on its technical form but, more importantly, on whether it is understandable and relevant to the user’s subsequent actions. Effective feedback should therefore meet the following criteria:
+
+- Timeliness: Feedback should occur in a recognisable temporal relationship to the action that triggered it. If it is delayed, users may no longer be able to identify its cause
+- Clarity: It should be evident which action, object, or system state the feedback refers to
+- Consistency: Similar states and events should be represented by consistent signals Colours, sounds, and symbols should not change their meaning without a comprehensible reason.
+- Perceptibility: Feedback should be sufficiently noticeable without obscuring other relevant information
+- Proportionality: The intensity and extent of feedback should correspond to the significance of the event. A routine confirmation, for example, should be less prominent than a critical error message
+- Actionability: Feedback should not only communicate the current state but, where necessary, also indicate how the interaction can be continued or corrected
 
 Gerade bei unterschiedlichen sensorischen, kognitiven und kommunikativen Voraussetzungen sind anpassbare und redundante Rückmeldungen relevant.
 
-=== Belottis 5 fragen zur Gestaltung von Feedback (token and constraints)
-vlt vorverschieben
-Für sensorbasierte und greifbare Interaktionssysteme entwickelten Bellotti et al. fünf Fragen, anhand derer sich die Verständlichkeit einer Interaktion systematisch untersuchen lässt. Wechselspiel zwischen Sytsem und Nutzende
-Das Modell betrachtet dabei, ob ein Nutzender die Aufmerksamkeit, Interpretation und Reaktion des Systems nachvollziehen können (vgl. Bellotti et al., 2002).
-TABELLE
-+ Address	Wie erkennt das System, dass eine Handlung an das System gerichtet ist?
-+ Attention	Woran erkennen die Nutzenden, dass das System aufmerksam ist und die Eingabe registriert?
-+ Action	Wie erkennt das System, auf welches Objekt und welche Operation sich die Handlung bezieht?
-+ Alignment	Woran erkennen die Nutzenden, dass das System ihre Absicht korrekt verstanden und ausgeführt hat?
-+ Accident	Wie können Fehlinterpretationen, unbeabsichtigte Handlungen und technische Fehler erkannt und korrigiert werden?
--> Die fünf Fragen verdeutlichen, dass eine technisch erfolgreiche Erkennung allein nicht ausreicht. Die Interpretation des Systems muss für die Nutzenden nachvollziehbar sein, und Missverständnisse müssen ohne unverhältnismäßigen Aufwand korrigiert werden können.
+MEHR AUF FÖRDERSCHWERPUNKT EINGEHEN
 
-
-
-==== Perspektive der Zielgruppe vlt eher nach potenzialen TUI für Kinder?
-
+=== Conclusion
 
 == Potentials of TUIs for children (with dissorders) (liang)
+ÜBERGANG - stellt eigentlich end conclusio des theorethischen backgrounds dar 
+
 Research attributes various potentials to TUIs for children’s learning. However, since these findings often originate from studies involving children without specifically identified special educational support needs, they cannot be transferred without qualification to students in the areas of intellectual development, learning, and autism. The following potentials are therefore considered in an extended manner that takes into account the target-group-specific conditions and ?the shared learning objectives defined in the introduction.?
 
 === Supporting Novices through Scaffolding and Accessibility
