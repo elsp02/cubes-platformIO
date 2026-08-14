@@ -1,9 +1,5 @@
-#import "functions.typ": req
+#import "functions.typ": req, apa-table
 
-#set page(numbering: "1")
-#set par(justify: true)
-// Figures nicht im Blocksatz
-#show figure: set par(justify: false)
 
 = Konzeptentwicklung
 - In diesem Kapitel wird beschrieben, welche Lösungen gewählt wurden und warum diese zur Berücksichtigung der Anforderungen geeignet sind
@@ -13,31 +9,16 @@
 == Ausgangspunkt und Konzeptziele
 - Bezug zur Anforderungsanalyse
   - Die in kapitel x durchgeführte Anforderungsanalyde bildet dier Grundlage für die Entwicklung des Systemkonzepts
-  - Ziel der Konzeptentwicklung ist es, Anforderungen in ein zusammenhängendes Systemkonzept zu überführen
-
-- Ziel des Konzepts
-  - Entwicklung eines modularen, würfelbasierten Lernsystems, das physisches Konstruieren mit digitaler Erfassung, Visualisierung und Rückmeldung verbindet
-  - Die Lernenden sollen mit den Bausteinen dreidimensionale Konstruktionen herstellen und verändern können
-  - Die physische Ist-Konstruktion soll digital erfasst und mit einer vorgegebenen Zielkonstruktion verglichen werden.
-  - Auf Grundlage dieses Vergleichs sollen die Lernenden eine Rückmeldung über ihren aktuellen Bearbeitungsstand erhalten
+  - Ziel der Konzeptentwicklung ist es, Anforderungen zu erfüllen und in ein zusammenhängendes Systemkonzept zu überführen
   
-- Konzeptentwicklung umfasst?? - angleichen an unterkapitelnamen
+- Konzeptentwicklung umfasst
     - physische Gestaltung der Würfel und ihrer Verbindungen
     - elektronische Erfassung und Energieübertragung
-    - Datenübertragung
-    - digitale Rekonstruktion der Konstruktion
-    - Aufgaben und Feedbackgestaltung
+    - Kommunikation, Datenübertragung und digitale Rekonstruktion der Konstruktion
+    - Aufgaben- und Interaktionsprinzip
+    - Visualisierungs- und Feedbackgestaltung
 
-- Ziel und Abgrenzung des Prototyps
-  - für prototypischen Funktionsnachweis wird Systemumfang bewusst begrenzt auf:
-  - Im mittelpunkt steht eine angeleitete räumliche Nachbauaufgabe mit mindestens zehn Bausteinen 
-  - Die Zielkonstruktion und die erkannte Ist-Konstruktion werden in einer computerbasierten Lernanwendung dargestellt.
-  -> Der Prototyp soll das grundlegende Zusammenspiel aus physischer Konstruktion, automatischer Erfassung, digitalem Vergleich und Rückmeldung demonstrieren.
 
-  - Nicht bestandteil/mögliche Erweiterungen: 
-  - freie Konstruktionsaufgaben
-  - weitere Spielmodi
-  - eine Untersuchung der langfristigen pädagogischen Wirksamkeit
 
 == Nutzungsszenario
 === Ablauf der Bauufgabe
@@ -86,8 +67,6 @@ Die Funktionsstruktur verdeutlicht:
 -  physische Handlung kann nicht unmittelbar durch die Lernanwendung interpretiert werden kann, sondern muss die Verbindung mechanisch hergestellt und elektronisch erkannt werden
 - lokale Informationen müssen übertragen und in ein digitales Strukturmodell überführt werden
 - Erst auf Grundlage dieses Modells kann die Lernanwendung einen Zielvergleich durchführen und ein inhaltliches Feedback erzeugen.
-
-Die Funktionsstruktur legt noch nicht fest, durch welche Komponenten und Technologien die einzelnen Teilsysteme realisiert werden -> Zuordnung erfolgt in der nachfolgenden Systemarchitektur
 
 
 == Übergeordnete Systemarchitektur

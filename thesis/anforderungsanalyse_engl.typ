@@ -1,6 +1,6 @@
 #import "functions.typ": apa-table, req, req-target
 
-= Requirements Analysis
+= Requirements Analysis <requirements-analysis>
 The requirements analysis translates the findings from the theoretical background and the design principles derived from the special educational context into concrete requirements for the prototype. Following a constructionist approach, the objective is to develop a modular, cube-based @TUI in the form of a learning game suitable for use in special education. The prototype is intended to enable students to complete three-dimensional construction tasks independently while receiving immediate feedback on whether their construction corresponds to the target structure or not.
 
 The requirements are derived from three perspectives:
@@ -22,7 +22,7 @@ The primary application scenario is a spatial reconstruction task, where student
 
 The level of difficulty can be varied through the number of bricks, their spatial arrangement and the required rotations. Simple tasks may consist of a small number of bricks connected primarily in a linear arrangement, whereas more challenging tasks may involve multiple spatial directions, different orientations, and branching structures. Future task types could include completing unfinished structures, identifying incorrect connections, or constructing freely without a predefined target.
 
-== Educational and Interaction-related Requirements
+== Pedagogical and Interaction-related Requirements
 In accordance with the constructionist understanding of learning described in Chapter @constructionism, the active creation of a physical artefact must form the core of the learning activity #req("TASK1"). Learners must be able to observe, inspect, and directly modify the emerging construction throughout the task #req("IA1"). This enables them to translate their mental representation into a concrete spatial structure through which the effects of individual actions become observable. To support independent use, the system must also be operable without technical or programming knowledge and without requiring recalibration #req("IA2").
 
 At the same time, the tasks must  must accommodate the diverse learning prerequisites of the target group and thus provide a clear and manageable framework for action #req("IA3"), without describing every individual action. Processes and sub-goals must be presented in a way that is easy to follow, whilst allowing sufficient time for completion #req("IA4") and opportunities for repetition #req("IA5").

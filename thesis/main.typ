@@ -346,6 +346,9 @@ This thesis ...
 
 #include "anforderungsanalyse_engl.typ"
 
+#pagebreak()
+
+#include "systemkonzept_engl.typ"
 
 // Weitere Kapitel später beispielsweise:
 //

@@ -10,6 +10,10 @@ Die technische Realisierung beschreibt, wie das zuvor entwickelte Konzept tatsä
     - auch Ausnahme dass ein Kontakt auf einer Aufnahmeseite anders als alle anderen positioniert wurden - Rotationsbestimmung im Code anpassen
 - grundlegender Aufbau der Baseplate
 
+
+ABBILDUNGEN: gehäuse, seiten und deckel extra und zusammengebaut, vlt explosionszeichnung
+aufbau einer andock und einer aufnahmeseite reales abbild und daneben zeichnung
+
 === elektronischer Aufbau
   - verwendete elektronische Bauteile
       - ATtiny1616 als Steuereinheit
@@ -25,6 +29,14 @@ Die technische Realisierung beschreibt, wie das zuvor entwickelte Konzept tatsä
 Abbildungen:
   - CAD-Darstellung oder Explosionszeichnung,
   - Fotos des gefertigten Würfels und der Basisplatte,
+
+=== Kontaktierung
+- Art der Kontakte
+  - Pogo Pins -> können kleine Abweichungen aus dem Herstellungsprozess und geringfügige Bewegungen zwischen den Würfeln ausgleichen
+  - Vertiefungen und Führungselemente dienen auch schutz der elektrischen schnittstelle (schutz vor fehlkontaktierung und kurzschluss)
+
+  - feedback mit led 
+
 
 == Kommunikationsprotokoll 
 welche Nachrichten werden wie übertragen?
@@ -90,3 +102,4 @@ ARCHTITEKTURDIAGRAMM
 - Auswahl und Darstellung einer Zielkonstruktion
 - visuelle Kennzeichnung korrekter und fehlerhafter Bausteine
   - Abstimmung zwischen globaler Rückmeldung in der Anwendung und lokalem Feedback an den Würfeln
+  - feedback mit led 

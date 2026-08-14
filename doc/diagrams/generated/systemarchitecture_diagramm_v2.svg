@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="650" viewBox="0 0 1200 650" role="img" aria-labelledby="title desc">
+  <title id="title">Overall System Architecture</title>
+  <desc id="desc">High-level overview of the building blocks, baseplate, learning application, learner, and teacher and their relationships.</desc>
+
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="5" orient="auto" markerUnits="strokeWidth">
+      <path d="M 0 0 L 10 5 L 0 10 z" fill="#365f91"/>
+    </marker>
+    <marker id="arrow-start" markerWidth="10" markerHeight="10" refX="1" refY="5" orient="auto-start-reverse" markerUnits="strokeWidth">
+      <path d="M 10 0 L 0 5 L 10 10 z" fill="#365f91"/>
+    </marker>
+    <style>
+      .text { font-family: Arial, Helvetica, sans-serif; fill: #202a35; }
+      .group-title { font-size: 21px; font-weight: 700; }
+      .component-title { font-size: 19px; font-weight: 700; }
+      .actor-note { font-size: 14px; }
+      .label { font-size: 14px; font-weight: 600; }
+      .boundary { fill: #f7f9fc; stroke: #5f7895; stroke-width: 2; }
+      .component { fill: #ffffff; stroke: #506579; stroke-width: 1.8; }
+      .application { fill: #eef4fb; stroke: #365f91; stroke-width: 2; }
+      .actor { fill: #ffffff; stroke: #596573; stroke-width: 1.8; }
+      .relation { fill: none; stroke: #365f91; stroke-width: 2.2; marker-end: url(#arrow); }
+      .bidirectional { fill: none; stroke: #365f91; stroke-width: 2.2; marker-start: url(#arrow-start); marker-end: url(#arrow); }
+      .label-bg { fill: #ffffff; opacity: 0.96; }
+    </style>
+  </defs>
+
+  <rect width="1200" height="650" fill="#ffffff"/>
+
+  <!-- Physical subsystem -->
+  <rect x="45" y="155" width="400" height="435" rx="14" class="boundary"/>
+  <text x="245" y="190" text-anchor="middle" class="text group-title">Physical Cube System</text>
+
+  <rect x="90" y="230" width="310" height="115" rx="11" class="component"/>
+  <g transform="translate(125 253)">
+    <path d="M 0 24 L 28 8 L 56 24 L 28 40 Z" fill="#eef4fb" stroke="#506579" stroke-width="1.4"/>
+    <path d="M 0 24 L 28 40 L 28 72 L 0 56 Z" fill="#ffffff" stroke="#506579" stroke-width="1.4"/>
+    <path d="M 56 24 L 28 40 L 28 72 L 56 56 Z" fill="#dce8f5" stroke="#506579" stroke-width="1.4"/>
+  </g>
+  <text x="270" y="288" text-anchor="middle" class="text component-title">Building Blocks</text>
+  <text x="270" y="315" text-anchor="middle" class="text actor-note">Physical construction and local feedback</text>
+
+  <rect x="90" y="445" width="310" height="95" rx="11" class="component"/>
+  <text x="245" y="485" text-anchor="middle" class="text component-title">Baseplate</text>
+  <text x="245" y="512" text-anchor="middle" class="text actor-note">Power supply and system gateway</text>
+
+  <!-- Learning application -->
+  <rect x="520" y="270" width="300" height="180" rx="14" class="application"/>
+  <text x="670" y="345" text-anchor="middle" class="text group-title">Learning Application</text>
+  <text x="670" y="378" text-anchor="middle" class="text actor-note">Task provision, structure processing,</text>
+  <text x="670" y="400" text-anchor="middle" class="text actor-note">visualisation, and feedback generation</text>
+
+  <!-- External actors -->
+  <text x="1030" y="165" text-anchor="middle" class="text group-title">External Actors</text>
+
+  <rect x="900" y="210" width="260" height="105" rx="12" class="actor"/>
+  <circle cx="945" cy="246" r="14" fill="none" stroke="#596573" stroke-width="2"/>
+  <path d="M 920 297 C 922 270, 968 270, 970 297 M 945 260 L 945 299" fill="none" stroke="#596573" stroke-width="2" stroke-linecap="round"/>
+  <text x="995" y="251" class="text component-title">Learner</text>
+  <text x="995" y="278" class="text actor-note">Interacts with the system</text>
+
+  <rect x="900" y="450" width="260" height="105" rx="12" class="actor"/>
+  <circle cx="945" cy="486" r="14" fill="none" stroke="#596573" stroke-width="2"/>
+  <path d="M 920 537 C 922 510, 968 510, 970 537 M 945 500 L 945 539" fill="none" stroke="#596573" stroke-width="2" stroke-linecap="round"/>
+  <text x="995" y="491" class="text component-title">Teacher</text>
+  <text x="995" y="518" class="text actor-note">Configures and supports</text>
+
+  <!-- Relationships -->
+  <path d="M 245 345 L 245 435" class="bidirectional"/>
+  <rect x="263" y="374" width="150" height="38" rx="4" class="label-bg"/>
+  <text x="338" y="390" text-anchor="middle" class="text label">Power and control /</text>
+  <text x="338" y="407" text-anchor="middle" class="text label">local structural data</text>
+
+  <path d="M 400 492 L 475 492 L 475 420 L 510 420" class="bidirectional"/>
+  <rect x="414" y="454" width="197" height="38" rx="4" class="label-bg"/>
+  <text x="512.5" y="470" text-anchor="middle" class="text label">Control and feedback /</text>
+  <text x="512.5" y="487" text-anchor="middle" class="text label">detected structure</text>
+
+  <path d="M 830 292 L 890 292" class="bidirectional"/>
+  <rect x="816" y="320" width="188" height="38" rx="4" class="label-bg"/>
+  <text x="910" y="336" text-anchor="middle" class="text label">Task interaction /</text>
+  <text x="910" y="353" text-anchor="middle" class="text label">visualisation and feedback</text>
+
+  <path d="M 900 503 L 850 503 L 850 420 L 830 420" class="relation"/>
+  <rect x="839" y="456" width="133" height="24" rx="4" class="label-bg"/>
+  <text x="905.5" y="473" text-anchor="middle" class="text label">Task configuration</text>
+
+  <path d="M 900 245 L 860 245 L 860 105 L 245 105 L 245 220" class="bidirectional"/>
+  <rect x="435" y="88" width="250" height="24" rx="4" class="label-bg"/>
+  <text x="560" y="105" text-anchor="middle" class="text label">Physical manipulation / local feedback</text>
+</svg>

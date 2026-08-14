@@ -109,7 +109,7 @@ Not only the temporal precision of coupling influences how clearly its digital m
 The coupling between physical objects and digital information can differ in content, flexibility, and physical representation. Selecting an appropriate approach therefore requires a careful consideration of the intended users and their abilities, as well as the specific application context. Regardless of the chosen approach, an effective TUI requires a clear and immediately perceptible relationship between the phiconand the associated digital meaning. The design of this coupling therefore directly influences the system’s comprehensibility, usability, and flexibility.
 
 
-=== The _Token and Constraint_ Framework <token_constraint>
+=== The _Token and Constraint_ Framework <token-constraint>
 Once digital information has been assigned to a phicon, it must be determined how this object can be physically arranged and how changes in its configuration can be translated into digital operations @TokenConstraint.
 
 One approach to structuring tangible interaction is the _Token and Constraint_ framework. The discrete physical objects that represent digital information are referred to as _tokens_ within this framework. They correspond to the physical representations previously introduced as _phicons_. However, the term _token_ is retained in this section to remain consistent with the framework’s original terminology. _Tokens_ are placed or manipulated within physical structures known as constraints. These constraints define where and how a token can be positioned or moved and are mapped to specific digital operations @TokenConstraint.
@@ -151,7 +151,7 @@ The factor of _Abstractness_ describes how concrete or ambiguous the meaning of 
 For students within the selected special educational focus, a balance between abstraction and clarity is therefore required. Phicons should provide sufficient indications of their function and possible use, but at the same time, the design should not be unnecessarily simplified or infantilising, so that it still provides sufficient depth for exploration @Geistige_entwicklung @lernen @autismus.
 
 ==== Openness
-_Openness_ defines the scope that a TUI provides for individual actions, solution strategies, and interpretations and is indirectly influenced by the number and restrictiveness of its physical _constraints_ (@token_constraint).
+_Openness_ defines the scope that a TUI provides for individual actions, solution strategies, and interpretations and is indirectly influenced by the number and restrictiveness of its physical _constraints_ (@token-constraint).
 While excessive instruction can restrict creativity, insufficient support or scaffolding often leads to frustration @TangibleInteraction.
 
 For students with a special educational focus on @GE, @LE and @ASD _structured Openness_ is particularly relevant. Clear intermediate goals can prevent children from becoming overwhelmed. When these are supplemented by step-by-step support that is adapted to the individual learner’s current level and can be reduced as confidence increases, a comprehensible framework for action is created without providing excessive instruction @Geistige_entwicklung @lernen @autismus.
