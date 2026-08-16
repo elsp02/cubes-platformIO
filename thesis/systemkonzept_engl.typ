@@ -31,7 +31,7 @@ The task is completed at the learner’s individual pace and does not impose a f
 
 Throughout the process, the teacher retains responsibility for the pedagogical guidance of the learner and can adapt the available selection of tasks or provide additional explanations if the feedback or assistance offered by the system is insufficient or not understood. Automated feedback is therefore intended to support the teacher during periods of independent work and should not replace individual pedagogical guidance.
 
-
+SCHREIBEN DASS DAS DIAGRAMM NUR EINE AUFGABE BESCHREIBT UND ES BEENDET IST SOBALD SIE FERTIG IST
 #figure(
   image("figures/rechteck_hoch@3x.png", width: 90%),
   caption: [task flow, Ablaufdiagramm]
@@ -134,7 +134,7 @@ To describe the system unambiguously, a distinction is made between the terminol
     [Data model], [Child brick], [Building brick whose docking face is connected to a receiving face of the parent brick],
   )
 
-== Physical Design and Connection Subsystem
+== Physical Design and Connection Subsystem <physical-concept>
 - Im Folgenden werden gemäß der Begriffsdefinition in Abschnitt X.3.3 die Bezeichnungen Andockseite und Aufnahmeseite verwendet.
 
 Das Kapitel beschreibt:
@@ -145,7 +145,7 @@ Das Kapitel beschreibt:
 - Gehäuse- und Wartungskonzept
 - mechanischen Aufbau der Baseplate
 
-=== Basic Geometry and Block Types
+=== Basic Geometry and Block Types <geometry-brick>
 In accordance with requirement #req("G1"), the connection faces of all building bricks have a square geometry with standardised dimensions. This geometry permits a rotationally symmetrical contact arrangement and allows four mechanically valid orientations in increments of 90°. It therefore ensures compatibility between different brick types and provides the mechanical basis for the electronic detection of relative rotation required by #req("C4").
 Based on the standardised connection geometry, two building-brick types are defined in accordance with #req("G3")
 - The _cube brick_ wth six square connection faces, as specified by #req("G2")
@@ -156,7 +156,7 @@ Whereas the cube brick supports linear as well as branched two- and three-dimens
 For the square connection faces a side lenght of approximately 40mm is specified. The selected dimension represents a compromise between the one-handed grasping and positioning required by #req("C5") and the internal space needed for electrical contacts and electronic components. Whether the chosen size is in fact ergonomically suitable is assessed in Chapter (EVALUATION).
 
 The consistent brick geometry also establishes a direct visual correspondence between the physical building bricks and conventional construction bricks such as ?LEGO or ?.
-The implications of the physical–digital correspondence for interaction are discussed in Section ??? @bild1.
+The implications of the physical–digital correspondence for interaction are discussed in Section ???.
 
 #grid(
   columns: (1fr, 1fr),
@@ -251,7 +251,7 @@ Depending on its type, a building brick provides either five downstream interfac
 
 ==== Fuctional Structure of the Baseplate
 The Baseplate contains four electronic functional units:
-+ A central control unit: It initiates the detection process and mediates between the physical cube system and the learning application
++ A central? control unit: It initiates the detection process and mediates between the physical cube system and the learning application
 + The downstream interface: It establishes the electrical connection to the first building brick
 + Central power supply: It provedes energy to the connected construction
 + Application interface: it enables the exhange of data with the learning application
@@ -384,9 +384,9 @@ enthält:
 
 === Logical Structure and Data Model <structure-model>
 The physical construction is conceptually represented as a directed tree: The baseplate forms the root of the tree, each connected building brick is represented by a node and each physical connection constitutes a directed edge between a parent and a child node.
-The model reflects also the directed interface structure introduced in @electrical-interface: The defined docking face connects each brick to its parent, while its receiving faces allow one or more child bricks to be attached. Consequently, each brick can have no more than one parent but may have several children. As required by #req("C3"), both linear and branching three-dimensional constructions can therefore be represented by the model. 
+The model reflects also the directed interface structure introduced in @electrical-interface: The defined docking face connects each brick to its parent, while its receiving faces allow one or more child bricks to be attached. Consequently, each brick can have no more than one parent but may have several children. As required by #req("C3"), both linear and branching three-dimensional constructions can therefore be represented by the model. By deriving the digital interpretation from the parent–child relationships and the resulting overall construction, the structure model applies the relational and constructive mapping principles introduced in @mapping.
 
-However, knowledge of the docking face and relative rotation alone is insufficient to characterise a building brick within the overall construction. Table @node-infos summarises the information contained in each node that is required for this purpose:
+To identify and interpret each building brick within this tree, however, the parent–child relationship alone is insufficient. Table @node-infos summarises the additional information contained in each node for this purpose:
 
 
 #apa-table(
@@ -419,30 +419,6 @@ However, knowledge of the docking face and relative rotation alone is insufficie
   )
 
 The identity is used to recognise an individual physical building brick and subsequently assign local feedback to it, whereas the brick type is required to interpret its geometry and compare it with the corresponding element of the target structure. Lastly, the relative rotation and occupied connection faces describe the local spatial relationship between the node and its parent and children.
-
-
-ABBILDUNG: Gegenüberstellung einer physischen Konstruktion und des daraus abgeleiteten digitalen Baumes
-
-==== Mapping Styles
-- das gewählte Strukturmodell verbindet mehrere der in Kapitel X beschriebenen Mapping Styles:
-  - relationales mapping: digitale Interpretation liegt auf den Beziehungen zwischen den bausteinen - 
-  - konstruktives mapping: digitale Bedeutung und räumliche Information entsteht nicht aus einem einzelnen Baustein, sondern aus der Verbindung mehrerer Elemente zu einer Gesamtstruktur
-
-==== methods of coupling
-- statische Kopplung: Zuordnung eines physischen Bausteintyps zu seinem digitalen Modell ist vorab festgelegt -> die zwei unterschiedlichen Bausteintypen werden immer durch ihr entsprechendes digitales Würfelmodell (das dem physischen baustein vom aussehen gleicht) repräsentiert 
-- interaktive Kopplung: Die Bedeutung der Konstruktion entsteht aus der Verbindung der Würfel untereinander (Position, Rolle im Baum und Bewertung hängen von der jeweiligen Konfiguration ab)
-
-
-////
-Ich würde die Überschrift vollständig entfernen und nur einen kurzen Rückbezug am Ende von „Logical Structure and Data Model“ einfügen:
-By deriving the digital interpretation from the parent–child relationships and the resulting overall construction, the structure model applies the relational and constructive mapping principles introduced in Section X.
-
-Die übrigen Inhalte lassen sich passender verteilen:
-Die visuelle Übereinstimmung zwischen physischem Baustein und digitalem Modell gehört zu „Basic Geometry and Block Types“ oder zum späteren Interaktionskonzept.
-Die konfigurationsabhängige Bedeutung der Bausteine kann kurz im „Task and Interaction Concept“ aufgegriffen werden.
-Die Unterscheidung zwischen statischer und interaktiver Kopplung muss nicht erneut ausführlich erklärt werden, wenn sie im theoretischen Hintergrund bereits behandelt wurde.
-So bleibt der theoretische Rückbezug erhalten, ohne den technischen Argumentationsfluss des Kapitels zu unterbrechen.
-//// 
 
 === Detection and Communication Concept
 Communication within the physical construction follows the parent child relationships of the structure model: A parent requests information from a directly connected child, which responds with its own node information and the serialised descriptions of all subordinate structures connected to it. This communication takes place through the upstream interface of the child and the corresponding downstream interface of the parent described in @functional-structure. It follows a request response principle since the parent initiates the exchange, and the child responds to the request. When the child subsequently queries its own receiving faces, it assumes the role of a parent in relation to the bricks connected below it.
@@ -503,6 +479,9 @@ The pedagogical meaning and visual presentation of the individual feedback state
 == Task and Interaction Subsystem <task-concept>
 The task and interaction concept specifies how learners complete the reconstruction task and which actions are available to them during this process. It furthermore defines the rules according to which a physical construction is evaluated while preserving sufficient flexibility for learners to explore, revise, and correct their chosen construction process.
 
+=== Physical–Digital Coupling
+The interaction concept combines the static and interactive forms of coupling introduced in @coupling. At the representational level, each physical brick type is statically linked to a corresponding digital model. The cube brick and the smashed brick are therefore always represented by digital models that reflect their respective physical geometry and appearance. The meaning of an individual brick within a construction, however, is determined interactively. Its position and orientation, its role within the parent child structure and its evaluation in relation to the target structure depend on the current physical configuration. Whenever bricks are connected, detached, rotated, or repositioned, these properties are recalculated by the learning application. The digital meaning of the construction therefore emerges from the relationships between the physical bricks rather than from the individual elements in isolation.
+
 === Task Logic
 The construction task is governed by a set of structural and procedural rules.
 
@@ -522,11 +501,11 @@ As required in #req("IA5"), errors are explicitely permitted and incorrect actio
 === Adaptation of Task Difficulty
 According to #req("TUI2"), The difficulty of the construction tasks must be adaptable to different learning prerequisites and can be varied through the following characteristics:
 
-- Number of building blocks: Tasks with fewer blocks provide a simpler starting point, whereas a larger number enables more extensive constructions
+- Number of building bricks: Tasks with fewer bricks provide a simpler starting point, whereas a larger number enables more extensive constructions
 - Spatial extent: Structures may extend along one, two, or all three spatial axes.
-- Structural complexity: Tasks may involve linear constructions or branching structures with several child blocks
+- Structural complexity: Tasks may involve linear constructions or branching structures with several child bricks
 - Relative rotation: Blocks may use consistent orientations or different rotations in increments of 90°
-- Block types: A task may require only one block type or a combination of different types.
+- Block types: A task may require only one brick type or a combination of different types.
 - Presentation of the target: The complete target structure may be displayed from the beginning or revealed incrementally
 - Level of support: Feedback may be limited to an evaluation of the current result or supplemented with guidance concerning possible subsequent actions
 
@@ -536,7 +515,7 @@ These characteristics can be combined to create tasks of varying complexity with
 ???
 The specific presentation and gradation of the corresponding feedback and assistance are defined in the following visualisation and feedback concept
 
-== Visualisierungs- und Feedbackkonzept <feedback-concept>
+== Visualisation and Feedback Subsystem <feedback-concept>
 ÜBERLEITUNG
 
 enthält:
@@ -551,102 +530,142 @@ enthält:
   - Feedback: bewertet Zustand im Hinblick auf Bauaufgabe = pädagogisches Feedback
   => Lernenden können zuerst nachvollziehen, ob und wie ihre handlung vom System erkannt wurde und anschließend erkennen, ob eine Korrektur erforderlich ist
 
-=== Visualisierung der Zielkonstruktion
-- Zu Beginn der Bauaufgabe wählt das Kind in der Lernanwenung eine Zielkonstruktion aus, die während der Bearbeitung als visuelle Referenz verfügbar bleibt
-- abhängig vom gewählten Schwierigkeitsgrad kann die Zielkonstruktion vollständig oder schrittweise dargestellt werden [TUI2, FB4]
-  - Vollständige Darstellung ermöglicht den Lernenden, den Aufbau eigenständig zu analysieren und eine eigene Vorgehensweise zu planen
-  - schrittweise Darstellung kann  den jeweils nächsten Teil der Konstruktion hervorheben und dadurch zusätzliche Orientierung bieten
--Die Zielkonstruktion und die erkannte Ist-Konstruktion müssen visuell eindeutig voneinander unterscheidbar sein -> darstellung entweder in getrennten Ansichten oder räumlich klar voneinander abgegrenzt
-
-FRAGE: in der aktuellen Darstellung wird die Visualisierung der Zielkonstruktion während des Bauens nicht dargestellt. Ziel ist es aber genau diese beschriebene Visualiserung bis zum zeitpunkt wo ich das projekt abgeben muss noch zu realisieren. Wie soll ich das also schreiben? 
+=== Visualization of the Target Structure
+At the beginning of a construction task, a target structure is selected in the learning application. This structure remains available as a visual reference throughout the construction process and can be presented either completely or imcrementally. 
+A complete representation enables lerners to analyse the target independently and plan their own construction process. An incremental representation provides additional guidance by presenting or highlighting only the currently relevant part of the target structure. As required by #req("TUI2") and #req("FB4"), different levels of difficulty and support can therefore have different target structure visualisations. 
 
 === Visualisierung der erkannten Ist-Konstruktion
-- Nach jedem Erfassungsvorgang wird die von Lernanwendung rekonstruierte Ist-Konstruktion dreidimensional dargestellt 
--> jeder erkannte Baustein wird entsprechen seines Typs, seiner berechneten Position und Orientierung so wie sein vom feedback abhängigen Aussehens in die Szene eingefügt
-- indem die digitale Darstellung den Lernenden zeigt, welche Konstruktion das System aus ihren Handlungen abgeleitet hat, wird die Anforderung des Interaktionsfeedbacks erfüllt #req("FB1"):
-  beispiel: Erscheint ein hinzugefügter Baustein an der tatsächlich positionierten Position, ist erkennbar, dass seine Verbindung technisch verarbeitet wurde. Fehlt ein Baustein oder wird er anders dargestellt als physisch angeordnet, weist dies auf ein mögliches Erkennungsproblem hin
+Following each detection cycle, the current structure reconstructed by the learning application is represented as a three-dimensional model. Each detected building brick is thereby inserted into the scene according to its type, calculated position and orientation. Its digital representation is based on the geometry and appearance of the physical bricks to preserve a comprehensible relationship between the physical and digital representations in accordance with #req("TUI3"). The target and the detected current structure must remain visually distinguishable to prevent learners from confusing the reference with their own construction. They should therefore be displayed in separate views or be clearly separated spatially within the application.
 
-- Da die Darstellung die physische Konstruktion möglichst konsistent abbilden muss #req("TUI3"), orientieren sich die digitalen Bausteinmodelle an der Form und dem Aussehen der realen Bausteine
-- die zwei unterschiedlichen Bausteintypen Würfelbaustein und smashed Bausein werden durch entsprechende digitale Modelle repräsentiert, wodurch die Zuordnung zwischen physischem Gegenstand und digitaler Darstellung nachvollziehbar bleibt
+The scene is embedded in a three-dimensional view to support rotation and zooming, allowing the construction to be inspected from different perspectives. This is particularly relevant for branching structures in which individual bricks or spatial relationships may be obscured from a single viewpoint. When the visualisation is initially displayed, the camera is automatically aligned with the defined front view of the construction along the positive y-axis.
 
-- Um die dreidimensionale Szene aus unterschiedlichen Perspektiven betrachten zu können, unterstützt die Ansicht Dreh- und Skalierfunktion. So können insbesondere bei verzweigten Konstruktionen die räumlichen Beziehungen besser wahrgenommen werden
-- Die Darstellung soll jedoch zu Beginn automatisch so ausgerichtet werden, dass die Vorderansicht (+y richtung) der gesamten Konstruktion dargestellt wird
+=== Integration of Visualisation and Feedback
+The representation of the current structure is supplemented with its brick specific feedback derived from the comparison with the target. While the relationship between a physical brick type and its digital geometry remains statically defined (see @coupling), the feedback state assigned to a brick changes dynamically according to its current position within the construction.
 
-=== Verbindung von Visualisierung und Feedback
-- Die Darstellung der Ist-Konstruktion wird um die aus dem Zeilvergleich abgeleiteten Feedbackinformationen für die Bausteine ergänzt
--Während die Kopplung zwischen Bausteintyp und digitaler Geometrie statisch festgelegt ist, werden die dargestellten Feedbackzustände während der Nutzung dynamisch zugewiesen
+This feedback visualisation distinguishes four relevant state:
++ A detected brick that is correctly positioned
++ A detected brick that deviates from the target structure
++ An unoccupied position that constitutes a permissible next construction step
++ A target position that is not yet accessible because its required parent brick is missing
 
-Für die Visualisierung werden insbesondere folgende Zustände der Bausteine benötigt:
-- korrekt erkannter und platzierter Baustein
-- technisch erkannter, aber inhaltlich abweichender Baustein
-- noch nicht besetzte, aber zulässige Position
-- noch nicht zugängliche beziehungsweise blockierte Position
+To make the different states visible to the learners, different coloured highlights are used for the building bricks. Correct and deviating bricks are distinguished through contrasting visual highlights, such as green and red outlines. Permissible next positions can be represented as transparent placeholders or _ghost cubes_. Not displayed are positions that are not yet accessible, as their presentation could suggest an action that cannot yet be performed within the directed parent child structure. By attaching each visual state directly to the affected brick or position, the feedback can be clearly associated with the relevant part of the construction in accordance with #req("FB2").
 
-Um die unterschiedlichen Zustände für die lernenden sichtbar zu machen, werden unterschiedliche farbige Hervorhebungen für die Bausteine verwendet
-  - Korrekte und abweichende Bausteine werden durch unterschiedlich Umrandungen oder Herborhebungen in den Farben grün oder rot gekennzeichnet
-  - Mögliche nächste Positionen lassen sich als transparente Platzhalter beziehungsweise sogenannte Ghost Cubes darstellen
-  - Noch nicht zugängliche Positionen werden nicht angezeigt, damit keine Handlungsmöglichkeiten suggeriert werden, die zu diesem Zeitpunkt noch nicht möglich sind
+#grid(
+  columns: (1fr, 1fr, 1fr, 1fr, 1fr),
+  column-gutter: 1em,
+  [
+    #figure(
+      image("figures/quadrat@3x.png", width: 90%),
+      caption: [physischer brick],
+      supplement: [Figure],
+      kind: "figure",
+    ) <physical-brick>
+  ],
+  [
+    #figure(
+      image("figures/quadrat@3x.png", width: 90%),
+      caption: [digitaler brick)],
+      supplement: [Figure],
+      kind: "figure",
+    ) <digital-brick>
+  ],
+  [
+    #figure(
+      image("figures/quadrat@3x.png", width: 90%),
+      caption: [correcter brick)],
+      supplement: [Figure],
+      kind: "figure",
+    ) <digital-correct-brick>
+  ],
+  [
+    #figure(
+      image("figures/quadrat@3x.png", width: 90%),
+      caption: [correcter brick)],
+      supplement: [Figure],
+      kind: "figure",
+    ) <digital-incorrect-brick>
+  ],
+  [
+    #figure(
+      image("figures/quadrat@3x.png", width: 90%),
+      caption: [correcter brick)],
+      supplement: [Figure],
+      kind: "figure",
+    ) <digital-ghost-brick>
+  ],
+)
 
-so kann die Rückmeldung eindeutig dem jeweils betroffenen Baustein zugeordnet werden #req("FB2")
+=== Feedback Levels
+The concept combines three levels of feedback and draws on the different feedback modalities introduced in @feedback-modalities. Intrinsic physical feedback results from the mechanical guiding elements and magnetic assistance. When connecting two bricks, learners can physically perceive that the two faces have engaged. But this confirms only the mechanical connection and does not indicate whether the connection has been detected electronically or whether the brick is correct in relation to the target structure. It is therefore supplemented by digital feedback. Its local from is presented directly on the affected physical brick at which a green or red light indicates whether the connected brick has been placed correctly or needs to be reviewed. The global digital feedback is presented through the learning application. In addition to the state of individual bricks, it can represent the complete construction, the progress made towards the target and possible subsequent actions. It therefore supports more detailed information than can be communicated through the limited output capabilities of an individual brick.
 
-=== Feedbackebenen
-Neben dem visualisierten digitalen Feedback in der Lernanwendung wird außerdem an jedem baustein lokal mit hilfe einer lichtanzeige das digitale Feedback wieder aufgegriffen
-
-- Das System kombiniert also drei Feedbackebenen:
-  - intrinsisches physisches Feedback: entsteht durch die mechanische Führung und magnetische Unterstützung der Verbindung -> Beim Verbinden können die Lernenden unmittelbar wahrnehmen, dass zwei Bausteine mechanisch miteinander verbunden wurden -> feedback bestätigt jedoch weder elektronische Erkennung noch inhatliche Korrektheit der Platzierung
-  - lokales digitales Feedback: wird direkt an den betreffenden Bausteinen ausgegeben. Durch ein grünes oder rotes Licht wird angezeigt, ob der verbundene Baustein korrekt platziert wurde oder überprüft werden muss
-  - globales digitales Feedback: wird in der Lernanwendung ausgegeben. kann neben dem Zustand einzelner Bausteine auch die gesamte Konstruktion, den Aufgabenfortschritt und mögliche nächste Handlungsschritte darstellen -> ermöglicht damit ausführlichere Rückmeldungen, als sie durch die begrenzten Ausgabemöglichkeiten eines einzelnen Bausteins möglich wären
--> dadurch erfolgt das Feedback zwar nicht multidimensional #req("IA6"), aber auf mehreren Ebenen
-
-- Lokales und globales Feedback müssen jedoch inhaltlich übereinstimmen -> wird Baustein lokal als korrekt gekennzeichnet, muss er auch in der digitalen Konstruktion denselben Zustand besitzen
-
-=== Arten des Feedbacks
-- Auf Grundlage des theoretischen Hintergrunds wird zwischen Interaktionsfeedback und päfagogischem Feedback unterschieden (kapitel) #req("FB1")
-
-- Interaktionsfeedback
-  - zeigt, ob und wie die physische Handlung technisch erfasst wurde, indem der in kapitel x beschriebene erkannte Ist-Zustand der Konstruktion visualisiert wird 
-
-- pädagogisches Feedback 
-  - bewertet den erkanten Zustand im Hinblick auf die Zielkonstruktion und kann dabei drei Funktionen erfüllen
-  - Ergebnisfeedback zeigt, ob ein Baustein beziehungsweise eine Verbindung korrekt ist.
-  - Fortschrittsfeedback macht durch einen Fortschrittsanzeige sichtbar, weiviel der Zielkonstruktion bereits erreicht wurde.
-  - Feedforward weist auf eine mögliche nächste Handlung oder Position hin.
--> Für  Prototyp bilden das Ergebnisfeedback und Fortschrittsfeedback die grundlegende Rückmeldung. Feedforward ergänzt diese abhängig vom vorgesehenen Unterstützungsumfang
-
-TABELLE WO EINBINDEN
-#figure(
-  table(
-    columns: 4,
-    stroke: none,
-
-    table.header[Rückmeldungsfall][lokales Feedback][Visualisierung in der Lernanwendung][Art des Feedback],
-
-[Verbindung erkannt und korrekt],	[positive Lichtrückmeldung am betroffenen Baustein], [Baustein wird farblich als korrekt hervorgehoben], [Ergebnisfeedback],
-
-[Verbindung erkannt, aber inhaltlich abweichend],	[negative Lichtrückmeldung am betroffenen Baustein], [Baustein beziehungsweise betroffener Bereich wird farblich als abweichend hervorgehoben], [Ergebnisfeedback],
-
-[zulässige nächste Position],	[keine lokale Ausgabe], [optionale Darstellung als transparenter Ghost Cube], [Feedforward],
-
-[Teilfortschritt erreicht],	[keine lokale Ausgabe], [Fortschrittsanzeige wird aktualisiert], [Fortschrittsfeedback],
-
-[Zielkonstruktion vollständig], [keine lokale Ausgabe],	[erfolgreicher Abschluss wird angezeigt], [Ergebnisfeedback],
-  ), 
-    caption: [Feedbackfälle?],
-) <rückmeldungsfälle>
-
-==== abgestufte Unterstützung
-- Das Interaktionsfeedback soll zeitnah nach der auslösenden handlung erfolgen #req("DET7"), damit die Systemreaktion einfeutig der Verbindung zugeordnet werden kann. - Auch das Ergebnisfeedback soll zeitnah anzeigen, ob die erkannte Verbindung mit der Zielkonstruktion übereinstimmt.
-- Weiterführende Hilfestellungen werden dagegen wie in den Anforderungen #req("FB3") und #req("FB4") gefordert abhängig vom Unterstützungsbedarf abgestuft angeboten:
-  - zunächst wird lediglich eine Abweichung am Baustein durch die farbliche Hervorhebung angezeigt
-  (- anschließend kann weitere Hilfe in Form einer Erklärung bereitgestellt werden)  
-  - bei weiterem Unterstützungsbedarf können zusätzlich die zulässigen nächsten Bausteine/Ghost Cubes dargestellt werden = Feedforward
-  - auch die Visualisierung der Zielkonstruktion kann je nach Unterstützungsbedarf nach den in Kapitel (Visualisierung der Zielkonstruktion) unterschiedlichen Darstellungsweisen abgebildet werden
-
--> Damit bleibt die Möglichkeit zur eigenständigen Fehleranalyse erhalten, während bei Bedarf zusätzliche Orientierung angeboten werden kann
-
-=== Zusammenfassung
+The local and global outputs must remain semantically consistent: if a brick is marked as correct locally, the corresponding digital brick must display the same state in the learning application.
 
 
+=== Types of Feedback
+Based on the distinction established in the theoretical background in @feedback-tui, the concept differentiates between interaction feedback and pedagogical feedback, as required by #req("FB1").
+
+By showing which digital structure the system has derived from the physical construction, the visualisation the interaction feedback is provided: The learner can infer that its connection has been detected and processed, if an added brick appears at the position and orientation in which it was physically placed. If the brick is absent or appears differently from the physical arrangement, this indicates a possible detection or reconstruction problem.
+
+The pedagogical feedback evaluates the detected state in relation to the target structure and can fulfil three functions:
+- Outcome feedback indicates whether a brick or connection is correct
+- Progress feedback shows how much of the target structure has already been completed
+- Feedforward indicates a permissible subsequent action or position
+
+Outcome and progress feedback constitute the basic feedback provided by the prototype while feedforward can supplement these forms depending on the configured level of support. Table @feedback-cases summarises the principal feedback cases and their presentation at the local and global levels
+
+#apa-table(
+  columns: (2fr, 2fr, 2fr, 2fr),
+
+  table-label: <feedback-cases>,
+
+  header: (
+    [Feedback case],
+    [Local feedback],
+    [Visualisation in the learning application],
+    [Type of feedback],
+  ),
+    [Physical change detected],
+    [No separate local output],
+    [The detected current construction is updated to show the recognised brick, position, and orientation],
+    [Interaction feedback],
+    [Connection detected and correct],
+    [Positive light signal on the affected brick],
+    [The brick is visually highlighted as correct],
+    [Outcome feedback],
+
+    [Connection detected but inconsistent with the target],
+    [Negative light signal on the affected brick],
+    [The brick or affected area is visually highlighted as deviating],
+    [Outcome feedback],
+
+    [Permissible next position],
+    [No local output],
+    [Optional representation as a transparent ghost cube],
+    [Feedforward],
+
+    [Partial progress achieved],
+    [No local output],
+    [The progress indicator is updated],
+    [Progress feedback],
+
+    [Target structure completed],
+    [No local output],
+    [Successful completion of the task is displayed],
+    [Outcome feedback],
+  )
+
+==== Graduated Support
+Different types of feedback should be provided at different points in time: Interaction feedback should be provided promptly after the action that triggered it, as required by #req("DET7"), so that learners can associate the system response with the corresponding physical connection. Outcome feedback should likewise indicate promptly whether the detected construction step corresponds to the target structure.
+
+According to #req("FB3") as well as #req("FB4"), more extensive assistance is provided incrementally according to the learner’s support needs. To allow the learner to inspect the physical and digital construction and attempt an independent correction only the affected brick is initially marked as deviating. If further support is required, the learning application may provide an additional explanation. At a higher level of assistance, permissible next positions can be displayed as ghost cubes to provide feedforward. 
+As already mentioned can the representation of the target structure also be adapted to the required level of support. It may remain fully visible to facilitate independent planning or be presented incrementally to direct attention towards the next relevant part. 
+
+This graduated approach preserves opportunities for independent error analysis while providing additional orientation when required.
+
+=== Conclusion??
+auf @feedback-children kapitel eingehen 
+
+== Concept Summary
 
 
 

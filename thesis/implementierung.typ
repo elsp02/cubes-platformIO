@@ -20,6 +20,7 @@ aufbau einer andock und einer aufnahmeseite reales abbild und daneben zeichnung
       - Pogo Pins als Upstream- und Downstream-Schnittstellen
       - LED Ansteuerung
       - Attiny1616
+      updi interface for flashing
   - Blockdiagramm der zwei Komponenten
   - zentrale Energieversorgung
     - zentrale 5V Energieversorgung via USB Anschluss von UPDI Adapter zu PC 

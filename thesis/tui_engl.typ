@@ -60,7 +60,7 @@ Ullmer and Ishii provide an overview of various types of represented digital inf
 ==== Types of Represented Digital Information
 A phicon in a @TUI can represent different kinds of digital information. These include _static media_, such as images and three-dimensional models, _dynamic content_, such as video streams or computationally generated graphics, and _digital attributes_, including colours or material properties. Within a TUI, a physical object does not necessarily correspond to a single digital file but can have different digital meanings. For example, a physical figure placed on an audio player may represent an entire audiobook, while another object may control playback. To the user, these objects represent a story or an action rather than the underlying files and computational processes. What matters most is therefore the meaning of an object and the actions associated with it  @EmergingFrameworks.
 
-==== Methods of Coupling
+==== Methods of Coupling <coupling>
 In addition to the different types of information represented, coupling methods serve to categorise how and when the relationship between a phicon and its digital representation is formed:
 
 - In _static coupling_, the meaning of an object is defined in advance. The physical object is permanently associated with a specific digital geometry, property or function, and this association cannot be altered during interaction.
@@ -127,7 +127,7 @@ Physical constraints influence not only the digital interpretation of an action 
   caption: [Interaction phases and physical syntax within the Token and Constraint framework],
 ) <token-constraint-syntax>
 
-==== Styles of Mapping
+==== Styles of Mapping <mapping>
 Mapping styles describe how the resulting physical configuration is translated into a computer-interpretable representation. Three principal styles can be distinguished: _spatial_, _relational_ and _constructive_ mapping.
 
 - In the _spatial mapping_, interpretation is based on the geometric position, distance, or orientation of phicons in the physical space. The pivotal factor, therefore, is the object's position within a spatial frame of reference.
@@ -187,8 +187,8 @@ The Design Factors show that there is no universally child-appropriate TUI. Its 
 == Feedback for TUI <feedback>
 In a @TUI, feedback informs users whether an action has been detected, how it has been interpreted, and how it has affected the state of the system. It thereby closes the perception action loop between physical manipulation and digital processing and supports the independent use of the system.
 
-=== Feedback Modalities
-As shown in @feedback-modalities, a system can communicate the consequences of an action through different output modalities. The physical properties of a @TUI already provide automatically intrinsic feedback that arises directly from manipulating its objects. Additional system-generated feedback may be presented visually, auditorily, haptically, or through a coordinated combination of these modalities. This multimodal feedback does not imply presenting as many signals as possible simultaneously since this may cause sensory overload. Instead, different modalities should offer alternative ways of accessing the same or complementary information, which can then be combined when a perceptual channel cannot be used, or can only be used to a limited extent.
+=== Feedback Modalities <feedback-modalities>
+As shown in @feedback-modalities-table, a system can communicate the consequences of an action through different output modalities. The physical properties of a @TUI already provide automatically intrinsic feedback that arises directly from manipulating its objects. Additional system-generated feedback may be presented visually, auditorily, haptically, or through a coordinated combination of these modalities. This multimodal feedback does not imply presenting as many signals as possible simultaneously since this may cause sensory overload. Instead, different modalities should offer alternative ways of accessing the same or complementary information, which can then be combined when a perceptual channel cannot be used, or can only be used to a limited extent.
 
 Regardless of its modality, feedback can also be characterised along several dimensions:
 - Local or global: presented directly at the manipulated object or through a separate display
@@ -199,7 +199,7 @@ Regardless of its modality, feedback can also be characterised along several dim
 #apa-table(
   columns: (1.2fr, 2fr, 2.2fr),
 
-  table-label: <feedback-modalities>,
+  table-label: <feedback-modalities-table>,
 
   header: (
     [Feedback Form],
@@ -254,7 +254,7 @@ _Pedagogical feedback_ can fulfil different functions:
 
 Additionally, as it would restrict independent planning and problem-solving, the system should not prescribe every step, but provide graduated feedback, in which support increases according to the learner’s needs. This preserves opportunities for independent error analysis while preventing learners from becoming unable to continue because the feedback is insufficient or incomprehensible.
 
-==== Criteria for Effective Feedback/design factors for children 
+==== Criteria for Effective Feedback/design factors for children <feedback-children>
 The effectiveness of feedback depends not only on its technical form but, more importantly, on whether it is understandable and relevant to the user’s subsequent actions. Effective feedback should therefore meet the following criteria:
 
 - Timeliness: Feedback should occur in a recognisable temporal relationship to the action that triggered it. If it is delayed, users may no longer be able to identify its cause

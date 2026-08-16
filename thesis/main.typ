@@ -325,6 +325,7 @@ This thesis ...
   ("MCRpd", "Model-Control-Representation (physical and digital"),
   ("rep_p", "Physical Representation"),
   ("rep_d", "Digital Representation"),
+  ("RGB", "red-green-blue"),
   ("TUI", "Tangible User Interface"),
   ("UI", "User Interface")
 
@@ -353,8 +354,10 @@ This thesis ...
 // Weitere Kapitel später beispielsweise:
 //
 //#include "systemkonzept2.typ"
- //#include "implementierung.typ"
-// #include "evaluation.typ"
+#pagebreak()
+#include "implementierung_engl.typ"
+#pagebreak()
+ #include "evaluation.typ"
 // #include "discussion.typ"
 // #include "conclusion.typ"
 
