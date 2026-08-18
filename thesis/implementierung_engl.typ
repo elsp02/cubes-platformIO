@@ -3,15 +3,13 @@
 = Technical Realisation
 The following chapter describes how the concept of the proposed learning system was implemented in the physical prototype. The focus is placed on the manufactured components, the electronic hardware, the implemented communication protocol, the embedded firmware and the learning application. 
 
-NOCH WAS DAZU?
-
 == Mechanical and Electronic Realisation
-??AUCH LEARNING APPLICATION ERKLÄREN??
-
-The physical and electonic implementation of the building bricks and the baseplate is described here. The section focuses on the components and construction methods used in the prototype as well as on deviations that occurred during manufacturing.
+The physical and electonic implementation of the building bricks and the Baseplate is described here. The section focuses on the components and construction methods used in the prototype as well as on deviations that occurred during manufacturing.
 
 === Mechanical Implementation
 The prototype comprises two physically implemented building-brick types: the _cube brick_ and the _smashed brick_. Both types use the standardised square connection interface defined in @geometry-brick, but differ in their geometry and number of receiving faces. In contrast to the cube brick, the smashed brick has only half its height and provides a single receiving face opposite its docking face. Its four remaining lateral faces do not permit further connections.
+
+The square connection faces have a side length of approximately 40 mm. The selected dimension represents a compromise between the one-handed grasping and positioning required by #req("C5") and the internal space required for the electrical contacts and electronic components. The ergonomic suitability of the implemented dimensions is assessed in the evaluation chapter.
 
 Both brick types were modelled using Autodesk Inventor and manufactured using a 3D printer. Their housings implement the modular structure introduced in the concept chapter and consist of a black structural frame, colour-coded connection-side modules and a removable black cover. The side modules are inserted individually into the supporting frame and can be removed separately. This allowes the electronic components to be mounted and tested before the complete brick is assembled. In addition, individual modules can also be replaced without manufacturing an entirely new housing.
 
@@ -20,45 +18,41 @@ Both brick types were modelled using Autodesk Inventor and manufactured using a 
   column-gutter: 1em,
   [
     #figure(
-      image("figures/rechteck_kurz@3x.png", width: 90%),
-      caption: [explosionszeichnung cube],
+      image("figures/quadrat@3x.png", width: 90%),
+      caption: [Exploded view of the cube brick],
       supplement: [Figure],
       kind: "figure",
-    ) <bild1>
+    ) <exploded-cube>
   ],
   [
     #figure(
-      image("figures/rechteck_kurz@3x.png", width: 90%),
-      caption: [explosionszeichnung smashed],
+      image("figures/quadrat@3x.png", width: 90%),
+      caption: [Exploded view of the smashed brick],
       supplement: [Figure],
       kind: "figure",
-    ) <bild2>
+    ) <exploded-smashed>
   ],
   [
     #figure(
-      image("figures/rechteck_kurz@3x.png", width: 90%),
-      caption: [explosionszeichnung baseplate],
+      image("figures/quadrat@3x.png", width: 90%),
+      caption: [Exploded view of the baseplate],
       supplement: [Figure],
       kind: "figure",
-    ) <bild2>
+    ) <exploded-baseplate>
   ],
 )
 
-The docking and receiving sides contain mechanical guiding structures that align connected bricks and restrict their relative orientation the four positions. The connection is additionally secured by 4 magnets on every docking and recieving face. 
-Die 4 contacte der docking seite befinden sich in den ecken der quadratischen fläche und der downstream kontakt in einer definierten ecke davon. Due to platzmangel muss der downstream contact of one receiving face anders platziert werden. the resulting rotational offset is compensated in the firmware, described in (section ???)
- der kontakt für GND und Versorgun ist in der Mitte der fläche platziert
-
-
-The baseplate is implemented as the root element of the construction. Its housing contains the baseplate electronics and provides one receiving sides for connecting the first brick.
+The Baseplate is implemented as the root element of the construction. Its housing contains the Baseplate electronics and provides one receiving sides for connecting the first brick.
 
 === Electronic Implementation
-VERWEIS AUF SCHALTPLAN UND KICAD DESIGN IM ANHANG
-Both brick types are equipped with an ATtiny1616 microcontroller that serves as their local control unit. The mechanical interfaces contain spring-loaded Pogo pins that establish the electrical connections while compensating for minor manufacturing tolerances and small movements between connected bricks. The recessed guiding structures surrounding the contacts additionally protect the electrical interface against accidental contact, incorrect alignment and short circuits.
+Both brick types are equipped with an ATtiny1616 microcontroller that serves as their local control unit. The mechanical interfaces contain spring-loaded Pogo pins that establish the electrical connections while compensating for minor manufacturing tolerances and small movements between connected bricks. The recessed guiding structures surrounding the contacts additionally protect the electrical interface against accidental contact, incorrect alignment and short circuits. The electronic structures of the building bricks and the baseplate are summarised in Figures @brick-electronics-block and @baseplate-electronics-block.
 
 The electrical implementation differs between the docking and receiving faces. On a receiving face, the data, supply and ground connections are implemented using spring-loaded contacts. The docking face contains the corresponding contact surfaces for the data connections, whereas the power connection uses a different construction consisting of a neodymium ring and a Pogo pin mounted directly on the printed circuit board. (ABBILDUNG)
 
 The four upstream data contacts of the docking face are located in the corners of the square connection area. Ground and power of this face are transmitted through rotationally symmetrical contacts. The ground contact is positioned at the centre of the interface, while the supply contact forms a concentric connection around it. Both electrical connections therefore remain unchanged when a brick is rotated in increments of 90°.
 A receiving face provides a single downstream data contact in one defined corner as well as the power and ground contact in the center. Because of the limited installation space, the downstream data contact of one receiving face of the cube brick is placed in a different corner from the otherwise uniform arrangement. The resulting rotational offset is compensated for in the building-brick firmware, as described in @contact-offset.
+The implemented contact arrangements are shown in Figures @receiving-face-contacts and @docking-face-contacts. 
+
 
 #grid(
   columns: (1fr, 1fr),
@@ -66,54 +60,46 @@ A receiving face provides a single downstream data contact in one defined corner
   [
     #figure(
       image("figures/rechteck_kurz@3x.png", width: 90%),
-      caption: [aufnahmeseite pogo pins],
+      caption: [Electrical contacts of a receiving face],
       supplement: [Figure],
       kind: "figure",
-    ) <bild1>
+    ) <receiving-face-contacts>
   ],
   [
     #figure(
       image("figures/rechteck_kurz@3x.png", width: 90%),
-      caption: [docking seite pogo pins],
+      caption: [Electrical contacts of the docking face],
       supplement: [Figure],
       kind: "figure",
-    ) <bild2>
+    ) <docking-face-contacts>
   ],
 )
 
-Four @RGB side view @LED on each cube side provide local feedback directly on the building brick. The assignment of the resulting colours to the implemented feedback states is described in INTERACTION??
+Four side-view @RGB @LED arranged around the printed circuit board provide local feedback directly on each building brick. The ATtiny1616, the RGB LEDs and the electrical components of the docking face are mounted on a printed circuit board designed using KiCad. The PCB is attached to the inside of the docking face using screws, while the contacts of the receiving faces are connected to the main board through the brick’s internal wiring. The complete circuit schematic and PCB layout are provided in the Appendix.
 
-The ATtiny1616, the four @RGB @LED and the electrical elements of the docking face are mounted on a printed circuit board designed using _KiCad_. The PCB is attached to the inside of the docking face using screws. The receiving face contacts are connected to the main board through the internal cable wiring of the brick.
+The baseplate is also controlled by an ATtiny1616. It communicates with the computer through the microcontroller’s hardware USART interface and a connected USB-to-TTL UART adapter. The prototype is supplied with 5 V from the computer’s USB interface through this adapter. The baseplate transfers the supply voltage to the connected root brick, from which it is forwarded through the subsequent brick connections.
 
-The baseplate is also controlled by an ATtiny1616 and communicates with the computer through the microcontroller’s hardware USART interface and a connected USB-to-TTL UART adapter. The prototype is supplied with 5 V from the computer’s USB interface through this adapter. The baseplate transfers the supply voltage to the connected root brick, from which it is forwarded through the subsequent brick connections.
+#figure(
+  image("figures/blockdiagramm-brick.svg", width: 95%),
+  caption: [Electronic block diagram of a building brick],
+  supplement: [Figure],
+  kind: "figure",
+)<brick-electronics-block>
 
-#grid(
-  columns: (1fr, 1fr),
-  column-gutter: 1em,
-  [
-    #figure(
-      image("figures/rechteck_kurz@3x.png", width: 90%),
-      caption: [blockdiagramm brick],
-      supplement: [Figure],
-      kind: "figure",
-    ) <bild1>
-  ],
-  [
-    #figure(
-      image("figures/rechteck_kurz@3x.png", width: 90%),
-      caption: [blockdiagram baseplate],
-      supplement: [Figure],
-      kind: "figure",
-    ) <bild2>
-  ],
-)
+#v(1em)
 
-=== Conclusion?
+#figure(
+  image("figures/blockdiagramm-baseplate.svg", width: 95%),
+  caption: [Electronic block diagram of the baseplate],
+  supplement: [Figure],
+  kind: "figure",
+)<baseplate-electronics-block>
+
+
 
 //////
 == Communication Protocol <communication-protocol>
-The communication concept introduced in @software-concept is implemented using two separat communication interfaces: The communication within the physical construction and its parent child communication is based of a ?selbst erstelltes? software-controlled single-wire protocol whereas the communicaiton between the learning application and the baseplate uses the hardware USART of the baseplate microcontroller
-TABELLE
+The communication concept introduced in @software-concept is implemented using two separate communication interfaces. Communication within the physical construction follows the parent–child hierarchy and uses a custom, software-controlled single-wire half-duplex protocol. Communication between the learning application and the baseplate is implemented using the hardware USART of the baseplate microcontroller and a USB-to-TTL UART adapter. The two interfaces are summarised in Table @communication-interface.
 
 #apa-table(
   columns: (2fr, 2fr, 1fr),
@@ -138,12 +124,13 @@ TABELLE
   )
 
 === Single-Wire Communication Between the Building Bricks
-The communication between two directly connected modules is implemented as a bidirectional single-wire half-duplex interface. The same data line is used alternately by the parent and child brick, and only one participant may transmit at a time.
+The communication between two directly connected modules is implemented as a bidirectional single-wire half-duplex interface. The same data line is used alternately by the parent and child brick and only one participant may transmit at a time.
 
 The idle state of the line is logic high. However, the line is not actively driven high. Instead, the transmitting microcontroller either pulls the line to ground to transmit a logic low or releases it and activates its internal pull-up resistor to obtain a logic high. This open-drain-like behaviour reduces the risk of electrical contention because connected devices do not actively drive the line to opposing voltage levels.
-Each byte is transmitted using a software-implemented UART-like format:(FIGURE):
+Each byte is transmitted using a software-implemented UART-like format illustrated in @one-byte-timing.
+
 #figure(
-  image("figures/rechteck_lang@3x.png", width: 90%),
+  image("figures/Single_wire_byte.svg", width: 90%),
   caption: [Timing of one byte on the single-wire interface]
 )<one-byte-timing>
 
@@ -153,7 +140,7 @@ This Communication type is used for construction detection and feedbackframe for
 
 
 === Common Frame Format
-Construction and feedback data have different contents but are transmitted using the same variable-length binary frame format. This format is used for communication between the building bricks as well as between the baseplate and the learning application:
+Construction and feedback data have different contents but are transmitted using the same variable-length binary frame format. This format shown in @frame-format is used for communication between the building bricks as well as between the Baseplate and the learning application:
 
 #figure(
   table(
@@ -177,50 +164,18 @@ Construction and feedback data have different contents but are transmitted using
   caption: [Implemented binary frame format]
 ) <frame-format>
 
-vlt die Infos auch in Figure einfügen
-#apa-table(
-  columns: (1fr, 1fr, 2fr),
+The SYNC synchronisation byte enables the receiver to identify the beginning of a frame. The length field given by LEN specifies the number of payload bytes that must subsequently be read. A frame with LEN = 0 contains an empty payload. Although the one-byte length field could theoretically represent up to 255 payload bytes, the prototype limits the payload to 128 bytes to restrict the required buffer size and transmission duration. 
 
-  table-label: <frame-format-table>,
+The payload stored in the PAYLOAD field, contains the information transmitted by the frame. Its structure depends wether it contains the detected tree structure or the feedback message. Both payload formats are described in detail in @detection-payload and @feedback-payload.
 
-  header: (
-    [Field],
-    [Size],
-    [Implemented meaning]
-  ),
-
-  caption: [Fields of the implemented binary frame format],
-
-    [SYNC],
-    [1 byte],
-    [Start marker 0xA5],
-
-    [LEN],
-    [1 byte],
-    [Number of bytes contained in the payload],
-
-    [Payload],
-    [0-128 bytes],
-    [Detection or feedback data],
-
-    [Checksum],
-    [1 byte],
-    [XOR checksum over LEN and all payload bytes]
-  )
-
-The synchronisation byte enables the receiver to identify the beginning of a frame. The length field specifies the number of payload bytes that must subsequently be read. A frame with LEN = 0 contains an empty payload. I Although the one-byte length field could theoretically represent up to 255 payload bytes, the prototype limits the payload to 128 bytes to restrict the required buffer size and transmission duration. 
-
-
-The payload contains the information transmitted by the frame. Its structure depends wether it contains the detected tree structure or the feedback message. Both payload formats are described in detail in @detection-payload and @feedback-payload.
-
-To detect transmission errors, an XOR checksum is calculated from the length field and all payload bytes:
+To detect transmission errors, an XOR CHECKSUM is calculated from the length field and all payload bytes:
 $
   C = L ⊕ P_0 ⊕ P_1 ⊕ dots.c ⊕ P_(L - 1)
 $
-beim Empfang wird die Prüfsumme erneut berechnet und mit dem übertragenen Wert verglichen. Stimmen beide Werte nicht überein, wird der Frame verworfen.
+For an empty payload, the checksum is equal to the length field. Upon reception, the checksum is recalculated and compared with the transmitted value. If the two values do not match, the frame is discarded.
 
 === Parent Child Communication
-The communication within the physical construction follows a _request–response_ procedure and is always initiated by the parent brick. Depending on the current process, the communication is used either to retrieve the detected construction or to transmit feedback towards the connected bricks.
+The communication within the physical construction follows a request–response procedure and is always initiated by the parent brick. Depending on the current process, the communication is used either to retrieve the detected construction or to transmit feedback towards the connected bricks.
 
 The command and acknowledgment bytes used in the two processes, are summarised in the following table @command-bytes
 
@@ -265,21 +220,15 @@ The command and acknowledgment bytes used in the two processes, are summarised i
   )
 
 ==== Detection Communication
-To request the detected subtree of a connected child, the parent (node) sends _CMD_STATUS_ through the corresponding downstream interface. After receiving this valid request, the child (node) changes the transmission direction and responds with _ACK_BUSY_ . This confirms that the request haas been received and the child is going to begin collecting the required information with subsequently querying its own receiving interfaces. Once the subordinate information has been collected, it returns a _DATA_FRAME_ containing its own Payload and the Payload of its complete subtree. This procedure is applied recursively throughout the connected construction. FIGURE
+To request the detected subtree of a connected child, the parent node sends CMD_STATUS through the corresponding downstream interface. After receiving this valid request, the child node changes the transmission direction and responds with ACK_BUSY. This confirms that the request haas been received and the child is going to begin collecting the required information with subsequently querying its own receiving interfaces. Once the subordinate information has been collected, it returns a DATA_FRAME containing its own Payload and the Payload of its complete subtree. . This procedure is recursively repeated at every occupied parent–child connection. @communication-diagram-detection illustrates one such communication transaction at byte level.
 
 #figure(
-  image("figures/rechteck_hoch@3x.png", width: 90%),
-  caption: [COMMUNICATION SEQUENCE DIAGRAM Recursive communication sequence for detecting the connected building-brick structure]
-)<communication-diagram-detection>
-
-BYTE EBENE??
-#figure(
-  image("figures/rechteck_hoch@3x.png", width: 90%),
-  caption: [SINGLE WIRE PARENT CHILD COMMUNICATION]
+  image("figures/Single_wire_parent_child_communication.svg", width: 95%),
+  caption: [Byte-level timing diagram of the detection communication between a parent and child brick]
 )<communication-diagram-detection>
 
 ===== Detection Payload <detection-payload>
-The payload returned during this sequence represents the detected construction tree. Each brick contributes a three-byte node header, followed by the serialised representations of its subordinate bricks:
+The payload returned during this sequence represents the detected construction tree. Each brick contributes a three-byte node header, followed by the serialised representations of its subordinate bricks shown in @node-header-format-detection.
 
 #figure(
   table(
@@ -303,46 +252,15 @@ The payload returned during this sequence represents the detected construction t
   caption: [Detection payload]
 ) <node-header-format-detection>
 
-vlt die Infos auch in Figure einfügen
-#apa-table(
-  columns: (1fr, 1fr, 2fr),
-
-  table-label: <detection-format-table>,
-
-  header: (
-    [Field],
-    [Size],
-    [Implemented meaning]
-  ),
-
-  caption: [Structure of a serialised building-brick node],
-
-    [NODE_ID],
-    [1 byte],
-    [Brick type and individual instance number],
-
-    [ORIENTATION],
-    [1 byte],
-    [Relative rotation represented by a value from 0 to 3],
-
-    [CHILD_MASK],
-    [1 byte],
-    [Bit mask of occupied receiving interfaces],
-
-    [Child-node Payload],
-    [variable],
-    [Subtree payloads of the subordinate bricks]
-  )
-
-The _NODE_IDs_ three most significant bits encode the brick type, whereas the five least significant bits encode the individual instance number. This allows the learning application to distinguish between the cube and smashed brick types while retaining an individual address for assigning local feedback.
-_ORIENTATION_ contains a value from 0 to 3, representing the four possible rotations of the brick relative to its parent. Within _CHILD_MASK_, bit \(i\) indicates whether a child was detected at receiving interface \(i\). The cube brick can use bits 0 to 4 for its five receiving interfaces whereas the smashed brick only needs one bit assigned to its single receiving interface. 
+The NODE_IDs three most significant bits encode the brick type, whereas the five least significant bits encode the individual instance number. This allows the learning application to distinguish between the cube and smashed brick types while retaining an individual address for assigning local feedback.
+ORIENTATION contains a value from 0 to 3, representing the four possible rotations of the brick relative to its parent. Within CHILD_MASK, bit \(i\) indicates whether a child was detected at receiving interface \(i\). The cube brick can use bits 0 to 4 for its five receiving interfaces whereas the smashed brick only needs one bit assigned to its single receiving interface. 
 The node representations of the connected children follow the node header in ascending order of the receiving-interface indices. The precise procedure through which the firmware collects and combines these node representations is described in Section //@firmware-brick.
 
-The baseplate does not add a node header of its own. Instead, it transfers the payload beginning with the first brick connected to it. If no root brick is detected, the baseplate transmits a DATA_FRAME with an empty payload.e.
+The Baseplate does not add a node header of its own. Instead, it transfers the payload beginning with the first brick connected to it. If no root brick is detected, the Baseplate transmits a DATA_FRAME with an empty payload.e.
 
 
 ==== Feedback Communication
-The feedback communication is also initialised by the parent node but with another command message. The _CMD_FEEDBACK_ singalises the child node the upcoming transmission of a _FEEEDBACK_FRAME_. After receiving the command, the child responds with _ACK_BUSY_, indicating that it is ready to receive the frame.
+The feedback communication is also initialised by the parent node but with another command message. The CMD_FEEDBACK singalises the child node the upcoming transmission of a FEEEDBACK_FRAME. After receiving the command, the child responds with ACK_BUSY, indicating that it is ready to receive the frame.
 The parent then transmits the complete FEEDBACK_FRAME. After processing and forwarding the frame, the child reports the result using either ACK_FINISHED or ACK_FAILED. The internal processing and forwarding logic is described in @firmware-brick.
 
 ===== Feedback Payload <feedback-payload>
@@ -368,18 +286,18 @@ The Feedback Payload uses the common frame format but contains pairs of brick id
     [1byte],
     [...]
   ),
-  caption: [feedback payload]
+  caption: [Feedback payload]
 ) <node-header-format>
 
-_LED_STATE_ can assume one of two values: _LED_GREEN_ or _LED_RED_. If a brick’s _NODE_ID_ is not included in the feedback payload, that brick switches off its @LED. An empty feedback payload can therefore be used to deactivate all local feedback simultaneously.
+LED_STATE can assume one of two values: LED_GREEN or LED_RED. If a brick’s NODE_ID is not included in the feedback payload, that brick switches off its @LED. An empty feedback payload can therefore be used to deactivate all local feedback simultaneously.
 
 === Communication between Learning Application and Baseplate
-The connection between the learning application and the baseplate uses the ATtiny1616 hardware USART at 115200 bit/s with eight data bits, no parity and one stop bit. The learning application controls an interaction session using the following single-byte commands and responses:
+The connection between the learning application and the Baseplate uses the ATtiny1616 hardware USART at 115200 bit/s with eight data bits, no parity and one stop bit. The learning application controls an interaction session using the following single-byte commands and responses:
 
 #apa-table(
   columns: (1.3fr, 1fr, 2fr, 2.5fr),
 
-  table-label: <application-baseplate-communication>,
+  table-label: <application-Baseplate-communication>,
 
   header: (
     [Message],
@@ -388,7 +306,7 @@ The connection between the learning application and the baseplate uses the ATtin
     [Meaning]
   ),
 
-  caption: [Messages exchanged between the learning application and the baseplate],
+  caption: [Messages exchanged between the learning application and the Baseplate],
 
     [PC_CMD_START],
     [0x53 (S)],
@@ -405,7 +323,7 @@ The connection between the learning application and the baseplate uses the ATtin
     [Application → Baseplate],
     [Feedback calculated by the application],
 
-    [PC_RESP_DONE],
+    [PC_RESP_FB_DONE],
     [0x44 (D)],
     [Baseplate → Application],
     [Feedback successfully forwarded],
@@ -421,15 +339,14 @@ The connection between the learning application and the baseplate uses the ATtin
     [Stop detection and switch off local feedback]
 )
 
-After receiving _PC_CMD_START_, the baseplate begins the detection process and transmits the detected construction to the learning application using the DATA_FRAME format defined above.
+After receiving PC_CMD_START, the Baseplate begins the detection process and transmits the detected construction to the learning application using the DATA_FRAME format defined above.
+After receiving the DATA_FRAME, the learning application answers with the FEEDBACK_FRAME calculated from the target comparison. The Baseplate forwards this frame through the physical construction and responds with PC_RESP_FB_DONE if all detected bricks confirmed the feedback. If the received frame is invalid or at least one brick fails to confirm the feedback transmission, it responds with PC_RESP_FB_FAILED.
 
-After receiving the DATA_FRAME, the learning application answers with the FEEDBACK_FRAME calculated from the target comparison. The baseplate forwards this frame through the physical construction and responds with PC_RESP_DONE if all detected bricks confirmed the feedback. If the received frame is invalid or at least one brick fails to confirm the feedback transmission, it responds with PC_RESP_FB_FAILED.
-
-When the basplate receives a _PC_CMD_STOP_ from the learning application, it forwards an empty FEEDBACK_FRAME so that all local @LED are switched off. It then terminates the cyclic detection by returning to its idle state.
+When the basplate receives a PC_CMD_STOP from the learning application, it forwards an empty FEEDBACK_FRAME so that all local @LED are switched off. It then terminates the cyclic detection by returning to its idle state.
 
 #figure(
-  image("figures/rechteck_hoch@3x.png", width: 90%),
-  caption: [KOMMUNIKATIONSSEQUENZDIAGRAMM Cube baseplate learning application]
+  image("figures/gesamt-kommunikationssequenz.svg", width: 90%),
+  caption: [Communication diagram between Learning application, Baseplate and brick]
 )<communication-diagram-learning-application>
 
 === Validation and Error Handling
@@ -442,26 +359,26 @@ Several validation mechanisms were implemented to prevent incomplete or corrupte
 - The XOR checksum detects changes to the payload or length field.
 - On the computer interface, incomplete or invalid frames are discarded and reception resumes by searching for the next valid SYNC byte.
 
-The baseplate waits up to two seconds for the first byte of the application’s feedback response and allows a maximum interval of 100 ms between bytes within that frame. Detection cycles are currently separated by a delay of 550 ms, in addition to the time required for communication within the connected construction. These values describe the implemented prototype and are not general protocol requirements.
-
-=== Conclusion?
+The Baseplate waits up to two seconds for the first byte of the application’s feedback response and allows a maximum interval of 100 ms between bytes within that frame. Detection cycles are currently separated by a delay of 550 ms, in addition to the time required for communication within the connected construction. These values describe the implemented prototype and are not general protocol requirements.
 
 
 /////
 == Firmware of Bricks and Baseplate <firmware>
 ÜBERLEITUNG
-The firmware is implemented in C++ using PlatformIO and compiled for the ATtiny1616 microcontrollers with an internal clock frequency of 20MHz. Separate firmware variants control the building bricks and the baseplate, while shared modules provide the functions required for single-wire communication, child-brick detection and feedback transmission.
+The firmware is implemented in C++ using PlatformIO and compiled for the ATtiny1616 microcontrollers with an internal clock frequency of 20MHz. Separate firmware variants control the building bricks and the Baseplate, while shared modules provide the functions required for single-wire communication, child-brick detection and feedback transmission.
 
 === Brick Firmware <firmware-brick>
 The brick firmware is responsible for collecting its local and untergeordnete tree structure and controlling the feedback output. Its implemented control flow is shown in figure @brick-state-machine
-
-#figure(
-  image("figures/rechteck_hoch@3x.png", width: 90%),
-  caption: [State machine of the brick firmware]
-)<brick-state-machine>
-
 After initialisation, all communication lines are released and the @LED outputs are configured. The firmware then monitors the four upstream contacts of the docking face. The index of the contact through which the first valid request is received determines the relative rotation of the brick. The corresponding communication line and orientation value are stored and used for all subsequent communication with the parent.
 This orientation detection is determined just once after the microcontroller has started. Disconnecting the brick interrupts its centrally supplied power, causing the firmware to restart when the brick is connected again. The orientation is therefore detected again after every new physical connection. 
+
+DETECTING folgt gleichem prinzip wie in parent child communication dargestellt 
+#figure(
+  image("figures/zustandsdiagram-brick-horizontal.svg", width: 100%),
+  caption: [State machine of the brick firmware a) b) ]
+)<brick-state-machine>
+
+
 
 ==== Detection Process
 When the brick/state machine enters the detection state, it queries the available downstream interfaces in ascending order. Depending on the brick type this means querying five or for the smashed brick only one interface. The communication with an individual child is handled by a dedicated child-polling function. A sucessful response provides the serialised payload of the child´s complete subtree. This subtree payload is stored temporarily until all configured downstream interfaces have been processed. If a child does not return a valid payload within the available attempts, its subtree is omitted from the current detection result. Successfully received child-subtree payloads are appended in ascending interface order to the brick’s own node payload according to the format specified in @detection-payload. For each included child, the corresponding bit in CHILD_MASK is set to one. The resulting complete payload therefore consists of the current bricks own node payload followed by the payloads of its successfully detected child subtrees. It is then transmitted to the parent using the frame and message sequence defined in @communication-protocol. 
@@ -482,143 +399,154 @@ When the brick/state machine enters the feedback state, the cube receives and va
 
 The same FEEDBACK_FRAME is subsequently forwarded to the interfaces marked as occpudied during the preceding detection cycle. With the in @communication-protocol defined messages, the brick then reports to its parent whether the frame was successfully processed and forwarded or not.
 
-=== Baseplate Firmware <firmware-baseplate>
-The behaviour of the building-brick firmware is coordinated by the baseplate firmware, which initiates the detection and feedback processes. In addition to controlling the communication session, the baseplate mediates between the learning application and the physical building-brick structure.
+=== Baseplate Firmware <firmware-Baseplate>
+The behaviour of the building-brick firmware is coordinated by the Baseplate firmware, which initiates the detection and feedback processes. In addition to controlling the communication session, the Baseplate mediates between the learning application and the physical building-brick structure.
 It does not parse the construction, calculate spatial positions or evaluate the task. These operations are performed by the learning application described in the following @software-application.
 
-The implemented control flow of the baseplate is shown in Figure @baseplate-state-machine.
-#figure(
-  image("figures/rechteck_hoch@3x.png", width: 90%),
-  caption: [State machine of the baseplate firmware]
-)<baseplate-state-machine>
+The implemented control flow of the Baseplate is shown in @Baseplate-state-machine.
 
-After initialisation, the baseplate releases its downstream communication line, configures its hardware USART and enters the idle state. It remains in this state until the learning application starts a new communication session. During an active session, the baseplate repeatedly initiates the detection of the connected construction by querying the brick attached to its single receiving interface. Since this is the first brick of the construction its response already contains the serialised payload of the complete root subtree. If no valid root payload is received, the current construction is represneted by an empty payload. Otherwise, the received subtree payload is forwarded without structural modification to the learning application.
+#figure(
+  image("figures/zustandsdiagram-baseplate.svg", width: 80%),
+  caption: [State machine of the Baseplate firmware]
+)<Baseplate-state-machine>
+
+After initialisation, the Baseplate releases its downstream communication line, configures its hardware USART and enters the idle state. It remains in this state until the learning application starts a new communication session. During an active session, the Baseplate repeatedly initiates the detection of the connected construction by querying the brick attached to its single receiving interface. Since this is the first brick of the construction its response already contains the serialised payload of the complete root subtree. If no valid root payload is received, the current construction is represented by an empty payload. Otherwise, the received subtree payload is forwarded without structural modification to the learning application.
 
 ==== Payload Transmission Control
-To avoid transmitting identical construction data during every cycle gibt es bestimmte bedingungen wann die baseplate es zur lwarning application schickt und wann nicht. 
+To avoid transmitting identical construction data during every cycle gibt es bestimmte bedingungen wann die Baseplate es zur lwarning application schickt und wann nicht. 
 
-The first payload after the beginning of a session is always transmitted, irrespective of a potentially retained result from a preceding session. For every other payload transmission the baseplate compares the current detection payload with the payload transmitted most recently. A new DATA_FRAME is only transmitted when the current payload differs from the preceding one. If the construction remains unchanged, the baseplate sends the unchanged payload erst after 50 detection cycles as a heartbeat. This confirms that the communication link and the detection process remain active without continuously transmitting identical frames. 
+The first payload after the beginning of a session is always transmitted, irrespective of a potentially retained result from a preceding session. For every other payload transmission the Baseplate compares the current detection payload with the payload transmitted most recently. A new DATA_FRAME is only transmitted when the current payload differs from the preceding one. If the construction remains unchanged, the Baseplate sends the unchanged payload erst after 50 detection cycles as a heartbeat. This confirms that the communication link and the detection process remain active without continuously transmitting identical frames. 
 
 The current implementation inserts a delay of 550 ms between consecutive detection cycles. The complete interval between two results additionally depends on the number and arrangement of connected bricks as well as on possible retransmission attempts.
 
 ==== Feedback Forwarding and Session Termination
-After tranmitting a DATA_FRAME, the baseplate waits for the corresponding FEEDBACK_FRAME from the learning application.It then forwards the frame to the root brick using the same procedure as the feedback processing of the building bricks described in @feedback-processing. Afterwards, the baseplate reports to the learning application whether the frame was confirmed by the connected construction or not. The baseplate does not interpret the individual feedback entries and nor control the @LED of the bricks directly. Its role is limited to receiving the frame from the learning application and initiating its distribution through the physical construction.
+After tranmitting a DATA_FRAME, the Baseplate waits for the corresponding FEEDBACK_FRAME from the learning application.It then forwards the frame to the root brick using the same procedure as the feedback processing of the building bricks described in @feedback-processing. Afterwards, the Baseplate reports to the learning application whether the frame was confirmed by the connected construction or not. The Baseplate does not interpret the individual feedback entries and nor control the @LED of the bricks directly. Its role is limited to receiving the frame from the learning application and initiating its distribution through the physical construction.
 
-When the learning application terminates the session, the baseplate forwards an empty feedback frame to the root brick and since no brick NODE_IDs are contained in this payload, all local feedback outputs are switched off. The baseplate then ends cyclic detection and returns to the idle state shown in @baseplate-state-machine.
+When the learning application terminates the session, the Baseplate forwards an empty feedback frame to the root brick and since no brick NODE_IDs are contained in this payload, all local feedback outputs are switched off. The Baseplate then ends cyclic detection and returns to the idle state shown in @Baseplate-state-machine.
 
 === Conclusion?
 
+///
 == Software Architecture and Backend Processing <software-application>
-The learning application consists of a Python based backend and a browser based frontend implemented in JavaScript. The backend processes the data exchanged with the baseplate, while the frontend provides the selected target structure and presents the visualised results to the user. In the following chapters the implemented software architecture as well as the backend processing are described. (The implementation of the three-dimensional visualisation as well as the user-facing presentation of feedback are described separately in @user-interface-visualisation-feedback.)
+PC AS LEARNING APPLICATION??
+The learning application consists of a Python based backend and a browser based frontend implemented in JavaScript. The backend processes the data exchanged with the Baseplate, while the frontend provides the selected target structure and presents the visualised results to the user. In the following chapters the implemented software architecture as well as the backend processing are described. (The implementation of the three-dimensional visualisation as well as the user-facing presentation of feedback are described separately in @user-interface-visualisation-feedback.)
 
  === Implemented Software Architecture
-  The backend connects the two communication interfaces of the learning application: Communication with the baseplate is implemented using PySerial, while a WebSocket connection is used to exchange data with the browser frontend. (The serial interface transfers the compact binary frames described in @communication-protocol, whereas the WebSocket interface exchanges JSON objects.)
+The backend acts as an intermediary between the browser frontend and the Baseplate. It communicates with the frontend through a WebSocket connection using JSON objects, while PySerial is used to exchange the binary frames defined in @communication-protocol with the Baseplate.
 
- At the begging of a construction session, the target structure selected in the frontend is transfered to the backend. The backend receives and deserialises the detected construction data and compares the resulting tree witht the selected target. The comparison derives two outputs: The binary FEEDBACK_FRAME for the physical bricks that is returned to the baseplate through the serial interface. And an evaluated tree which is transferred to the frontend as a JSON object. This evaluated tree contains the structural information and feedback states required for the subsequent visualisation.
+A construction session begins when the frontend transmits the selected target structure to the backend. For each construction received from the Baseplate, the backend reconstructs the detected tree, compares it with the selected target and generates a feedback frame for the physical bricks as well as an evaluated tree for the frontend.
 
- The Serial communication and WebSocket are processed independently since they use different interfaces and data formats. Since the backend maintains a single serial connection to one baseplate, the current implementation supports only one active construction session at a time.
+ The Serial communication is handled by a dedicated worker thread, whereas the WebSocket server operates asynchronously. The two interfaces exchange different data representations: compact binary frames are used for communication with the Baseplate, while JSON objects are exchanged with the frontend.
+ Since the prototype uses a single serial interface connected to one Baseplate, only one browser based construction session can be active at a time.
 
-
- aufbau mit frontend und backend
- - learning application consists of a python based backend and a browserr based frontend implemented in Javascript
-
- - backend aufgabe: 
-    - connects the serial communication with the baseplate to the frontend and performs the application logic associated with the construction task
-    - deserialising the detected construction, managing the selected target structure, comparing both structures and generating the data required for local and global feedback - soll ich das nennen?
-
- - frontend aufgabe:
-    - provides the target structure to the backend and receives the evaluated construction through a WebSocket connection
-    - berechnet die position der bricks und visualisiert es
-    - Its presentation-related functions are discussed in @user-interface-visualisation-feedback.
- - backend communication with baseplate: Pyserial
- - frontend - backend communication: Websocket connection
-
- - process erklärung
-  - beginning: frontend transfers the selected target structure to backend
-  - backend: 
-    - receives and deserialises detected construction data
-    - compares resulting tree with selected target 
-    - derives two outputs from comparison
-      - a binary feedback frame that is returned to the baseplate and forwarded to the physical bricks -> baseplate wie wird das geschickt? (serial interface exchanges compact byte frames with the baseplate)
-      - evaluated tree for frontend -> latter is transfered to browser as JSON object and contains construction data and feedback states required for its subsequent visual representation 
-  - Serial communication and WebSocket communication are processed indepentently becuase they use different data formats and interfaces
-  - current implementation supports one active construction session at a time which means for the user just one?
-
-  #figure(
+#figure(
   image("figures/rechteck_lang@3x.png", width: 90%),
   caption: [Implemented software architecture of the learning application]
 )<software-architecture>
 
-//Figure @software-architecture should show the browser frontend, the WebSocket interface, the backend components for deserialisation, comparison and feedback generation, the serial interface and the baseplate.
+//Figure @software-architecture should show the browser frontend, the WebSocket interface, the backend components for deserialisation, comparison and feedback generation, the serial interface and the Baseplate.
 
- === Deserialisation and Internal Tree Models/Tree reconstruction and target comparison
- - backend recieves the detected construction as the payload defined in @detection-payload
- - recursive parser converts this linear byte sequence into an object based tree represenation
-  - starting with first root node, it evlauates each node header and uses the transmitted child mask to identify and recursively reconstruct the subordinate nodes in ascending port oder -> each child node is thereby assigned to the recieving port thourgh which it is connected to its parent
-  - each detected brick is represented internally by a node containing its identifier, orientation, parent port (ist diese representation struktur nach dem parser oder davor? )
-    CubeNode structure stores following information for every detected brick:
-    - its complete node identifier,
-    - its relative orientation,
-    - the receiving interface through which it is connected to its parent,
-    - its child mask,
-    - its subordinate nodes.
-- after reconstruction, the parser verifies that the complete payload has been consumed
-- Incomplete node data or remaining bytes cause the payload to be rejected as invalid
+ === Deserialisation and Internal Tree Models
+The backend receives the detected construction in the payload format defined in @detection-payload. A recursive parser converts this linear byte sequence into an object based tree representation. Starting with the root node, the parser reads each node header and uses the transmitted CHILD_MASK to identify and recursively reconstruct its subordinate nodes in ascending port order. Each child node is thereby assigned to the receiving port through which it is connected to its parent. Each detected brick is consequently represented by a CubeNode containing
+    - The complete node identifier
+    - The relative orientation
+    - The receiving port through which it is connected to its parent
+    - The child mask
+    - The subordinate nodes
 
-- target construction uses a separate but strucutrally equivalent tree representation (JSON File). 
-  - Its nodes contain the required brick type and orientation, while the child nodes are assigned to their expected receiving ports
-  - Unlike the detected structure, the target tree does not contain individual brick identifiers because bricks of the same type are interchangeable within the task
+After reconstruction, the parser verifies that the complete payload has been consumed. Incomplete node data or remaining bytes cause the payload to be rejected as invalid.
 
--> Both representations nevertheless share the same hierarchical organisation, allowing them to be compared recursively.
+The target construction uses a separate but structurally equivalent tree representation. It is stored as a JSON object and converted by the backend into a TargetNode. Each target node contains the required brick type and orientation, while its child nodes are assigned to the expected receiving ports. Since physical bricks of the same type are interchangeable within the task, the target structure does not contain individual brick identifiers. Both representations nevertheless share the same hierarchical organisation and can therefore be compared recursively.
 
+//#apa-table(
+//  columns: (1.2fr, 2fr, 2fr),
+//
+//  table-label: <internal-tree-models>,
+//
+//  header: (
+//    [Information],
+//    [Detected construction (`CubeNode`)],
+//    [Target construction (`TargetNode`)],
+//  ),
+//
+//  caption: [Internal representations of the detected and target constructions],
+//
+//  [Brick identification],
+//  [Complete node identifier containing type and instance],
+//  [Brick type without an individual instance],
+//
+//  [Orientation],
+//  [Detected relative orientation],
+//  [Expected relative orientation],
+//
+//  [Receiving port],
+//  [Derived during deserialisation and stored with the child node],
+//  [Defined by the target structure],
+//
+//  [Subordinate structure],
+//  [Child mask and list of detected child nodes],
+//  [Child nodes assigned to their expected receiving ports],
+//)
 
-VLT BEISPIEL EINER SOLCHEN DESERIALIZED NODE/SERIALISED NODE? und TARGET REPRESENTATION
+VLT BEISPIEL EINER SOLCHEN DESERIALIZED NODE/SERIALISED NODE? und TARGET REPRESENTATION ODER TABELLE
 
 //vlt die zwei kapitel zusammennehmen
-=== Comparison and Generetation of Feedback Data
-- once the construction is geparsed und als node dargestellt the comparison starts at the root node of the detected and target structure and proceeds recursively through the receiving ports of each parent
-- for every expected position, the implementation examines the 
-  - presence of a physical brick, 
-  - its type, its relative 
-  - orientation 
-  - its position within the parent–child structure.
-  -> The individual identifier of a brick is not used to determine whether the construction is correct; it is retained solely to address the corresponding physical brick when generating local feedback.
+=== Target Comparison and Feedback Data Generation <comparison-feedback-generation>
+Once the detected payload has been reconstructed, the comparisons begins at the root nodes of the detected and target strucutres and proceeds recursively through the receiving ports of each brick. 
 
-- comparison reproduces an evaluated tree that combines infirmation form detected and target structure. each entry is assigned of one of five internal states
-  - correct
-  - wrong
-  - attachable
-  - blocked
+For every position occurring in either structure, the algorithm compares the presence, type, relative orientation and structural placement of the corresponding brick.The individual node identifier is not used to determine if a brick is correctly positioned or not but is retained to address the physical brick when generating local feedback. 
 
-- in addition to the general wrong state, an error masks records wheter a deviation relates to the 
-  - brick type
-  - orientation
-  - receiving port
-  - parent path
-  - presence of an unexpected element
--> separation allows the same comparison result to support different forms and levels of feedback without executing the structural comparison again.
+The comparison then creates an evaluated tree that combines actual and expected information. Each position is assigned to one of five internal states, as summarised in @comparison-states
 
-- If the path leading to a brick is already incorrect, its subordinate structure is also marked as invalid-> Conversely, an unoccupied target position is classified as ATTACHABLE only if its parent path is correct; subordinate positions that cannot yet be reached meaningfully remain BLOCKED.
+#apa-table(
+  columns: (1fr, 4fr),
 
-- two outputs are dervied from the evaluated tree
-  - generates brick specific feedback data set for all physically present nodes and converts it into the feedback frame defined in @feedback-payload
-    (Physically present bricks with the state CORRECT receive a green LED state. Bricks classified as WRONG or UNEXPECTED receive a red LED state. ATTACHABLE/BLOCKED Missing target positions do not correspond to physical bricks and therefore do not produce local LED entries)
-  - generates a JOSN compatible representation of the evaluated tree for the frontend -> This representation contains both detected bricks and currently unoccupied target positions, together with their assigned states and expected properties. 
-  -> The manner in which these results are presented locally and globally is described in @user-interface-visualisation-feedback.
+  table-label: <comparison-states>,
+
+  header: (
+    [State],
+    [Assignment by the comparison algorithm],
+  ),
+
+  caption: [Internal states of the evaluated construction tree],
+
+  [CORRECT],
+  [A brick is present with the required type, orientation and connection],
+
+  [WRONG],
+  [A brick is present but differs from the target],
+
+  [ATTACHABLE],
+  [A target brick is missing, but its parent has already been placed correctly],
+
+  [BLOCKED],
+  [A target brick is missing and cannot yet be placed because its parent is missing or incorrect],
+
+  [UNEXPECTED],
+  [A brick is present where the target does not contain a brick],
+)
+
+If a brick is connected to a receiving port that is not occupied in the target structure, the algorithm searches the remaining unoccupied ports of the same parent for an expected brick of the same type. If such a position exists, the brick is classified as WRONG and the expected port is stored in the comparison result. Otherwise, the brick and its subordinate structure are classified as UNEXPECTED. The comparison also considers the validity of the complete structural path. If a parent brick is missing or incorrect, its subordinate bricks cannot yet occupy valid positions within the target structure and are therefore marked as WRONG. Conversely, an unoccupied target position is classified as ATTACHABLE only if its parent path is correct.
+
+In addition to these general internal states, each evaluated node also contains an error mask. Its individual bits indicate wheter the deviation relates to the brick type, orientation, receiving port, parent path or the presence of an unexpected element. This additional separation allows the same comparison result to support different forms and levels of feedback.
+
+When the comparison is done, two output representations are genereted from the evaluated tree: For the physical construction a brick specific feedback data set for all physically present nodes is generetad and converted into the feedback frame defined in @feedback-payload. For the frontend, the evaluated tree is converted into a JSON-compatible representation. This representation contains both detected bricks and currently unoccupied target positions, together with their assigned states and expected properties.
+ 
+(-> The manner in which these results are presented locally and globally is described in @user-interface-visualisation-feedback.)
+
+=== Conclusion?
+?The backend transfers the evaluated tree to the frontend as a JSON object. Based on the structural and feedback information contained in this representation, the frontend calculates the spatial poses of the individual bricks and generates the user-facing visualisation described in the following section.?
+
+///
+== Frontend, Visualisation and Feedback <user-interface-visualisation-feedback>
+ÜBERLEITUNG
+
 
 === Calculation of Spatial Poses <calculation-poses>
+The evaluated tree received from the backend contains no absolute spatial coordinates. Instead, the frontend calculates the position and orientation of each brick from its type, receiving port, relative orientation and parent–child relationship. The same calculation is used for target structures and evaluated constructions.
 
-- calculation passiert lokal? -> not necessary to calculate global coordinates for the comparison. Spatial positions and rotations are calculated separately for the subsequent three-dimensional visualisation.
-- calculation passiert im frontend?
-- calculation für detected construction and target construction
-
-- implementation uses a local coordinate system for every brick:
-  - z axis represents the vertical axis
-  - docking face of a brick is oriented towards its local negative z direction
-  - For the cube brick, receiving ports \(0\) to \(4\) correspond to the directions \(-x\), \(-y\), \(+z\), \(+x\) and \(+y\). 
-  - The smashed brick provides only one receiving port in its local \(+z\)-direction. 
-  ->  @brick-coordinate-system  and @smashed-coordinate-system should illustrate this assignment together with the orientation values detected at the docking interface.
-
+For the Calulation the implementation uses a local coordinate system for every brick: The z axis represents the vertical axis of the brick and the docking face is oriented towards its local negative z direction. For the cube brick, receiving ports \(0\) to \(4\) correspond to the directions \(-x\), \(-y\), \(+z\), \(+x\) and \(+y\). The smashed brick provides only one receiving port in its local \(+z\)-direction. 
+@brick-coordinate-system  and @smashed-coordinate-system  illustrate this local coordinate system and the orientation values detected at the docking interface.
 
 #grid(
   columns: (1fr, 1fr),
@@ -658,19 +586,9 @@ times
 q_("twist")(o).
 $
 
-- The attachment quaternion $q_("attachment")(t, p)$ aligns the docking face of the child with the selected receiving face of the parent
-- The twist quaternion $q_("twist"))(o)$ represents the detected relative rotation $o$.
-The four orientation values are mapped to rotations of
-$90 degree$, $0 degree$, $-90 degree$ and $-180 degree$
-around the local $z$-axis. -> assignments aligns the orientation of the digital models with the orientation convention used by the connection-detection system
+The attachment quaternion $q_("attachment")(t, p)$ aligns the docking face of the child with the selected receiving face of the parent. The twist quaternion $q_("twist"))(o)$ represents the detected relative rotation $o$. The four transmitted orientation values are mapped to rotations of $90 degree$, $0 degree$, $-90 degree$ and $-180 degree$ around the local $z$-axis. This assignments aligns the orientation of the digital models with the orientation convention used by the connection-detection system
 
-- the first brcik connected to the baseplate forms root of the displayed construction
-- since it has no parent brick, its local positon is set to the origin of the scene and its local orientation is derived solely from its transmitted relative rotation
-
-for all subordinate bricks, the local position and orientation are accumulated recursively along the parent child structure. every child object is inserted into the scene graph as a subordinate object of its parent. 
-
-The global transformation of a child brick $c$ follows from the global transformation of its parent brick $p$ with the local transformation of the child:
-
+The first brcik connected to the Baseplate forms root of the displayed construction and has therefore no parent brick. Beause of that, its local positon is set to the origin of the scene and its local orientation is derived solely from its transmitted relative rotation value. For every other subordinate brick, the local transformation is combined with the transfomration of its parent: 
 $
 T_("global", c)
 =
@@ -679,26 +597,116 @@ times
 T_("local", c).
 $
 
-this recursive composition converts the locally detected connection information into global positions and orientations without requiring the backend to transmit absolute coordinates 
+
+This calculation is applied recursively throughout the tree. Local connection information is therefore sufficient to derive the global position and orientation of every brick and the backend does not require to transmit absolute coordinates.
+
+==== Three-Dimensional Visualisation
+The resulting construction is then displayed using corresponding GLB Models of the two brick types and placed within a Three.js scene.  With the help of orbit controls the scene can be rotated and enlarged through mouse or touch input, allowing the construction to be inspected from different perspectives.
+
+
+#figure(
+  image("figures/rechteck_lang@3x.png", width: 90%),
+  caption: [Abbild physische Construction und digitales Abbild]
+)<visualisation-construction>
+
+=== Feedback Presentation/Visual and Local Feedback
+The three-dimensional representation of the evaluated construction is extended by visual cues derived from the comparison states described in @software-application. These cues are complemented by local feedback from the LEDs integrated into the physical bricks. Table @implemented-feedback-presentation summarises how each state is represented on both feedback levels.
+
+#apa-table(
+  columns: (1.2fr, 2.4fr, 2.2fr),
+
+  table-label: <implemented-feedback-presentation>,
+
+  header: (
+    [Evaluation state],
+    [Representation in the frontend],
+    [Feedback on the physical brick],
+  ),
+
+  caption: [Implemented presentation of the evaluation states],
+
+  [Correct],
+  [Green pulsing outline],
+  [Green LED light],
+
+  [Wrong or unexpected],
+  [Red pulsing outline],
+  [Red LED light],
+
+  [Attachable],
+  [Semi-transparent ghost brick],
+  [No physical output],
+
+  [Blocked],
+  [Not displayed],
+  [No physical output],
+)
+
+#figure(
+  image("figures/rechteck_lang@3x.png", width: 90%),
+  caption: [bild mit allen 3 brick types also outline und ghost]
+)<visualisation-feedback-brick>
+
+Physically present bricks retain the appearance of their corresponding digital models, while coloured outlines indicate the evaluation result. Green represents a correctly positioned brick, whereas red indicates an incorrect or unexpected brick. A currently attachable target brick is displayed semi-transparentlyas a visual indication of an available next construction step. Not displayed are target bricks that cannot yet be reached because their preceding construction path is incomplete.
+
+The global feedback in the frontend is coordinated with the local @LED feedback of the physical bricks.A brick shown with a green or red outline is illuminated in the corresponding colour. Missing target bricks have no physical counterpart and are therefore represented exclusively in the frontend. Missing target positions do not have a corresponding physical output and are therefore represented only in the frontend.
+
+To signalise both the current construction progress and the completion of the task, a progress bar additionally shows the proportion of the target construction that has already been completed correctly.
+BILD???
+
+=== User Interface and Task Selection
+The visualisation process is not limited to displaying the detected bricks and their feedback states during the construction task. It begins on the dashboard, where the learner selects the target strucutre that defines the subsequent task.
+
+The dashboard presents the available target constructions as selectable cards. Each card contains a three-dimensional preview generated from the corresponding target-tree data. Selecting a card opens an enlarged preview window in which the construction can be rotated and inspected from different viewing angles. The learner can then either cancel the selection and return to the dashboard or confirm the selected construction.
+
+The preview window additionally contains two level options from which the learner can choose. Although the selected level is transferred together with the target structure, it does not currently affect the task behaviour. It is intended to support a future differentiation of task difficulty.
+
+After the target structure has been confirmed, the live construction view is opened and the selected target is transferred to the backend. During the task, this view displays the evaluated construction using the spatial reconstruction and feedback representations described in the preceding sections. The progress bar is placed at the top of the interface and indicates the proportion of the target construction that has already been completed correctly.
+
+The construction session can be terminated using the button in the upper area of the live view. The frontend then returns to the dashboard, where another target construction can be selected.
+
+ABBILDUNG so drei oder vier bilder die den process visualisieren mit zuerst auswahl interface dann preview und dann aufgabe
+#grid(
+  columns: (1fr, 1fr, 1fr),
+  column-gutter: 1em,
+  [
+    #figure(
+      image("figures/quadrat@3x.png", width: 90%),
+      caption: [Target selection],
+      supplement: [Figure],
+      kind: "figure",
+    ) <target-selection>
+  ],
+  [
+    #figure(
+      image("figures/quadrat@3x.png", width: 90%),
+      caption: [review and confirmation ],
+      supplement: [Figure],
+      kind: "figure",
+    ) <preview-and-confirmation>
+  ],
+  [
+    #figure(
+      image("figures/quadrat@3x.png", width: 90%),
+      caption: [Construction and feedback],
+      supplement: [Figure],
+      kind: "figure",
+    ) <construction-and-feedback>
+  ],
+)
+
+=== Conclusion?
+
+
+
+
+
+
 
 sagen dass nur aus lokalen informationen der bausteine ausreichen umd die gloablen positionen zu berechnen - oder das vlt am ende in conclusion zusammen mit dem fact dass lokale informationen ausreichen um global die konstruktion zu bewerten/vergleichen
 The same tree-building implementation is used for the target
 
-// wo soll das hin?:
-The generated construction is placed within a Three.js scene containing a perspective camera, ambient and directional lighting and a shadow-receiving ground plane. The camera position is adapted to the bounding box of the construction when the first result of a session is displayed. Orbit controls allow the visualisation to be rotated and enlarged using either mouse or touch input
-
-=== Conclusion
-
-
-=== Benutzeroberfläche, Visualisierung und Feedback 
-<user-interface-visualisation-feedback>
-
-die positionsberechnung und error mask ist grundlage für visualsierung
-
-- Auswahl und Darstellung einer Zielkonstruktion
-- visuelle Kennzeichnung korrekter und fehlerhafter Bausteine
-  - Abstimmung zwischen globaler Rückmeldung in der Anwendung und lokalem Feedback an den Würfeln
-  - feedback mit led 
+additional separation of error mask -> different feedback possible
 
   anforderungen
   - rot grün

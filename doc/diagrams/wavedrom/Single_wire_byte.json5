@@ -1,11 +1,46 @@
 {
   head: {
-    text: "Single-wire byte transmission"
+    text: [
+      "tspan",
+      [
+        "tspan",
+        {
+          "font-size": "22",
+          "font-family": "Times New Roman",
+          "font-weight": "bold"
+        },
+        "Single-wire byte transmission"
+      ]
+    ]
   },
+
   signal: [
-    {name: "1-wire", wave: "1..01.0101.01..."},
-    {name: "Transmitter?", wave: "x..34.......3xxx", data: ["start bit", "data byte", "stop bit"]}
+    {
+      name: "1-wire",
+      wave: "1.01.0101.01."
+    },
+    {
+      name: "Transmitter",
+      wave: "x.34......3xx",
+      data: ["start bit", "data byte", "stop bit"]
+    }
   ],
-  foot:{"text": "Idle = HIGH, start bit = LOW, 8 data bits LSB first, stop bit = HIGH, bit time = 104 us"},
-  "config": {"hscale": 2}
+
+  foot: {
+    text: [
+      "tspan",
+      [
+        "tspan",
+        {
+          "font-size": "18",
+          "font-family": "Times New Roman"
+        },
+        "Idle = HIGH, start bit = LOW, 8 data bits LSB first, stop bit = HIGH, bit time = 104 us"
+      ]
+    ]
+  },
+
+  config: {
+    hscale: 2
+  }
 }

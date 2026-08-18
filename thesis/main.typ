@@ -21,8 +21,8 @@ Special Education]
 
 #let thesis-type = [Bachelor Thesis]
 
-#let supervisor = [Claudia Meitinger]
-#let second-supervisor = [Christoph Zeuke]
+#let supervisor = [Prof. Dr. Claudia Meitinger]
+#let second-supervisor = [Prof. Dr.-Ing. Christoph Zeuke]
 
 #let submission-date = [18. August 2026]
 
@@ -53,6 +53,13 @@ Special Education]
 #set par(
   justify: true,
   leading: 0.65em,
+  spacing: 0.65em,
+  first-line-indent: 1.5em,
+)
+
+#set list(
+  indent: 1.7em,
+  body-indent: 0.5em,
 )
 
 // Figures nicht im Blocksatz
@@ -182,14 +189,33 @@ Special Education]
 // FRONT MATTER
 // ============================================================
 
-#set page(numbering: "i")
-#counter(page).update(1)
+#set page(
+  numbering: "i",
 
+  footer: context [
+    #line(
+      length: 100%,
+      stroke: 0.5pt,
+    )
+
+    #v(3pt)
+
+    #align(center)[
+      #counter(page).display("i")
+    ]
+  ],
+)
+
+#counter(page).update(1)
+// Declaration
+
+
+#include "declaration.typ"
 
 // ------------------------------------------------------------
 // ABSTRACT
 // ------------------------------------------------------------
-
+#pagebreak()
 #heading(
   numbering: none,
   outlined: false,
@@ -319,15 +345,20 @@ This thesis ...
   ("ASD", "Autism Spectrum Disorder"),
   ("GUI", "Graphical User Interface"),
   ("GE", "Special education focus on intellectual development"),
+  ("ID", "Identification"),
   ("LE", "Special education focus on learning"),
   ("LED", "Light-Emitting Diode"),
   ("MVC", "Model View Controller"),
   ("MCRpd", "Model-Control-Representation (physical and digital"),
+  ("NFC", "Near Field Communication"),
   ("rep_p", "Physical Representation"),
   ("rep_d", "Digital Representation"),
+  ("RFID", "Radio Frequency Identification"),
   ("RGB", "red-green-blue"),
   ("TUI", "Tangible User Interface"),
-  ("UI", "User Interface")
+  ("UHF", "Ultra High Frequency"),
+  ("UI", "User Interface"),
+  ("3D", "Three Dimensional")
 
 )
 // ------------------------------------------------------------
@@ -342,7 +373,8 @@ This thesis ...
 
 #include "tui_engl.typ"
 
-//#include "verwandte_systeme.typ"
+#pagebreak()
+#include "verwandte_systeme.typ"
 #pagebreak()
 
 #include "anforderungsanalyse_engl.typ"
@@ -357,7 +389,7 @@ This thesis ...
 #pagebreak()
 #include "implementierung_engl.typ"
 #pagebreak()
- #include "evaluation.typ"
+ #include "evaluation_engl.typ"
 // #include "discussion.typ"
 // #include "conclusion.typ"
 
@@ -375,5 +407,6 @@ This thesis ...
 #bibliography(
   ("bib.bib", "bib_manual.bib"),
   title: [References],
-  style: "ieee",
+  style: "ieee-grouped.csl",
 )
+

@@ -1,0 +1,35 @@
+{
+  head: {
+    text: [
+      "tspan",
+      [
+        "tspan",
+        {
+          "font-size": "22",
+          "font-family": "Times New Roman",
+          "font-weight": "bold"
+        },
+        "Single-wire Parent Child Communication"
+      ]
+    ]
+  },
+  signal: [
+    {name: "Parent", wave: "x.7......0...............x.", data: ["CMD_STATUS", "delay", "ACK_BUSY", "delay","DATA_FRAME [length varies]"]},
+    {name: "1-wire", wave: "1.0101.01..0.1.0.1..010.1.."},
+    {name: "Child", wave: "x.0......8.5......8.6....x.", data: ["delay", "ACK_BUSY", "delay","DATA_FRAME [length varies]"]},
+  ],
+  foot: {
+    text: [
+      "tspan",
+      [
+        "tspan",
+        {
+          "font-size": "18",
+          "font-family": "Times New Roman"
+        },
+        "The length of the messages shown does not correspond to reality "
+      ]
+    ]
+  },
+  "config": {"hscale": 0.5}
+}
