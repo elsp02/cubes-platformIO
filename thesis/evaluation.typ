@@ -169,3 +169,46 @@ The system-generated feedback is primarily visual and therefore does not constit
 
 == ausblick
 steffis anmelrungen zum user interface 
+
+The objective was to develop a tangible user interface for children in special education that would enrich classroom activities for students and teachers.
+The system was intended to address the following competencies:
+- Primary: spatial thinking, action planning and self-directed learning
+- Secondary: problem-solving, error detection and self-correction
+- Additional: fine motor skills, concentration and hand–eye coordination
+
+Explain why this objective was achieved and discuss the most important requirements.
+Relate the discussion to constructionism, embodied interaction and the design factors of TUIs for children.
+
+Although not everything has been implemented and differentiated or graduated feedback is still missing, the prototype provides a foundation for these features.
+The evaluation showed that the students enjoyed building and understood the general concept even without digital detection and feedback.
+Students with different levels of support needs were able to build with the bricks because tasks of varying difficulty were available.
+
+= Conclusion
+Summarise the work and provide a final conclusion in approximately half a page.
+
+== Outlook
+Make the prototype fully functional and test it again with the students at the school.
+Extend the learning application with different feedback levels.
+Add different learning games, such as having one student construct a model for another student to reproduce.
+Investigate replacing the computer with an ESP32 and a Wi-Fi connection to the tablet.
+Make the feedback in the learning application multimodal by supplementing text output with spoken feedback, for example.
+
+///
+/// 
+= Conclusion
+This thesis investigated how a modular, brick-based tangible user interface can combine physical construction with digital processing and feedback to create an action-oriented learning game for children in special education. The design was grounded in constructionism, embodied cognition and principles for child-appropriate tangible interaction. These foundations were translated into pedagogical, interaction-related, mechanical and technical requirements intended to support spatial thinking, action planning, problem-solving and increasingly independent learning.
+
+The resulting prototype combines graspable construction elements with a digital learning application and an electronic architecture for detecting, reconstructing and evaluating physical structures. The physical configuration is represented digitally through the relationships between connected bricks, enabling it to be compared with a selected target and providing the basis for feedback both within the application and on the construction itself. In this way, the concept extends conventional building materials without replacing their immediate haptic and spatial qualities.
+
+The formative evaluation showed that the central learning idea was understandable and engaging for the participating students. They were able to interact with the bricks, interpret digital target structures of varying complexity and approach the reconstruction tasks through active experimentation. The activity also supported different working styles and spontaneous collaboration. These findings indicate that the combination of tangible construction and digital representation is appropriate for the intended context and can provide meaningful opportunities to engage with the targeted competence areas.
+
+The prototype does not yet constitute a completed learning system. In particular, unreliable electronic detection prevented the integrated feedback process from being evaluated with the target group, and no conclusions can be drawn about measurable learning gains. Nevertheless, the work demonstrates the feasibility and educational potential of the overall concept. It provides a coherent foundation on which reliable automatic feedback, individualised support and further learning activities can be developed. The principal contribution of the thesis is therefore not a finished product, but a theoretically grounded and practically tested proof of concept for an accessible tangible learning system in special education.
+
+== Outlook
+The immediate priority is to achieve reliable end-to-end operation of construction detection, target comparison and local as well as application-based feedback. Communication timing and connection reliability should be improved before the complete system is evaluated again with students. This evaluation should examine whether learners understand the distinction between technical detection feedback and pedagogical feedback and whether the system enables them to recognise and correct errors with less adult assistance.
+
+The learning application should subsequently implement graduated levels of support. Initial feedback could identify only the affected part of a construction, while further levels provide explanations, highlight a permissible next step or present the target incrementally. Multimodal access should also be expanded through spoken instructions or read-aloud assistance, stronger visual contrasts and predominantly pictorial rather than text-heavy guidance. These options should remain configurable so that support can be adapted without changing the fundamental interaction principle.
+
+Further learning activities could extend the reconstruction task, for example by completing unfinished structures, identifying deliberately introduced errors or allowing one student to create a model for another student to reproduce. Such activities could broaden the addressed competencies and make collaborative use more explicit. From a technical perspective, it should also be investigated whether base-station communication and suitable backend functions can be transferred to an ESP32. A direct Wi-Fi connection to the tablet could reduce dependence on a separate computer and simplify classroom setup.
+
+Once the prototype is stable, longer-term studies with larger and more diverse groups should investigate learning development, transfer, sustained motivation and the degree of independent use across repeated sessions. Teachers should be included systematically to assess preparation effort, classroom integration and the usefulness of the available support levels. These steps would allow the proof of concept to develop into a robust and adaptable learning system for regular educational practice.

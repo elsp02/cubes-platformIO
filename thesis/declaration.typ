@@ -11,7 +11,8 @@
 
   #v(0.4cm)
 
-  I hereby declare that I have written this thesis independently and have used no sources or aids other than those indicated. Augsburg, 18 August 2026
+  I hereby declare that I have written this thesis independently and have used no sources or aids other than those indicated. \
+  Augsburg, 18 August 2026
 
   #v(2.5cm)
 

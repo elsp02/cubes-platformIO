@@ -24,7 +24,7 @@ Special Education]
 #let supervisor = [Prof. Dr. Claudia Meitinger]
 #let second-supervisor = [Prof. Dr.-Ing. Christoph Zeuke]
 
-#let submission-date = [18. August 2026]
+#let submission-date = [18 August 2026]
 
 
 // ------------------------------------------------------------
@@ -62,7 +62,7 @@ Special Education]
   body-indent: 0.5em,
 )
 
-// Figures nicht im Blocksatz
+// Do not justify figure captions
 #show figure: set par(justify: false)
 
 
@@ -95,7 +95,7 @@ Special Education]
   block(
     above: 1.2em,
     below: 0.8em,
-    it, // oder it.body wenn level 3 keine Nummerierung mehr haben soll
+    it, // Use it.body instead if level-3 headings should not be numbered
   )
 }
 
@@ -104,7 +104,7 @@ Special Education]
   block(
     above: 1.1em,
     below: 0.8em,
-    it.body, // oder it.body wenn level 3 keine Nummerierung mehr haben soll
+    it.body, // Use it instead if level-4 headings should be numbered
   )
 }
 
@@ -173,7 +173,7 @@ Special Education]
       columns: (auto, auto),
       stroke: none,
       column-gutter: 4cm,
-      //align: (right + horizon, left + horizon),  // aligned text jeweils in die mitte
+      //align: (right + horizon, left + horizon), // Align text vertically in the centre
 
       [Supervisor:], [#supervisor],
       [Second Supervisor:], [#second-supervisor],
@@ -221,7 +221,7 @@ Special Education]
   outlined: false,
 )[Abstract]
 
-This thesis ...
+Children with special educational needs benefit from concrete, action-oriented learning opportunities that accommodate different cognitive, perceptual and motor abilities. This thesis presents a modular, brick-based tangible learning game that combines the haptic and spatial qualities of physical construction materials with digital task presentation, construction detection and feedback. Learners select a three-dimensional target structure in a browser-based application and reproduce it using electronically connected building bricks. The system was designed to create opportunities for spatial thinking, action planning, problem-solving and increasingly independent learning while allowing task complexity and assistance to be adapted to individual needs. A prototype comprising two brick geometries, a central baseplate, embedded communication and a learning application was developed and assessed against requirements derived from learning theory, tangible interaction and the special education context. A formative qualitative evaluation was conducted with ten students from one class at a special education school. Because electronic construction detection was not sufficiently reliable during the session, the students evaluated the physical bricks, target selection and three-dimensional visualisation, while the remaining functions were assessed analytically. The students understood the reconstruction task, interacted willingly with the physical and digital elements and completed structures of varying complexity. The tangible materials also encouraged experimentation and spontaneous peer support. However, the integrated detection and feedback cycle, graduated assistance and multimodal output remain to be implemented reliably and evaluated with the target group. The results therefore do not demonstrate learning gains, but they provide formative evidence that the central interaction concept is accessible, engaging and suitable as a foundation for a tangible learning system in special education.
 
 
 #pagebreak()
@@ -349,7 +349,7 @@ This thesis ...
   ("LE", "Special education focus on learning"),
   ("LED", "Light-Emitting Diode"),
   ("MVC", "Model View Controller"),
-  ("MCRpd", "Model-Control-Representatio (physical and digital"),
+  ("MCRpd", "Model–Control–Representation (physical and digital)"),
   ("NFC", "Near Field Communication"),
   ("rep_p", "Physical Representation"),
   ("rep_d", "Digital Representation"),
@@ -358,7 +358,7 @@ This thesis ...
   ("TUI", "Tangible User Interface"),
   ("UHF", "Ultra High Frequency"),
   ("UI", "User Interface"),
-  ("3D", "Three Dimensional")
+  ("3D", "Three-Dimensional")
 
 )
 // ------------------------------------------------------------
@@ -383,13 +383,13 @@ This thesis ...
 
 #include "systemkonzept_engl.typ"
 
-// Weitere Kapitel später beispielsweise:
+// Additional chapters can be included here later, for example:
 //
 //#include "systemkonzept2.typ"
 #pagebreak()
 #include "implementierung_engl.typ"
 #pagebreak()
- #include "evaluation_engl.typ"
+#include "evaluation_engl.typ"
 // #include "discussion.typ"
 // #include "conclusion.typ"
 
@@ -455,4 +455,9 @@ This thesis ...
   title: [References],
   style: "ieee-grouped.csl",
 )
+
+#pagebreak()
+#counter(heading).update(0)
+#set heading(numbering: "A.1")
+#include "appendix.typ"
 
