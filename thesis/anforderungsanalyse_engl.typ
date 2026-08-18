@@ -94,7 +94,7 @@ As discussed in relation to multimodal accessibility in @tui-children, providing
 
   req-target("FB4"),  [Assistance should be provided on a tiered basis, depending on the learners level],
 
-  req-target("IA6"), [Feedback can be provided through multiple output modalities],
+  req-target("IA6"), [Feedback should be provided through multiple output modalities],
 )
 
 == Geometrical and Ergonomic Requirements
@@ -140,7 +140,7 @@ The detection functionality should remain reliable when multiple blocks are conn
     [Requirement],
   ),
 
-  caption: [requirements for the construction detection],
+  caption: [Requirements for the construction detection],
 
     req-target("DET1"),  [The system must be able to uniquely detect each cube],
 
@@ -163,7 +163,7 @@ The maximum response time of 400 ms @Time,
 
 == Electrical and Technical Requirements
 The technical implementation should be as simple, modular and low-maintenance as possible, with individual components remaining replaceable at reasonable effort. To reduce maintenance requirements and avoid the need to charge multiple devices separately and thereby make the system suitable for use in schools, the building blocks must operate without individual batteries or rechargeable power sources #req("EL1").
- the building blocks must operate without individual batteries or rechargeable power sources #req("EL1"). For the initial proof of concept, the prototype should include at least ten building blocks, as this number is sufficient to demonstrate multi-part and spatially branching constructions #req("EL2"). In the future, the system should be expandable with additional blocks without requiring changes to its fundamental operating principle #req("EL3").
+ For the initial proof of concept, the prototype should include at least ten building blocks, as this number is sufficient to demonstrate multi-part and spatially branching constructions #req("EL2"). In the future, the system should be expandable with additional blocks without requiring changes to its fundamental operating principle #req("EL3").
 
 #apa-table(
   columns: (0.7fr, 5fr),
@@ -199,7 +199,7 @@ The cost per building block should preferably remain between one and three euros
     [Requirement],
   ),
 
-  caption: [safety and Economic requirements],
+  caption: [Safety and economic requirements],
 
     req-target("S1"),  [The cubes must be able to withstand repeated gripping, connecting and disconnecting],
 

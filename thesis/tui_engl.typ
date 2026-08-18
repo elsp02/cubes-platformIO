@@ -2,30 +2,30 @@
 
 //= TUI
 == Graphical vs Tangible User Interface
-A @UI can be defined as the point of contact through which people communicate and interact with a technical system. The most common type of @UI is the @GUI, in which digital information is visually represented on a screen and manipulated through input devices such as a mouse, a keyboard, or a touchscreen @TangibleUserInterface.
+A @UI can be defined as the point of contact through which people communicate and interact with a technical system. The most common type of @UI is the @GUI, in which digital information is visually represented on a screen and manipulated through input devices such as a mouse, a keyboard, or a touchscreen @TangibleUserInterfacePast.
 
-Shaer and Hornecker contrast this mode of interaction with people’s everyday experience of the physical environment @TangibleUserInterfacePast[p. 3]:
+Shaer and Hornecker contrast this mode of interaction with people’s everyday experience of the physical environment @TangibleUserInterfacePast[p. 1]:
 
 #align(center)[
 #quote(block: true)[
   “We live in a complex world, filled with myriad objects, tools, toys and people. Our lives are spent in diverse interaction with this environment. Yet, for the most part, our computing takes place sitting in front of and staring at, a single glowing screen attached to an array of buttons and a mouse”
 ] <Shaer>]
 
-The quotation highlights the separation between traditional computer interaction and people’s embodied experience of the physical world: In everyday life, objects can be grasped, combined and explored through several senses, whereas conventional @GUI, by contrast, translate these actions into interactions with visual representations on a two-dimensional display. Consequently, digital interaction frequently utilizes only a limited extent of people's innate physical capabilities, potentially resulting in a reduced level of intuitiveness @TangibleUserInterfacePast.
+The quotation highlights the separation between traditional computer interaction and people’s embodied experience of the physical world: In everyday life, objects can be grasped, combined and explored through several senses, whereas conventional @GUI, by contrast, translate these actions into interactions with visual representations on a two-dimensional display. Consequently, digital interaction frequently makes only limited use of people’s natural physical capabilities, potentially resulting in a reduced level of intuitiveness @TangibleUserInterfacePast.
 
 The concept of Ishii and Ullmer’s Tangible Bits responds to this separation by coupling digital information with everyday physical and graspable objects and the surrounding environment. Its central aim is to bridge the divide between the digital domain of bits and the physical world of atoms, thereby making digital information directly accessible through physical manipulation. Tangible Bits consequently provided an important conceptual foundation for the development of @TUI @TangibleBits1997@TangibleBits2008.
 
-Different to a @GUI, in a @TUI, the computer becomes a natural extension of the physical environment. Interaction does not occur exclusively through graphical elements on a screen, instead, users manipulate real world objects, reffered to physical objects, so called phicons in order to interact with the digital system. These phicons do not merely serve as input devices but they also fulfil a representational function @TangibleUserInterface.
+Unlike a @GUI, a @TUI integrates computing into the physical environment. Interaction does not occur exclusively through graphical elements on a screen; instead, users manipulate real-world objects, commonly referred to as phicons, to interact with the digital system. These phicons do not merely serve as input devices but also fulfil a representational function @TangibleUserInterfacePast.
 
 The fundamental principle of a @TUI is predicated on two closely related characteristics @TokenConstraint:
 
-+ Phicons, are used as representations of digital information and computational operations
-+ The physical manipulation of these phicons is used to interact with the associated computational operation
+-  Phicons are used as representations of digital information and computational operations
+-  The physical manipulation of these phicons is used to interact with the associated computational operation
 
 Because different types of information or functions can be represented by separate physical elements, multiple phicons may remain available for simultaneous manipulation. They may also be operated in parallel or with both hands. This principle, known as _space multiplexing_, can improve interaction efficiency and facilitate collaborative use by groups, which is typically more restricted in conventional GUI-based interaction @TokenConstraint.
 
 === MVC and MCRpd Model
-The difference between these styles of user interfaces becomes more obvious when comparing their undelying interaction models shown in @MVC_MCRpd_Model @EmergingFrameworks.
+The difference between these styles of user interfaces becomes more obvious when comparing their underlying interaction models shown in @MVC_MCRpd_Model @EmergingFrameworks.
 
 ==== MVC model for GUI
 Within the @MVC architecture, an interactive software system is divided into three functional components: The _model_ represents the underlying data and the current state of the system, the _view_ presents this information graphically, while the _control_ processes user input and translates it into changes to the model. Therefore, in the interaction model of a @GUI, there is a clear separation between the control devices, such as the mouse and keyboard and the digital representation displayed on the screen @EmergingFrameworks.
@@ -41,16 +41,17 @@ Consequently, the physical representation performs a dual function: On the one h
 
 #figure(
   image("figures/MVC-MCRpd-Model.svg", width: 100%),
-  caption: [a) interaction model of GUI: MVC model; b) interaction Model of TUI: MCRpd model @EmergingFrameworks],
+  caption: [a) Interaction model of GUI: MVC model; b) Interaction Model of TUI: MCRpd model @EmergingFrameworks],
 ) <MVC_MCRpd_Model>
 
 === Conclusion
-The distinctive characteristic of a @TUI lies in the close coupling between representation and action. Whereas a @GUI typically separates the visual representation of digital information on a screen from interaction through an input device, a @TUI uses physical artefacts both to represent digital content and to manipulate it @EmergingFrameworks. This coupling can support the constructivist and constructionist learning approaches discussed in @learning-theories by enabling learners to explore relationships through physical manipulation and to externalise their ideas in the form of tangible, directly modifiable artefacts @TangibleUserInterface.
+The distinctive characteristic of a @TUI lies in the close coupling between representation and action. Whereas a @GUI typically separates the visual representation of digital information on a screen from interaction through an input device, a @TUI uses physical artefacts both to represent digital content and to manipulate it @EmergingFrameworks. This coupling can support the constructivist and constructionist learning approaches discussed in @learning-theories by enabling learners to explore relationships through physical manipulation and to externalise their ideas in the form of tangible, directly modifiable artefacts @TangibleUserInterfacePast.
 
 
 
 == Design Factors for TUI
-wie müssen tuis gestaltet sein generell und auf kinder bezogen 
+The comprehensibility and usability of a @TUI depend fundamentally on how coherently its physical objects, their digital meanings and the actions available through them are coordinated.
+
 === Coupling Objects with Digital Information <coupling_objects>
 Ullmer and Ishii provide an overview of various types of represented digital information, coupling methods and approaches to physical representation in order to describe the coupling between phicons and digital information @EmergingFrameworks.
 
@@ -66,15 +67,16 @@ In addition to the different types of information represented, coupling methods 
 
 - _Interactive coupling_ occurs when the meaning of an object changes depending on the other objects with which it is connected or combined.
 
-_Static coupling_ therefore provide a stable and often more easily understandable meaning, whereas _dynamic_ and _interactive coupling_ enable the same physical objects to be used more flexibly. Regardless of which coupling method is used, it is esssential for the system that changes to the physical object are reflected immediately transparently in the digital representation. If this correspondence is delayed, missing or inconsistent, the relationship between the physical and digital representations becomes difficult to understand @EmergingFrameworks.
+_Static coupling_ therefore provides a stable and often more easily understandable meaning, whereas _dynamic_ and _interactive coupling_ enable the same physical objects to be used more flexibly. Regardless of which coupling method is used, it is essential that changes to the physical object are reflected immediately and transparently in the digital representation. If this correspondence is delayed, missing or inconsistent, the relationship between the physical and digital representations becomes difficult to understand @EmergingFrameworks.
 
 ==== Approaches to Physical Representation
-Not only the temporal precision of coupling influences how clearly its digital meaning and potential interactions can be understood but also the appearance of it. There are four approaches to choose from, which are  presented in @physical-representation-approaches. These approaches are not necessarily mutually exclusive and may be combined within a single system@EmergingFrameworks.
+Both the temporal precision of the coupling and the appearance of the physical object influence how clearly its digital meaning and possible interactions can be understood. Four approaches to physical representation are presented in @physical-representation-approaches. These approaches are not necessarily mutually exclusive and may be combined within a single system @EmergingFrameworks.
 
 #apa-table(
   columns: (1fr, 2fr, 2fr),
 
   table-label: <physical-representation-approaches>,
+  breakable: true,
 
   header: (
     [Approach],
@@ -103,7 +105,7 @@ Not only the temporal precision of coupling influences how clearly its digital m
 )
 
 ==== Conclusion
-The coupling between physical objects and digital information can differ in content, flexibility and physical representation. Selecting an appropriate approach therefore requires a careful consideration of the intended users and their abilities, as well as the specific application context. Regardless of the chosen approach, an effective TUI requires a clear and immediately perceptible relationship between the phiconand the associated digital meaning. The design of this coupling therefore directly influences the system’s comprehensibility, usability and flexibility.
+The coupling between physical objects and digital information can differ in content, flexibility and physical representation. Selecting an appropriate approach therefore requires a careful consideration of the intended users and their abilities, as well as the specific application context. Regardless of the chosen approach, an effective TUI requires a clear and immediately perceptible relationship between the phicon and the associated digital meaning. The design of this coupling therefore directly influences the system’s comprehensibility, usability and flexibility.
 
 
 === The _Token and Constraint_ Framework <token-constraint>
@@ -112,12 +114,12 @@ Once digital information has been assigned to a phicon, it must be determined ho
 One approach to structuring tangible interaction is the _Token and Constraint_ framework. The discrete physical objects that represent digital information are referred to as _tokens_ within this framework. They correspond to the physical representations previously introduced as _phicons_. However, the term _token_ is retained in this section to remain consistent with the framework’s original terminology. _Tokens_ are placed or manipulated within physical structures known as constraints. These constraints define where and how a token can be positioned or moved and are mapped to specific digital operations @TokenConstraint.
 
 ==== Phases of Interaction
-The Interaction within _Token and Constraint_ systems can involve two phases: _Associate_ and _Manipulate_: During the _Associate_ phase a _token_ is placed within a constraint, thereby establishing a logical relationship between the information represented by the _token_ and the operation assigned to the constraint. This initially creates a discrete state, such as presence or absence, activation or deactivation, or selection and deselection. The same _token_ may be inserted into different constraints in order to associate its digital information with different predefined operations @TokenConstraint.
+The interaction within _Token and Constraint_ systems can involve two phases: _Associate_ and _Manipulate_. During the _Associate_ phase, a _token_ is placed within a constraint, thereby establishing a logical relationship between the information represented by the _token_ and the operation assigned to the constraint. This initially creates a discrete state, such as presence or absence, activation or deactivation, or selection and deselection. The same _token_ may be inserted into different constraints in order to associate its digital information with different predefined operations @TokenConstraint.
 
-The _Manipulate_ phase starts once the _token_ has been physically engaged with the _constraint_. The _token_ can now be moved within the _constraint_'s mechanical boundaries to modify parameters of the associated operation. The absolute and relative positions of _tokens_, both in relation to the _constraint_ and to one another, can result in different digital interpretations. The meaning of an interaction therefore emerges from the interplay between the _token_, the _constraint_ and the overall physical configuration. Translating or rotating of the _token_ may result for example in the continuous adjustment of a value, the navigation through a list, or the alteration of another variable of the digital system. However, not every _Token and Constraint_ system needs to support both phases of interaction since in some systems, inserting and removing a _token_ may already constitute the complete interaction @TokenConstraint.
+The _Manipulate_ phase starts once the _token_ has been physically engaged with the _constraint_. The _token_ can now be moved within the _constraint_'s mechanical boundaries to modify parameters of the associated operation. The absolute and relative positions of _tokens_, both in relation to the _constraint_ and to one another, can result in different digital interpretations. The meaning of an interaction therefore emerges from the interplay between the _token_, the _constraint_ and the overall physical configuration. Translating or rotating the _token_ may result, for example, in the continuous adjustment of a value, the navigation through a list, or the alteration of another variable of the digital system. However, not every _Token and Constraint_ system needs to support both phases of interaction, since in some systems, inserting and removing a _token_ may already constitute the complete interaction @TokenConstraint.
 
 ==== Physical Syntax and Interaction Guidance
-Physical constraints influence not only the digital interpretation of an action but also its haptic and perceptual qualities, since the physical syntax renders some of the available interaction possibilities directly perceivable. In this context, syntax refers to the rules according to which individual phicons can be combined to form an input that can be meaningfully interpreted by the system. The configuration and mechanical configuration of the constraints function as a physical grammar by directly indicating which actions are possible and which are prevented. This supports the creation of physical configurations that are interpretable both by the user and by the underlying computational system. By reducing the range of possible manipulations, invalid states can be avoided and the available courses of action can be made easier to understand @TokenConstraint.
+Physical constraints influence not only the digital interpretation of an action but also its haptic and perceptual qualities, since the physical syntax renders some of the available interaction possibilities directly perceivable. In this context, syntax refers to the rules according to which individual phicons can be combined to form an input that can be meaningfully interpreted by the system. The geometry and mechanical configuration of the constraints function as a physical grammar by directly indicating which actions are possible and which are prevented. This supports the creation of physical configurations that are interpretable both by the user and by the underlying computational system. By reducing the range of possible manipulations, invalid states can be avoided and the available courses of action can be made easier to understand @TokenConstraint.
 
 #figure(
   image("figures/token-constraint.svg", width: 100%),
@@ -138,49 +140,8 @@ These mapping styles are not mutually exclusive and may be combined within a sin
 ==== Conclusion
 The _Token and Constraint_ framework demonstrates how physical actions can be translated into comprehensible digital operations. _Tokens_ enable direct manipulation, while constraints guide interaction and prevent invalid configurations. These characteristics can support constructivist and constructionist learning by enabling structured exploration and making the consequences of physical actions observable. However, their educational value ultimately depends on the design of the learning task.
 
-=== Child appropriate TUIs in the Field of Special Education <tui-children>
-Whether a @TUI is perceived as accessible, exploratory and supportive of learning depends
-not only on its general design, but also on its adaptation to the specific needs of children. A literature review of TUIs for children’s creative learning highlights the factors of abstractness, openness, richness and complexity, as well as a smooth experience. Since these factors were also not specifically formulated for students with a special educational focus, they are discussed below with consideration of the heterogeneous learning abilities and conditions for action within the defined target group @TangibleInteraction.
-
-==== Abstractness
-The factor of _Abstractness_ describes how concrete or ambiguous the meaning of a phicon is designed to be. While abstract and not fully predetermined representations can promote imagination and divergent thinking, an overly abstract design can lead to confusion, particularly among children without the required prior knowledge or additional explanation. The choice of physical representation and the manner in which it is coupled with digital information, explained in @coupling_objects, therefore directly influence how comprehensible the meaning of the phicon is perceived to be  @TangibleInteraction.
-
-For students within the selected special educational focus, a balance between abstraction and clarity is therefore required. Phicons should provide sufficient indications of their function and possible use, but at the same time, the design should not be unnecessarily simplified or infantilising, so that it still provides sufficient depth for exploration @Geistige_entwicklung @lernen @autismus.
-
-==== Openness
-_Openness_ defines the scope that a TUI provides for individual actions, solution strategies and interpretations and is indirectly influenced by the number and restrictiveness of its physical _constraints_ (@token-constraint).
-While excessive instruction can restrict creativity, insufficient support or scaffolding often leads to frustration @TangibleInteraction.
-
-For students with a special educational focus on @GE, @LE and @ASD _structured Openness_ is particularly relevant. Clear intermediate goals can prevent children from becoming overwhelmed. When these are supplemented by step-by-step support that is adapted to the individual learner’s current level and can be reduced as confidence increases, a comprehensible framework for action is created without providing excessive instruction @Geistige_entwicklung @lernen @autismus.
-
-==== Richness and Complexity
-While _Richness_ refers to the variety of possible content, actions and combinations within a system, _Complexity_ describes the demands that arise from this variety. A design that is too simple does not provide sufficient inspiration, whereas overly complex interfaces can overwhelm children. The system should support children in overcoming difficulties independently without removing the challenge entirely @TangibleInteraction.
-
-Due to the different learning conditions associated with the considered support needs, the complexity of the @TUI should not be reduced uniformly but should instead be individually adaptable. Different levels of difficulty can be designed to introduce new content and possibilities for action gradually. The objective should therefore not be to create the simplest possible design, but to provide an appropriate level of challenge for each child @Geistige_entwicklung @lernen @autismus.
-
-==== Smooth Experience 
-//BEZUG BELLOTTI 5 FRAGEN
-Faulty hardware or software can severely impair the learning experience. Unreliable systems make children feel uncertain and discourage them from learning from mistakes or taking risks, particularly when it is not clearly recognisable whether an error was caused by the system or by their own actions @TangibleInteraction. 
-
-For students with special educational needs, this can considerably reduce both motivation and confidence in acting independently. The in @feedback described Feedback should therefore be reliable, immediate and clearly attributable. Multimodal feedback can provide access through different perceptual channels, but its intensity and quantity must remain limited or adaptable in order to prevent unnecessary sensory overload @Geistige_entwicklung @lernen @autismus.
-
-The factors discussed above originate from the literature review on @TUI for children’s creative learning. Based on the learning needs of students within the considered areas of special educational support, two additional factors are proposed: _Adaptability_ and _Multimodal Accessibility_.
-
-==== Adaptability
- _Adaptability_ describes the extent to which a TUI can be adjusted to learners’ individual abilities and needs. Task difficulty, pace and level of suuport should be configurable without changing the fundamental interaction concept. Such adaptations can provide sufficient guidance while allowing learners to work as independently as possible @Geistige_entwicklung @lernen @autismus.
-
-==== Multimodal Accessibility
-_Multimodal Accessibility_ requires relevant information and feedback to be available through more than one perceptual channel. Information should therefore not be communicated exclusively through text, colour, or sound, as each of these may create barriers for individual learners. But combining those modes can provide alternative means of access. However, the number and intensity of stimuli should remain adaptable to avoid sensory overload @InklusiveBildungKinder.
-
-==== Teachers
-For use in schools, the requirements of teachers must also be considered and teachers should be included as stakeholders in the TUI design process. Nevertheless, the system should be usable without programming knowledge or time-consuming calibration. Tasks must be easy to select and understand, the components must be transportable and the system must be capable of being set up with minimal preparation time @TangibleInteraction.
-
-==== Conclusion
-The Design Factors show that there is no universally child-appropriate TUI. Its suitability depends on how well the interaction design responds to individual abilities, support needs and sensory preferences. The central design challenge is therefore to provide sufficient structure and accessibility without unnecessarily restricting independent exploration.
-
 
 == Feedback for TUI <feedback>
-
 In a @TUI, feedback informs users whether an action has been detected, how it has been interpreted and how it has affected the state of the system. It thereby closes the perception-action loop between physical manipulation and digital processing and supports the independent use of the system. @bellotti2002making @wensveen2004interaction
 
 === Feedback Modalities <feedback-modalities>
@@ -230,95 +191,73 @@ Regardless of its modality, feedback can also be characterised along several dim
   [Coordinated combinations of visual, auditory, or haptic signals],
 )
 
-The distinction presented in @feedback-modalities-table is based on the differentiation between inherent and additionally generated information proposed by Wensveen et al. @wensveen2004interaction
+The distinction presented in @feedback-modalities-table is based on the differentiation between inherent and additionally generated information proposed by Wensveen et al @wensveen2004interaction.
 
 === Feedback in Learning-Oriented TUIs <feedback-tui>
-
 In learning-oriented @TUI, two levels of feedback should be distinguished:
 
-- _Interaction feedback_ communicates whether and how a physical action has been technically detected and processed. @bellotti2002making
-- _Pedagogical feedback_ evaluates the action or its outcome in relation to the learning task. @hattie2007power @shute2008focus
+- _Interaction feedback_ communicates whether and how a physical action has been technically detected and processed @bellotti2002making,
+- _Pedagogical feedback_ evaluates the action or its outcome in relation to the learning task @hattie2007power @shute2008focus.
 
-A system may therefore detect an action correctly while evaluating it as incorrect in relation to the task. Conversely, a failure to detect an action must not be presented as an error made by the learner. Reliable interaction feedback is therefore a prerequisite for meaningful pedagogical feedback. @bellotti2002making @iso9241-110-2020
+A system may therefore detect an action correctly while evaluating it as incorrect in relation to the task. Conversely, a failure to detect an action must not be presented as an error made by the learner. Reliable interaction feedback is therefore a prerequisite for meaningful pedagogical feedback @bellotti2002making @iso9241-110-2020.
 
 ==== Interaction Feedback
 
-_Interaction feedback_ makes the technical response of the system comprehensible. It should indicate whether a physical action has been detected and interpreted correctly. @bellotti2002making If an action cannot be processed, the system should distinguish a technical recognition problem from an incorrect solution to the learning task. Otherwise, learners may incorrectly attribute system failures to their own actions and become uncertain about how to proceed. @bellotti2002making @iso9241-110-2020
+_Interaction feedback_ makes the technical response of the system comprehensible. It should indicate whether a physical action has been detected and interpreted correctly. If an action cannot be processed, the system should distinguish a technical recognition problem from an incorrect solution to the learning task. Otherwise, learners may incorrectly attribute system failures to their own actions and become uncertain about how to proceed @bellotti2002making @iso9241-110-2020.
 
 ==== Pedagogical Feedback
 
-While _interaction feedback_ primarily confirms whether an action has been technically processed, _pedagogical feedback_ concerns the meaning of that action within the learning process. It supports learners in assessing their current progress, recognising deviations from the intended outcome and adapting their subsequent actions. @butler1995feedback @hattie2007power
+While _interaction feedback_ primarily confirms whether an action has been technically processed, _pedagogical feedback_ concerns the meaning of that action within the learning process. It supports learners in assessing their current progress, recognising deviations from the intended outcome and adapting their subsequent actions @butler1995feedback @hattie2007power.
 
 _Pedagogical feedback_ can fulfil different functions:
 
-- Outcome feedback indicates whether a result is correct or incorrect. @shute2008focus
-- Process feedback provides information about the approach taken or a possible cause of error. @hattie2007power
-- Feedforward offers guidance for the next step. @hattie2007power
-- Progress feedback indicates what has already been achieved in relation to the intended goal. @hattie2007power
+- Outcome feedback indicates whether a result is correct or incorrect.
+- Process feedback provides information about the approach taken or a possible cause of error
+- Feedforward offers guidance for the next step
+- Progress feedback indicates what has already been achieved in relation to the intended goal
 
-Additionally, as it would restrict independent planning and problem-solving, the system should not prescribe every step, but provide graduated feedback in which support increases according to the learner’s needs. This preserves opportunities for independent error analysis while preventing learners from becoming unable to continue because the feedback is insufficient or incomprehensible. @shute2008focus @butler1995feedback
-
-==== Criteria for Effective Feedback and Design Factors for Children <feedback-children>
-
-The effectiveness of feedback depends not only on its technical form but, more importantly, on whether it is understandable and relevant to the user’s subsequent actions. @hattie2007power @shute2008focus Effective feedback should therefore meet the following criteria:
-
-- Timeliness: Feedback should occur in a recognisable temporal relationship to the action that triggered it. If it is delayed, users may no longer be able to identify its cause. The appropriate timing nevertheless depends on the task, learning objective and learner’s prerequisites. @shute2008focus
-
-- Clarity: It should be evident which action, object, or system state the feedback refers to. @bellotti2002making @shute2008focus
-
-- Consistency: Similar states and events should be represented by consistent signals. Colours, sounds and symbols should not change their meaning without a comprehensible reason. @iso9241-110-2020
-
-- Perceptibility: Feedback should be sufficiently noticeable without obscuring other relevant information. @iso9241-110-2020
-
-- Proportionality: The intensity and extent of feedback should correspond to the significance of the event. A routine confirmation, for example, should be less prominent than a critical error message. @wensveen2004interaction @shute2008focus
-
-- Actionability: Feedback should not only communicate the current state but, where necessary, also indicate how the interaction can be continued or corrected. @hattie2007power @shute2008focus
-
-Particularly where learners have different sensory, cognitive and communicative prerequisites, feedback should be adaptable and essential information should not be conveyed through only one perceptual channel. @Geistige_entwicklung @lernen @autismus For digitally presented feedback, this requirement is additionally supported by accessibility guidelines stating that information should not depend exclusively on properties such as colour or other individual sensory characteristics. @w3c2024wcag
+Additionally, as it would restrict independent planning and problem-solving, the system should not prescribe every step, but provide graduated feedback in which support increases according to the learner’s needs. This preserves opportunities for independent error analysis while preventing learners from becoming unable to continue because the feedback is insufficient or incomprehensible @shute2008focus @hattie2007power.
 
 === Conclusion
-
-== Potentials of TUIs for children (with dissorders) (liang)
-ÜBERGANG - stellt eigentlich end conclusio des theorethischen backgrounds dar 
-
-Research attributes various potentials to TUIs for children’s learning. However, since these findings often originate from studies involving children without specifically identified special educational support needs, they cannot be transferred without qualification to students in the areas of intellectual development, learning and autism. The following potentials are therefore considered in an extended manner that takes into account the target-group-specific conditions and ?the shared learning objectives defined in the introduction.?
-
-=== Supporting Novices through Scaffolding and Accessibility
-Kompetenzbereich
-By representing complex technical details in a simplified manner through phicons, tangible user interfaces can translate abstract and complex technical processes into directly perceivable actions and thereby lower the knowledge threshold required for interaction. The use of familiar objects and physically comprehensible actions, such as grasping or matching, can facilitate access to complex content, particularly for novices and reduce cognitive load.
-
-?This can be especially relevant for students who require support with memory, concept formation, or the structuring of actions?. However, for children with the considered support needs, the meaning of an object and the actions it enables must be clearly recognisable, as physical properties may otherwise create expectations that do not correspond to the object’s digital function. Clearly distinguishable objects and structured, manageable interaction possibilities are therefore required. Possible motor, visual, auditory, or communicative impairments must also be considered and information should be accessible through alternative perceptual channels. But, this multimodality does not mean presenting as many stimuli as possible simultaneously, but rather providing equivalent and individually adaptable forms of access.
-
-=== Playful Exploration and Error-Tolerant Learning
-Kompetenzbereich
-In accordance with the principles of constructionism (bezug), familiar objects not only facilitate initial access but can also create a protected environment in which children are able to experiment without fear of risk or failure. When actions can easily be reversed and errors do not result in lasting negative consequences, autonomous and exploratory experimentation becomes possible. Different solution strategies can then be tested through trial and error. This may also lead to approaches that extend beyond predefined instructions and encourage the development of independent solutions.
-
-However, a large number of simultaneously available options can make orientation more difficult and lead to cognitive overload for students in the selected special educational focus areas. Structured exploration is therefore appropriate, in which clear intermediate goals, limited choices and gradual assistance provide a comprehensible framework for action. Errors should not remain unnoticed but should be communicated immediately and unambiguously without fully prescribing the subsequent course of action, as this could otherwise lead to confusion and frustration. Sufficient processing time, repeatable action sequences and individually adaptable support enable learners to complete tasks at their own pace.
-
-=== Promoting Initiative and Motivation
-Kompetenzbereich
-Exploratory activity creates opportunities for learners to develop personal ideas and creative solution strategies. As explicitly emphasised in constructionism, children shift from being recipients of information to becoming active creators and can thereby express their individual ideas, preferences and emotional states. The immediate relationship between their own actions and a perceptible effect can support experiences of autonomy and competence.
-
-For learners with different support needs, however, the available choices must remain comprehensible, manageable and adapted to their individual abilities. Achievable intermediate goals and visible learning progress can help to reduce uncertainty and repeated experiences of failure.
-
-=== Supporting Cognitive Development and Spatial Learning
-Kompetenzbereich
-To enable children to concentrate on experimenting with new elements, the possible range of actions can be restricted through a token-and-constraint system. As described previously, such systems make part of the interaction rules perceptible through their physical form and arrangement. Consequently, not all possible action sequences need to be remembered and processed mentally, which can reduce the cognitive demands placed on the learner.
-The manipulation of tangible objects also combines visual perception with haptic and motor experiences and thereby relates to the theory of embodied cognition (bezug). Actions such as grasping, rotating and spatially arranging objects can help learners physically comprehend positions, orientations and relationships. This may support spatial awareness and the ability to form mental spatial representations.
-
-For learners with the considered support needs, these characteristics can particularly support the recognition of relationships and the development of problem-solving abilities. However, the number and complexity of spatial relationships should be adapted to the individual learner’s current level and expanded gradually.
-
-=== Promoting Communication and Collaboration
-Kompetenzbereich
-The possibility of space multiplexing described in (bezug) can also benefit children. The simultaneous and shared manipulation of objects in physical space can naturally encourage cooperation and mutual inspiration. Ideas that are difficult to express verbally can be demonstrated, explained and discussed through the constructions that have been created. Due to the physical nature of the interaction, TUIs can therefore provide a shared point of reference for learning in groups.
-
-This may be particularly relevant for learners who use augmentative and alternative communication or whose receptive and expressive language abilities differ. In addition to spoken language, gestures, pointing and other communication aids can be incorporated into the interaction.
+Effective feedback in a learning-oriented @TUI must make both the technical processing and the pedagogical meaning of an action comprehensible. By combining accessible feedback modalities with graduated support, the system can help learners recognise deviations and adapt their actions to work independently without prescribing the complete solution.
 
 
-TUIs can therefore support concrete and accessible learning activities, structured exploration, personal initiative, spatial and cognitive processes, as well as communication and collaboration. They are particularly relevant for learning with children because they support learning through embodied interaction and physical movement, which can contribute to children’s thinking and understanding (Pookkottuvariam, p. 2). However, these potentials can only be realised when children’s individual motor, sensory, cognitive and communicative needs are systematically considered throughout the design process.
+== Child-Appropriate TUIs in the Field of Special Education <tui-children>
+Whether a @TUI is perceived as accessible, exploratory and supportive of learning depends
+not only on its general design and feedback, but also on its adaptation to the specific needs of children. A literature review of TUIs for children’s creative learning highlights the factors of abstractness, openness, richness and complexity, as well as a smooth experience. Since these factors were also not specifically formulated for students with a special educational focus, they are discussed below with consideration of the heterogeneous learning abilities and conditions for action within the defined target group @TangibleInteraction.
 
-FAZIT
-FIGURE/TABELLE die die potenziale und gestaltungsfaktoren und vlt auch kompetenzen vereint
+==== Abstractness
+The factor of _Abstractness_ describes how concrete or ambiguous the meaning of a phicon is designed to be. While abstract and not fully predetermined representations can promote imagination and divergent thinking, an overly abstract design can lead to confusion, particularly among children without the required prior knowledge or additional explanation. The choice of physical representation and the manner in which it is coupled with digital information, explained in @coupling_objects, therefore directly influence how comprehensible the meaning of the phicon is perceived to be  @TangibleInteraction.
 
+For students within the selected special educational focus, a balance between abstraction and clarity is therefore required. Phicons should provide sufficient indications of their function and possible use, but at the same time, the design should not be unnecessarily simplified or infantilising, so that it still provides sufficient depth for exploration @Geistige_entwicklung @lernen @autismus.
 
+==== Openness
+_Openness_ defines the scope that a TUI provides for individual actions, solution strategies and interpretations and is indirectly influenced by the number and restrictiveness of its physical _constraints_ (@token-constraint).
+While excessive instruction can restrict creativity, insufficient support or scaffolding often leads to frustration @TangibleInteraction.
+
+For students with a special educational focus on @GE, @LE and @ASD _structured Openness_ is particularly relevant. Clear intermediate goals can prevent children from becoming overwhelmed. When these are supplemented by step-by-step support that is adapted to the individual learner’s current level and can be reduced as confidence increases, a comprehensible framework for action is created without providing excessive instruction @Geistige_entwicklung @lernen @autismus.
+
+==== Richness and Complexity
+While _Richness_ refers to the variety of possible content, actions and combinations within a system, _Complexity_ describes the demands that arise from this variety. A design that is too simple does not provide sufficient inspiration, whereas overly complex interfaces can overwhelm children. The system should support children in overcoming difficulties independently without removing the challenge entirely @TangibleInteraction.
+
+Due to the different learning conditions associated with the considered support needs, the complexity of the @TUI should not be reduced uniformly but should instead be individually adaptable. Different levels of difficulty can be designed to introduce new content and possibilities for action gradually. The objective should therefore not be to create the simplest possible design, but to provide an appropriate level of challenge for each child @Geistige_entwicklung @lernen @autismus.
+
+==== Smooth Experience
+Faulty hardware or software can severely impair the learning experience. Unreliable systems make children feel uncertain and discourage them from learning from mistakes or taking risks, particularly when it is not clearly recognisable whether an error was caused by the system or by their own actions @TangibleInteraction.
+
+For students with special educational needs, this can considerably reduce both motivation and confidence in acting independently. The feedback described in @feedback should therefore be reliable, immediate and clearly attributable. Multimodal feedback can provide access through different perceptual channels, but its intensity and quantity must remain limited or adaptable in order to prevent unnecessary sensory overload @Geistige_entwicklung @lernen @autismus.
+
+The factors discussed above originate from the literature review on @TUI for children’s creative learning. Based on the learning needs of students within the considered areas of special educational support, two additional factors are proposed: _Adaptability_ and _Multimodal Accessibility_.
+
+==== Adaptability
+ _Adaptability_ describes the extent to which a TUI can be adjusted to learners’ individual abilities and needs. Task difficulty, pace and level of support should be configurable without changing the fundamental interaction concept. Such adaptations can provide sufficient guidance while allowing learners to work as independently as possible @Geistige_entwicklung @lernen @autismus.
+
+==== Multimodal Accessibility
+_Multimodal Accessibility_ requires relevant information and feedback to be available through more than one perceptual channel. Information should therefore not be communicated exclusively through text, colour, or sound, as each of these may create barriers for individual learners. Combining these modes, however, can provide alternative means of access. The number and intensity of stimuli should remain adaptable to avoid sensory overload @InklusiveBildungKinder.
+
+==== Teachers
+For use in schools, the requirements of teachers must also be considered and teachers should be included as stakeholders in the TUI design process. Nevertheless, the system should be usable without programming knowledge or time-consuming calibration. Tasks must be easy to select and understand, the components must be transportable and the system must be capable of being set up with minimal preparation time @TangibleInteraction.
+
+==== Conclusion
+The design factors show that there is no universally child-appropriate TUI. Its suitability depends on how well the interaction design responds to individual abilities, support needs and sensory preferences. The central design challenge is therefore to provide sufficient structure and accessibility without unnecessarily restricting independent exploration.
 

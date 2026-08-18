@@ -1,4 +1,4 @@
-//Table nach APA style
+// Table nach APA style
 #let apa-table(
   columns: 3,
   header: (),
@@ -14,6 +14,12 @@
     weight: "bold",
   )
 
+  // IMPORTANT:
+  // Allow the figure containing the table to break across pages
+  show figure.where(kind: table): set block(
+    breakable: breakable,
+  )
+
   // Caption below the table
   show figure.where(kind: table): set figure.caption(
     position: bottom,
@@ -25,7 +31,7 @@
     #it.supplement #context it.counter.display(it.numbering): #emph[#it.body]
   ]
 
-  let fig =figure(
+  let fig = figure(
     table(
       columns: columns,
 
@@ -62,6 +68,10 @@
     ),
 
     caption: caption,
+
+    // IMPORTANT:
+    // Pass placement parameter to the figure
+    placement: placement,
   )
 
   // Attach label directly to the figure
@@ -70,7 +80,6 @@
   } else {
     [#fig #table-label]
   }
-}
 }
 
 // ID verknüpfen

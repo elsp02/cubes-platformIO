@@ -1,8 +1,8 @@
 #import "functions.typ": req, apa-table
 
-= Evaluation
+//G1, G2, C1 und C2, nicht mehr verwendet 
 
-== Evaluation Design and Scope
+= Evaluation
 The aim of the evaluation is to determine to what extend the developed prototype fulfils the requirements established in @requirements-analysis.
 Since the requirements concern unterschiedliche aspekte different evaluation methods were applied. These comprise a formative target group evaluation und ? eine analytsiche technische evaluation?
 @evaluation-methods provides an overview of the applied evaluation methods and the requirements addressed by each method. 
@@ -64,7 +64,7 @@ After confirming their selection, the chosen target structure was displayed as a
   column-gutter: 0.8em,
   [
     #figure(
-      image("figures/quadrat@3x.png", width: 100%),
+      image("figures/level-easy.png", width: 100%),
       caption: [Bild 1],
       supplement: [einfach],
       kind: "figure",
@@ -72,7 +72,7 @@ After confirming their selection, the chosen target structure was displayed as a
   ],
   [
     #figure(
-      image("figures/quadrat@3x.png", width: 100%),
+      image("figures/level-middle.png", width: 100%),
       caption: [Bild 2],
       supplement: [mittel],
       kind: "figure",
@@ -80,7 +80,7 @@ After confirming their selection, the chosen target structure was displayed as a
   ],
   [
     #figure(
-      image("figures/quadrat@3x.png", width: 100%),
+      image("figures/level-komplex.png", width: 100%),
       caption: [Bild 3],
       supplement: [schwer],
       kind: "figure",

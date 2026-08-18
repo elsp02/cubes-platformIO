@@ -3,7 +3,7 @@
 
 = Theoretical Background
 
-// Fundamentals of learning theory vlt als überkapitel über constructionism ... und embodied interaction
+
 == Fundamentals of Learning Theory <learning-theories>
 The ways in which children acquire and apply new knowledge can be explained through different theoretical perspectives. These perspectives differ primarily in their understanding of how knowledge is formed, which role learners assume within the learning process and how learning environments should be designed. The three approaches discussed in the following, instructivism, constructivism and constructionism, pursue different educational objectives but are all relevant to the development of learning systems. While instructivism primarily conceptualises learners as recipients of externally structured knowledge, constructivism and constructionism emphasise their active participation in the learning process @LEARNINGDOING@SituatingConstructionism.
 
@@ -28,7 +28,7 @@ The mathematician and psychologist Seymour Papert extends the constructivist app
 
 The constructed artefact fulfils several functions: On the one hand, it makes abstract theoretical considerations concrete, tangible and, in the literal sense, comprehensible. Relationships that may be difficult to understand when represented solely through language or graphics can become visible through the spatial arrangement of a physical model. On the other hand, modifying the model enables learners to test different assumptions and directly observe their effects @Constructionism@MindstormsChildren. 
 
-Papert even goes beyond the physical act of construction by emphasising the importance of personal meaning. Following the principle that “love is a better master than duty” @Constructionism[p,6], he argues that learning is enhanced when children create something that is personally meaningful to them.
+Papert even goes beyond the physical act of construction by emphasising the importance of personal meaning. Following the principle that “love is a better master than duty” @Constructionism[p. 6], he argues that learning is enhanced when children create something that is personally meaningful to them.
 
 Building on the explanations of the three learning theories, the central characteristics and differences are again summarised in @learning-approaches:
 #apa-table(
@@ -63,7 +63,7 @@ While constructivism and constructionism explain why actively creating an extern
 === Embodied Cognition <embodied-cognition>
 _embodied cognition_ assumes that cognitive processes do not occur independently of the body but are shaped by perception, movement and interaction with the environment. From this perspective, the physical manipulation of a learning object is not merely a means of executing an action that has already been fully planned mentally. Instead, the manipulation itself can form part of the processes of thinking and understanding and may therefore be considered as an integral component of the cognitive system. Knowledge consequently emerges through the reciprocal relationship between the brain, the body and the environment @TangibleInteraction@embodiedInteraction.
 
-For learning processes, this implies that physical activities can be particularly relevant when they correspond meaningfully to the subject matter becuase arbitrary movement alone does not necessarily improve learning. Rather, the correspondence between the physical action and the concept to be learned is crucial. When learners are expected to understand a spatial relationship, for example, it may be beneficial for them to establish this relationship by physically positioning and rotating objects. In this case, the action does not merely represent the learning content symbolically but makes it directly accessible through bodily experience @TangibleInteraction@embodiedInteraction.
+For learning processes, this implies that physical activities can be particularly relevant when they correspond meaningfully to the subject matter becausse arbitrary movement alone does not necessarily improve learning. Rather, the correspondence between the physical action and the concept to be learned is crucial. When learners are expected to understand a spatial relationship, for example, it may be beneficial for them to establish this relationship by physically positioning and rotating objects. In this case, the action does not merely represent the learning content symbolically but makes it directly accessible through bodily experience @TangibleInteraction@embodiedInteraction.
 
 However, the educational value of physical interaction depends on the relationship between the performed action and the concept to be learned. Movement alone does not necessarily improve learning. The physical action must meaningfully correspond to the underlying content and make relevant properties or relationships directly perceivable @embodiedInteraction.
 

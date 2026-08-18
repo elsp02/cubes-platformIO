@@ -231,14 +231,14 @@ This thesis ...
 // TABLE OF CONTENTS
 // ------------------------------------------------------------
 
-#show outline.entry.where(level: 1): it => {
-  strong(it)
-}
+#{
+  show outline.entry.where(level: 1): it => strong(it)
 
-#outline(
-  title: [Table of Contents],
-  depth: 2,
-)
+  outline(
+    title: [Table of Contents],
+    depth: 2,
+  )
+}
 
 #pagebreak()
 
@@ -349,7 +349,7 @@ This thesis ...
   ("LE", "Special education focus on learning"),
   ("LED", "Light-Emitting Diode"),
   ("MVC", "Model View Controller"),
-  ("MCRpd", "Model-Control-Representation (physical and digital"),
+  ("MCRpd", "Model-Control-Representatio (physical and digital"),
   ("NFC", "Near Field Communication"),
   ("rep_p", "Physical Representation"),
   ("rep_d", "Digital Representation"),
@@ -403,6 +403,52 @@ This thesis ...
 #abbr.list(
   title: "List of Abbreviations",
 )
+
+// ------------------------------------------------------------
+// OPTIONAL: LIST OF FIGURES
+// ------------------------------------------------------------
+#{
+  show outline.entry: it => link(
+    it.element.location(),
+    it.indented(
+      strong(it.prefix()),
+      [
+        #it.body()
+        #box(width: 1fr, it.fill)
+        #it.page()
+      ],
+    ),
+  )
+
+  outline(
+    title: [List of Figures],
+    target: figure.where(kind: image),
+  )
+}
+
+// ------------------------------------------------------------
+// OPTIONAL: LIST OF TABLES
+// ------------------------------------------------------------
+#{
+  show outline.entry: it => link(
+    it.element.location(),
+    it.indented(
+      strong(it.prefix()),
+      [
+        #it.body()
+        #box(width: 1fr, it.fill)
+        #it.page()
+      ],
+    ),
+  )
+
+  outline(
+    title: [List of Tables],
+    target: figure.where(kind: table),
+  )
+}
+ #pagebreak()
+
 
 #bibliography(
   ("bib.bib", "bib_manual.bib"),
