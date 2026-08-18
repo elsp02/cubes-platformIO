@@ -151,13 +151,13 @@ flowchart LR
 
         C1["Cube Node<br/>parent: Baseplate<br/>children: Cube 2, Cube 3"]
         C2["Cube Node<br/>parent: Cube 1<br/>children: Cube 4"]
-        C3["Cube Node<br/>parent: Cube 1<br/>children: none"]
-        C4["Cube Node<br/>parent: Cube 2<br/>children: none"]
+        C1["Cube Node<br/>parent: Cube 1<br/>children: none"]
+        C2["Cube Node<br/>parent: Cube 2<br/>children: none"]
 
         BP -->|"polls downstream"| C1
         C1 -->|"polls downstream"| C2
-        C1 -->|"polls downstream"| C3
-        C2 -->|"polls downstream"| C4
+        C1 -->|"polls downstream"| C1
+        C2 -->|"polls downstream"| C2
     end
 
     %% ======================================================

@@ -90,7 +90,7 @@ As discussed in relation to multimodal accessibility in @tui-children, providing
 
   req-target("FB2"),  [Feedback must be clearly linked to the action that triggered it or the area concerned],
 
-  req-target("FB3"),  [Feedback should be provided on a tiered basis, je nachdem ob der fehler schon mit weniger feedback ausgebessert werden kann],
+  req-target("FB3"), [Feedback should be graduated, increasing only when less support is insufficient for error correction],  
 
   req-target("FB4"),  [Assistance should be provided on a tiered basis, depending on the learners level],
 
@@ -99,8 +99,8 @@ As discussed in relation to multimodal accessibility in @tui-children, providing
 
 == Geometrical and Ergonomic Requirements
 The building blocks form the central element of the learning game: They serve as physical representations of digital information while simultaneously functioning as controls for interacting with the system (phicons). Their geometric and mechanical design therefore influences both the range of possible constructions and the comprehensibility and accessibility of the interaction. As already established by the educational requirements, the shape and connection mechanisms must clearly indicate how and where the blocks can be connected #req("TUI3").
-To enable three-dimensional constructions, all faces of a block must provide connection capabilities #req("C3"). These connections must also allow two connected cubes to be positioned in different orientations relative to one another #req("C4"). Building on this structural flexibility, further variety could be introduced through additional block types with different geometric shapes #req("G3").
-In order to hold the structure together, the connection between the building blocks must be stable enough to be undone with minimal effort, while also being strong enough to be created without requiring precise positioning that demands fine motor skills #req("C6"). In addition, each block must be capable of being securely grasped, positioned and connected using one hand #req("C5").
+To enable three-dimensional constructions, all faces of a block must provide connection capabilities #req("C1"). These connections must also allow two connected cubes to be positioned in different orientations relative to one another #req("C2"). Building on this structural flexibility, further variety could be introduced through additional block types with different geometric shapes #req("G1").
+In order to hold the structure together, the connection between the building blocks must be stable enough to be undone with minimal effort, while also being strong enough to be created without requiring precise positioning that demands fine motor skills #req("C4"). In addition, each block must be capable of being securely grasped, positioned and connected using one hand #req("C3").
 #apa-table(
   columns: (0.7fr, 5fr),
 
@@ -112,15 +112,15 @@ In order to hold the structure together, the connection between the building blo
   ),
 
   caption: [Physical design requirements],
-    req-target("G3"), [Different cube types could be implemented in different geometric shapes],
+    req-target("G1"), [Different cube types could be implemented in different geometric shapes],
 
-    req-target("C3"),  [The cubes must be able to be arranged or stacked in three dimensions],
+    req-target("C1"),  [The cubes must be able to be arranged or stacked in three dimensions],
 
-    req-target("C4"),  [The cubes must be able to be positioned relative to one another in different orientations],
+    req-target("C2"),  [The cubes must be able to be positioned relative to one another in different orientations],
 
-    req-target("C5"),  [The cubes must be graspable and connected with one hand],
+    req-target("C3"),  [The cubes must be graspable and connected with one hand],
 
-    req-target("C6"),  [Cube connections must be strong enough to hold the structure together and easy enough to disconnect with minimal effort],
+    req-target("C4"),  [Cube connections must be strong enough to hold the structure together and easy enough to disconnect with minimal effort],
 
   )
 

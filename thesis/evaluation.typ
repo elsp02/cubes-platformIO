@@ -105,7 +105,7 @@ Hier behandelst du ausschließlich die physische Handhabung:
 - Konnten dreidimensionale und verzweigte Strukturen gebaut werden?
 - Gab es Unterschiede zwischen den beiden Bausteintypen?
 - Kam es zu unbeabsichtigtem Lösen, Verrutschen oder falscher Ausrichtung?
-Hier kannst du auf C3–C6, TASK1, IA1, IA5 und TUI3 Bezug nehmen.
+Hier kannst du auf C1–C4, TASK1, IA1, IA5 und TUI3 Bezug nehmen.
 
 // Beobachtete Ergebnisse mit requirements aufzählen
 

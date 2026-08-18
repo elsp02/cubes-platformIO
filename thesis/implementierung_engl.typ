@@ -9,7 +9,7 @@ The physical and electonic implementation of the building bricks and the Basepla
 === Mechanical Implementation
 The prototype comprises two physically implemented building-Brick types: the _cube brick_ and the _smashed brick_. Both types use the standardised square connection interface defined in @geometry-Brick, but differ in their geometry and number of receiving faces. In contrast to the cube Brick, the smashed Brick has only half its height and provides a single receiving face opposite its docking face. Its four remaining lateral faces do not permit further connections.
 
-The square connection faces have a side length of approximately 40 mm. The selected dimension represents a compromise between the one-handed grasping and positioning required by #req("C5") and the internal space required for the electrical contacts and electronic components. The ergonomic suitability of the implemented dimensions is assessed in the evaluation chapter.
+The square connection faces have a side length of approximately 40 mm. The selected dimension represents a compromise between the one-handed grasping and positioning required by #req("C3") and the internal space required for the electrical contacts and electronic components. The ergonomic suitability of the implemented dimensions is assessed in the evaluation chapter.
 
 Both Brick types were modelled using Autodesk Inventor and manufactured using a 3D printer. Their housings implement the modular structure introduced in the concept chapter and consist of a black structural frame, colour-coded connection-side modules and a removable black cover. The side modules are inserted individually into the supporting frame and can be removed separately. This allowes the electronic components to be mounted and tested before the complete Brick is assembled. In addition, individual modules can also be replaced without manufacturing an entirely new housing.
 
@@ -336,8 +336,6 @@ Several validation mechanisms were implemented to prevent incomplete or corrupte
 The Baseplate waits up to two seconds for the first byte of the application’s feedback response and allows a maximum interval of 100 ms between bytes within that frame. Detection cycles are currently separated by a delay of 550 ms, in addition to the time required for communication within the connected construction. These values describe the implemented prototype and are not general protocol requirements.
 
 
-
-FIGURE13
 #figure(
   image("figures/gesamt-kommunikationssequenz.svg", width: 90%),
   caption: [Communication diagram between Learning application, Baseplate and Brick],
@@ -578,32 +576,12 @@ The preview window additionally contains two level options from which the learne
 
 After the target structure has been confirmed, the live construction view is opened and the selected target is transferred to the backend. During the task, this view displays the evaluated construction using the spatial reconstruction and feedback representations described in the preceding sections. The progress bar is placed at the top of the interface and indicates the proportion of the target construction that has already been completed correctly.
 
-The construction session can be terminated using the button in the upper area of the live view. The frontend then returns to the dashboard, where another target construction can be selected.
+The construction session can be terminated using the button in the upper area of the live view. The frontend then returns to the dashboard, where another target construction can be selected. The complete interaction sequence is illustrated in Figure @user-interface-flow.
 
 ABBILDUNG so drei oder vier bilder die den process visualisieren mit zuerst auswahl interface dann preview und dann aufgabe
 
 #figure(
   image("figures/target-selection.png", width: 90%),
   caption:["target selection"]
-)<target-selection>
+)<user-interface-flow>
 
-#grid(
-  columns: (1fr, 1fr),
-  column-gutter: 1em,
-  [
-    #figure(
-      image("figures/preview.png", width: 90%),
-      caption: [review and confirmation ],
-      supplement: [Figure],
-      kind: "figure",
-    ) <preview-and-confirmation>
-  ],
-  [
-    #figure(
-      image("figures/quadrat@3x.png", width: 90%),
-      caption: [Construction and feedback],
-      supplement: [Figure],
-      kind: "figure",
-    ) <construction-and-feedback>
-  ],
-)

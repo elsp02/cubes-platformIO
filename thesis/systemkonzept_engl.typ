@@ -114,9 +114,9 @@ Within the proposed TUI, each building Brick functions as a phicon: it represent
 Physical interaction with the system begins with the building blocks and their connections. Their design shapes how learners experience the construction process while also determining how reliably the resulting physical arrangement can be interpreted by the technical system. This chapter therefore describes the physical design that forms the tangible foundation of the system. In accordance with the terminology defined in @topology, the terms docking face and receiving face are used throughout the following sections.
 
 === Basic Geometry and Block Types <geometry-Brick>
-In accordance with requirement #req("C4"), the connection faces must allow two connected bricks to assume a discrete and unambiguously interpretable relative orientation. Existing systems such as _i-Cube_, _RFIBricks_ and _NFCStack_ similarly employ fourfold rotational symmetry to distinguish the orientation of connected bricks @iCube @RFIBrick @NFCStack. Based on this principle, a standardised square geometry is selected for all connection faces. This geometry permits a rotationally symmetrical contact arrangement and provides four mechanically valid orientations in increments of 90°.
+In accordance with requirement #req("C2"), the connection faces must allow two connected bricks to assume a discrete and unambiguously interpretable relative orientation. Existing systems such as _i-Cube_, _RFIBricks_ and _NFCStack_ similarly employ fourfold rotational symmetry to distinguish the orientation of connected bricks @iCube @RFIBrick @NFCStack. Based on this principle, a standardised square geometry is selected for all connection faces. This geometry permits a rotationally symmetrical contact arrangement and provides four mechanically valid orientations in increments of 90°.
 This geometry permits a rotationally symmetrical contact arrangement and allows four mechanically valid orientations in increments of 90°.
-Based on the standardised connection geometry, two building-Brick types are defined in accordance with #req("G3")
+Based on the standardised connection geometry, two building-Brick types are defined in accordance with #req("G1")
 - The cube Brick wth six square connection faces, as specified by (G1)
 - The smashed Brick with two opposing square connection faces, while its remaining faces cannot be used to establish connections
 
@@ -128,12 +128,12 @@ Whereas the cube Brick supports linear as well as branched two- and three-dimens
 )<Brick-type>
 
 ==== Directed Design of the Connection Faces
-To limit the complexity of manufacturing and connection detection, two functionally distinct types of connection faces are defined. The docking face connects a Brick to the existing construction, whereas the receiving faces allow additional bricks to be attached through their respective docking faces. To enable three-dimensional constructions as required by #req("C3"), the cube Brick must provide connection possibilities along all three of its local spatial axes. As one of its six connection faces serves as the docking face, the remaining five are designed as receiving faces. Because the smashed Brick has only two opposing connection faces it can have only one receiving face. Consequently, a valid connection can only be established between a receiving face of the parent Brick and the docking face of the child Brick.
+To limit the complexity of manufacturing and connection detection, two functionally distinct types of connection faces are defined. The docking face connects a Brick to the existing construction, whereas the receiving faces allow additional bricks to be attached through their respective docking faces. To enable three-dimensional constructions as required by #req("C1"), the cube Brick must provide connection possibilities along all three of its local spatial axes. As one of its six connection faces serves as the docking face, the remaining five are designed as receiving faces. Because the smashed Brick has only two opposing connection faces it can have only one receiving face. Consequently, a valid connection can only be established between a receiving face of the parent Brick and the docking face of the child Brick.
 
 To identify the intended target connection and orientation between two bricks, the _Receiving faces_ are differentiated by colour. This directed design provides the physical basis for representing the resulting construction as a parent child structure. The corresponding digital structure model is described in @structure-model.
 
 ==== Mechanical Connection Principle
-The mechanical connection principle was selected with regard to stability, unambiguous alignment and the low operating force specified by #req("C6"). For the prototype a combination of a mechanical form fit mechanism and magnetic assistance is used: The docking face contains recessed guiding elements, while the receiving faces contain corresponding protruding elements. Magnets with complementary polarities draw compatible faces together and stabilise the resulting connection without requiring the force associated with a conventional snap-fit mechanism.
+The mechanical connection principle was selected with regard to stability, unambiguous alignment and the low operating force specified by #req("C4"). For the prototype a combination of a mechanical form fit mechanism and magnetic assistance is used: The docking face contains recessed guiding elements, while the receiving faces contain corresponding protruding elements. Magnets with complementary polarities draw compatible faces together and stabilise the resulting connection without requiring the force associated with a conventional snap-fit mechanism.
 
 Together, the guiding elements and magnets implement a mechanical constraint as described in @token-constraint. They align the electrical contact areas and impede invalid connections because incompatible interface geometries do not fit and equally polarised magnets repel one another. The available connection possibilities are therefore partly conveyed through the physical design itself.
 
@@ -232,7 +232,7 @@ This data flow separates physical acquisition from task-related interpretation. 
 
 === Logical Structure and Data Model <structure-model>
 The physical construction is conceptually represented as a directed tree: The Baseplate forms the root of the tree, each connected building Brick is represented by a node and each physical connection constitutes a directed edge between a parent and a child node.
-The model reflects also the directed interface structure introduced in @electrical-interface: The defined docking face connects each Brick to its parent, while its receiving faces allow one or more child bricks to be attached. Consequently, each Brick can have no more than one parent but may have several children. As required by #req("C3"), both linear and branching three-dimensional constructions can therefore be represented by the model. By deriving the digital interpretation from the parent–child relationships and the resulting overall construction, the structure model applies the relational and constructive mapping principles introduced in @mapping.
+The model reflects also the directed interface structure introduced in @electrical-interface: The defined docking face connects each Brick to its parent, while its receiving faces allow one or more child bricks to be attached. Consequently, each Brick can have no more than one parent but may have several children. As required by #req("C1"), both linear and branching three-dimensional constructions can therefore be represented by the model. By deriving the digital interpretation from the parent–child relationships and the resulting overall construction, the structure model applies the relational and constructive mapping principles introduced in @mapping.
 
 To identify and interpret each building Brick within this tree, however, the parent–child relationship alone is insufficient. @node-infos summarises the additional information contained in each node for this purpose:
 
@@ -449,8 +449,6 @@ According to #req("FB3") as well as #req("FB4"), more extensive assistance is pr
 As already mentioned can the representation of the target structure also be adapted to the required level of support. It may remain fully visible to facilitate independent planning or be presented incrementally to direct attention towards the next relevant part. 
 
 This graduated approach preserves opportunities for independent error analysis while providing additional orientation when required.
-
-== Concept Summary
 
 
 

@@ -194,17 +194,17 @@ Das Kapitel beschreibt:
 - Aussehen: realer Würfel spiegelt digitalen Würfel wieder -> abstraktheit (TUI Anforderung bezug) + alltagsgegenstand (physische repräsentation bezug) => vlt das in interaktionskapitel
 
 - Entsprechend der Anforderung G1 besitzen die Verbindungsseiten eines jeden Bausteins eine quadratische Grundfläche mit einheitlichen Abmessungen 
-=> quadratische Verbindungsfläche ermöglicht rotationssymmetrisches contact arrangement (elektrische anforderungen) -> vier mechanisch mögliche Rotationen in 90-Grad-Schritten-> stellt eine einheitliche Verbindung unterschiedlicher Bausteintypen sicher + bildet mechanische Voraussetzung für die in C4 geforderte elektronische Rotationserkennung
+=> quadratische Verbindungsfläche ermöglicht rotationssymmetrisches contact arrangement (elektrische anforderungen) -> vier mechanisch mögliche Rotationen in 90-Grad-Schritten-> stellt eine einheitliche Verbindung unterschiedlicher Bausteintypen sicher + bildet mechanische Voraussetzung für die in C2 geforderte elektronische Rotationserkennung
 
-- basierend auf der grundlage der quadratischen Verbindungsflächen werden zwei Bausteintypen vorgesehen (G3):
+- basierend auf der grundlage der quadratischen Verbindungsflächen werden zwei Bausteintypen vorgesehen (G1):
   - Würfelbaustein mit sechs quadratischen Verbindungsflächen (G2)
   - Smashed Baustein mit zwei gegenüberliegenden quatratischen Verbindungsseiten. die übrigen seiten stellen keine Verbindungsseiten dar
 
-=> Durch Würfelbaustein können sowohl lineare als auch verzweigte zwei und dreidimensionale Strukturen entland der drei orthogonaler Raumachsen aufgebaut werden (C3). smashed würfel ermöglicht nur lineare Verbindungen entlang seiner lokalen z-Achse (siehe Abbildung Würfel)
+=> Durch Würfelbaustein können sowohl lineare als auch verzweigte zwei und dreidimensionale Strukturen entland der drei orthogonaler Raumachsen aufgebaut werden (C1). smashed würfel ermöglicht nur lineare Verbindungen entlang seiner lokalen z-Achse (siehe Abbildung Würfel)
 
 
 Für die quadratischen Verbindungsflächen ist eine Seitenlänge von ungefähr 40 mm vorgesehen
--> Kompromiss zwischen Anforderung, dass Baustein mit einer Hand gegriffen und positioniert werden kann (C5) und ausreichend Bauraum für Kontakte und elektronische Komponenten. Ob die gewählte Größe tatsächlich ergonomisch geeignet ist, wird in Kapitel x evaluiert 
+-> Kompromiss zwischen Anforderung, dass Baustein mit einer Hand gegriffen und positioniert werden kann (C3) und ausreichend Bauraum für Kontakte und elektronische Komponenten. Ob die gewählte Größe tatsächlich ergonomisch geeignet ist, wird in Kapitel x evaluiert 
 
 Baseplate:
 - Box in die elektrischen Komponenten versteckt sind
@@ -220,7 +220,7 @@ Die gerichtete Gestaltung der Verbindungsseiten bildet die physische Grundlage f
 
 ==== mechanisches Verbindungsprinzip
 - Für das mechanische Verbinden der Würfel kommen grundsätzlich formschlüssige Steckverbindung, magnetische Verbindung, (mechanical locking connection?) oder Kombination der Prinzipien infrage
-- Auswahl anhand anforderung Stabilität, eindeutige Ausrichtung und geringen Kraftaufwand (C6)
+- Auswahl anhand anforderung Stabilität, eindeutige Ausrichtung und geringen Kraftaufwand (C4)
 
 #figure(
   table(
@@ -420,7 +420,7 @@ SEQUENZDIAGRAMM
 - Das Modell folgt der in Kapitel X.4 beschriebenen Seitenstruktur:
   -  definierte Andockseite eines Bausteins stellt die Verbindung zu seinem übergeordneten Element her
   -  Die Aufnahmeseiten ermöglichen die Verbindung mit untergeordneten Bausteinen
-  ->  Jeder Baustein besitzt dadurch höchstens ein übergeordnetes Element/Elternbaustein, kann jedoch mehrere untergeordnete Kindbausteine aufnehmen, sodass auch verzweigte und dreidimensionale Konstruktionen möglich sind (C3)
+  ->  Jeder Baustein besitzt dadurch höchstens ein übergeordnetes Element/Elternbaustein, kann jedoch mehrere untergeordnete Kindbausteine aufnehmen, sodass auch verzweigte und dreidimensionale Konstruktionen möglich sind (C1)
 
 Ein Node enthält die für ?seine Einordnung? erforderlichen Informationen:
 

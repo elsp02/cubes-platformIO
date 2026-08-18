@@ -25,11 +25,11 @@ The evaluation not investigate long-term use or learning outcomes.
 
   [Target-group evaluation],
   [Observation of brick handling, usability, visual comprehension and assistance needs],
-  [TASK1; IA1–IA5; TUI1–TUI3; C3–C6],
+  [TASK1; IA1–IA5; TUI1–TUI3; C1–C4],
 
   [Physical inspection and demonstration],
   [Inspection, dimensional checks, component count and manual demonstration of connections and assembly],
-  [G1–G3; C1–C4; EL1–EL2; S1–S3],
+  [G1–G1; C1–C2; EL1–EL2; S1–S3],
 
   [Implementation analysis],
   [Traceability analysis of contact design, communication protocol, firmware and application components],
@@ -59,6 +59,7 @@ For the construction tasks, eight physical prototype bricks were available, comp
 The learning application was presented on a touchscreen tablet and displayed a selection of unterschiedlich schweren target structures with varying levels of complexity from which the students could choose. 
 After confirming their selection, the chosen target structure was displayed as an interactive three-dimensional model in full-screen mode.
 
+FALSCH
 #grid(
   columns: (1fr, 1fr, 1fr),
   column-gutter: 0.8em,
@@ -127,7 +128,7 @@ Hier behandelst du ausschließlich die physische Handhabung:
 - Konnten dreidimensionale und verzweigte Strukturen gebaut werden?
 - Gab es Unterschiede zwischen den beiden Bausteintypen?
 - Kam es zu unbeabsichtigtem Lösen, Verrutschen oder falscher Ausrichtung?
-Hier kannst du auf C3–C6, TASK1, IA1, IA5 und TUI3 Bezug nehmen.
+Hier kannst du auf C1–C4, TASK1, IA1, IA5 und TUI3 Bezug nehmen.
 
 // Beobachtete Ergebnisse mit requirements aufzählen
 

@@ -6492,7 +6492,7 @@
 		(at 198.1 61.9 -90)
 		(descr "Capacitor SMD 0805 (2012 Metric), square (rectangular) end terminal, IPC-7351 nominal with elongated pad for handsoldering. (Body size source: IPC-SM-782 page 76, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf, https://docs.google.com/spreadsheets/d/1BsfQQcO9C6DZCsRaXUlFlo91Tg2WpOkGARC1WS5S8t0/edit?usp=sharing)")
 		(tags "capacitor handsolder")
-		(property "Reference" "C6"
+		(property "Reference" "C4"
 			(at -1.4625 -2.3 180)
 			(layer "B.SilkS")
 			(uuid "ec654e9e-8466-448d-916f-4621970a9264")
@@ -6960,7 +6960,7 @@
 		(at 175 60.8625 90)
 		(descr "Capacitor SMD 0805 (2012 Metric), square (rectangular) end terminal, IPC-7351 nominal with elongated pad for handsoldering. (Body size source: IPC-SM-782 page 76, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf, https://docs.google.com/spreadsheets/d/1BsfQQcO9C6DZCsRaXUlFlo91Tg2WpOkGARC1WS5S8t0/edit?usp=sharing)")
 		(tags "capacitor handsolder")
-		(property "Reference" "C4"
+		(property "Reference" "C2"
 			(at 2.2625 2.6 180)
 			(layer "B.SilkS")
 			(uuid "ff1df0ad-6701-4cb1-8b58-873874c1f219")
@@ -7800,7 +7800,7 @@
 		(at 183.8625 50 180)
 		(descr "Capacitor SMD 0805 (2012 Metric), square (rectangular) end terminal, IPC-7351 nominal with elongated pad for handsoldering. (Body size source: IPC-SM-782 page 76, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf, https://docs.google.com/spreadsheets/d/1BsfQQcO9C6DZCsRaXUlFlo91Tg2WpOkGARC1WS5S8t0/edit?usp=sharing)")
 		(tags "capacitor handsolder")
-		(property "Reference" "C5"
+		(property "Reference" "C3"
 			(at 0 1.68 0)
 			(layer "B.SilkS")
 			(uuid "46a1e88a-6ed8-46d6-afec-1e947ebd755a")
@@ -8334,7 +8334,7 @@
 		(at 182.1 75.1625 90)
 		(descr "Capacitor SMD 0805 (2012 Metric), square (rectangular) end terminal, IPC-7351 nominal with elongated pad for handsoldering. (Body size source: IPC-SM-782 page 76, https://www.pcb-3d.com/wordpress/wp-content/uploads/ipc-sm-782a_amendment_1_and_2.pdf, https://docs.google.com/spreadsheets/d/1BsfQQcO9C6DZCsRaXUlFlo91Tg2WpOkGARC1WS5S8t0/edit?usp=sharing)")
 		(tags "capacitor handsolder")
-		(property "Reference" "C3"
+		(property "Reference" "C1"
 			(at 2.2625 0 180)
 			(layer "B.SilkS")
 			(uuid "5dd80152-b4ec-4a6b-8966-047629cd6cb0")
