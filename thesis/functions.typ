@@ -4,6 +4,8 @@
   header: (),
   caption: none,
   table-label: none,
+  breakable: false,
+  placement: none,
   ..cells
 ) = {
 

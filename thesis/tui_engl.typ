@@ -52,12 +52,9 @@ The distinctive characteristic of a @TUI lies in the close coupling between repr
 == Design Factors for TUI
 wie müssen tuis gestaltet sein generell und auf kinder bezogen 
 === Coupling Objects with Digital Information <coupling_objects>
-(But how does digital information become linked to physical objects? And what format can this link be presented? Ullmer and Ishii answer these questions by providing an overview of the various types of digital bindings,coupling methods and approaches to physical representation @EmergingFrameworks.
+Ullmer and Ishii provide an overview of various types of represented digital information, coupling methods and approaches to physical representation in order to describe the coupling between phicons and digital information @EmergingFrameworks.
 
-
-Ullmer and Ishii provide an overview of various types of represented digital information, coupling methods and approaches to physical representation in order to describe the coupling between phicons and digital information
-
-==== Types of Represented Digital Information
+==== Types of Represented Digital Information 
 A phicon in a @TUI can represent different kinds of digital information. These include _static media_, such as images and three-dimensional models, _dynamic content_, such as video streams or computationally generated graphics and _digital attributes_, including colours or material properties. Within a TUI, a physical object does not necessarily correspond to a single digital file but can have different digital meanings. For example, a physical figure placed on an audio player may represent an entire audiobook, while another object may control playback. To the user, these objects represent a story or an action rather than the underlying files and computational processes. What matters most is therefore the meaning of an object and the actions associated with it  @EmergingFrameworks.
 
 ==== Methods of Coupling <coupling>
@@ -105,7 +102,7 @@ Not only the temporal precision of coupling influences how clearly its digital m
 
 )
 
-==== Conclusion ?? vlt gesammt am ende von level2 kapitel
+==== Conclusion
 The coupling between physical objects and digital information can differ in content, flexibility and physical representation. Selecting an appropriate approach therefore requires a careful consideration of the intended users and their abilities, as well as the specific application context. Regardless of the chosen approach, an effective TUI requires a clear and immediately perceptible relationship between the phiconand the associated digital meaning. The design of this coupling therefore directly influences the system’s comprehensibility, usability and flexibility.
 
 
@@ -178,19 +175,22 @@ _Multimodal Accessibility_ requires relevant information and feedback to be avai
 ==== Teachers
 For use in schools, the requirements of teachers must also be considered and teachers should be included as stakeholders in the TUI design process. Nevertheless, the system should be usable without programming knowledge or time-consuming calibration. Tasks must be easy to select and understand, the components must be transportable and the system must be capable of being set up with minimal preparation time @TangibleInteraction.
 
-
-
 ==== Conclusion
 The Design Factors show that there is no universally child-appropriate TUI. Its suitability depends on how well the interaction design responds to individual abilities, support needs and sensory preferences. The central design challenge is therefore to provide sufficient structure and accessibility without unnecessarily restricting independent exploration.
 
 
 == Feedback for TUI <feedback>
-In a @TUI, feedback informs users whether an action has been detected, how it has been interpreted and how it has affected the state of the system. It thereby closes the perception action loop between physical manipulation and digital processing and supports the independent use of the system.
+
+In a @TUI, feedback informs users whether an action has been detected, how it has been interpreted and how it has affected the state of the system. It thereby closes the perception-action loop between physical manipulation and digital processing and supports the independent use of the system. @bellotti2002making @wensveen2004interaction
 
 === Feedback Modalities <feedback-modalities>
-As shown in @feedback-modalities-table, a system can communicate the consequences of an action through different output modalities. The physical properties of a @TUI already provide automatically intrinsic feedback that arises directly from manipulating its objects. Additional system-generated feedback may be presented visually, auditorily, haptically, or through a coordinated combination of these modalities. This multimodal feedback does not imply presenting as many signals as possible simultaneously since this may cause sensory overload. Instead, different modalities should offer alternative ways of accessing the same or complementary information, which can then be combined when a perceptual channel cannot be used, or can only be used to a limited extent.
 
-Regardless of its modality, feedback can also be characterised along several dimensions:
+As shown in @feedback-modalities-table, a system can communicate the consequences of an action through different output modalities. The physical properties of a @TUI already provide intrinsic feedback that arises directly from manipulating its objects. Additional system-generated feedback may be presented visually, auditorily, haptically, or through a coordinated combination of these modalities. @wensveen2004interaction
+
+This multimodal feedback does not imply presenting as many signals as possible simultaneously, since excessive or unnecessarily complex information may increase processing demands and impede the interpretation of the feedback. @shute2008focus Instead, different modalities should offer alternative ways of accessing the same or complementary information, which can then be combined when a perceptual channel cannot be used, or can only be used to a limited extent. @iso9241-110-2020 @w3c2024wcag
+
+Regardless of its modality, feedback can also be characterised along several dimensions concerning its location, temporal relationship to the action, dynamics and duration. @wensveen2004interaction
+
 - Local or global: presented directly at the manipulated object or through a separate display
 - Discrete or continuous: confirming an individual event or continuously indicating a state
 - Immediate or delayed: responding directly to an action or providing a later summary
@@ -217,56 +217,64 @@ Regardless of its modality, feedback can also be characterised along several dim
   [Communicates states, errors and changes visually],
   [LEDs, displays, projections, or animations],
   
-
   [_Auditory_],
-  [Attracts attention and communicates information autitory],
+  [Attracts attention and communicates information auditorily],
   [Sounds, signals, or spoken information],
-
 
   [_Haptic_],
   [Makes system responses physically perceptible],
   [Vibration, movement, or force feedback],
 
-
   [_Multimodal_],
   [Provides complementary or alternative access through different perceptual channels],
   [Coordinated combinations of visual, auditory, or haptic signals],
-
 )
 
-=== Feedback learning TUI <feedback-tui>
-In learning-oriented @TUI, two levels of feedback should be distinguished:
-- _Interaction feedback_ communicates whether and how a physical action has been technically detected and processed
-- _Pedagogical feedback_ evaluates the action or its outcome in relation to the learning task
+The distinction presented in @feedback-modalities-table is based on the differentiation between inherent and additionally generated information proposed by Wensveen et al. @wensveen2004interaction
 
-A system may therefore detect an action correctly while evaluating it as incorrect in relation to the task. Conversely, a failure to detect an action must not be presented as an error made by the learner. Reliable interaction feedback is therefore a prerequisite for meaningful pedagogical feedback.  
+=== Feedback in Learning-Oriented TUIs <feedback-tui>
+
+In learning-oriented @TUI, two levels of feedback should be distinguished:
+
+- _Interaction feedback_ communicates whether and how a physical action has been technically detected and processed. @bellotti2002making
+- _Pedagogical feedback_ evaluates the action or its outcome in relation to the learning task. @hattie2007power @shute2008focus
+
+A system may therefore detect an action correctly while evaluating it as incorrect in relation to the task. Conversely, a failure to detect an action must not be presented as an error made by the learner. Reliable interaction feedback is therefore a prerequisite for meaningful pedagogical feedback. @bellotti2002making @iso9241-110-2020
+
 ==== Interaction Feedback
-_Interaction Feedback_ makes the technical response of the system comprehensible. It should indicate wheter a physical action has been detected and interpreted correctly or not. If an action cannot be processed, the system should immediately distinguish a technical recognition problem from an incorrect solution to the learning task. Otherwise, learners may incorrectly attribute system failures to their own actions and become uncertain about how to proceed.
+
+_Interaction feedback_ makes the technical response of the system comprehensible. It should indicate whether a physical action has been detected and interpreted correctly. @bellotti2002making If an action cannot be processed, the system should distinguish a technical recognition problem from an incorrect solution to the learning task. Otherwise, learners may incorrectly attribute system failures to their own actions and become uncertain about how to proceed. @bellotti2002making @iso9241-110-2020
 
 ==== Pedagogical Feedback
-While _interaction feedback_ primarily confirms whether an action has been technically processed, _pedagogical feedback_ concerns the meaning of that action within the learning process. It supports learners in assesing their current progress and recognising deviations from the intended outcome to adapt their subsequent actions. 
 
-_Pedagogical feedback_ can fulfil different functions: 
-- Outcome feedback indicates whether a result is correct or incorrect.
-- Process feedback provides information about the approach taken or a possible cause of error.
-- Feedforward offers guidance for the next step.
-- Progress feedback indicates what has already been achieved
+While _interaction feedback_ primarily confirms whether an action has been technically processed, _pedagogical feedback_ concerns the meaning of that action within the learning process. It supports learners in assessing their current progress, recognising deviations from the intended outcome and adapting their subsequent actions. @butler1995feedback @hattie2007power
 
-Additionally, as it would restrict independent planning and problem-solving, the system should not prescribe every step, but provide graduated feedback, in which support increases according to the learner’s needs. This preserves opportunities for independent error analysis while preventing learners from becoming unable to continue because the feedback is insufficient or incomprehensible.
+_Pedagogical feedback_ can fulfil different functions:
 
-==== Criteria for Effective Feedback/design factors for children <feedback-children>
-The effectiveness of feedback depends not only on its technical form but, more importantly, on whether it is understandable and relevant to the user’s subsequent actions. Effective feedback should therefore meet the following criteria:
+- Outcome feedback indicates whether a result is correct or incorrect. @shute2008focus
+- Process feedback provides information about the approach taken or a possible cause of error. @hattie2007power
+- Feedforward offers guidance for the next step. @hattie2007power
+- Progress feedback indicates what has already been achieved in relation to the intended goal. @hattie2007power
 
-- Timeliness: Feedback should occur in a recognisable temporal relationship to the action that triggered it. If it is delayed, users may no longer be able to identify its cause
-- Clarity: It should be evident which action, object, or system state the feedback refers to
-- Consistency: Similar states and events should be represented by consistent signals Colours, sounds and symbols should not change their meaning without a comprehensible reason.
-- Perceptibility: Feedback should be sufficiently noticeable without obscuring other relevant information
-- Proportionality: The intensity and extent of feedback should correspond to the significance of the event. A routine confirmation, for example, should be less prominent than a critical error message
-- Actionability: Feedback should not only communicate the current state but, where necessary, also indicate how the interaction can be continued or corrected
+Additionally, as it would restrict independent planning and problem-solving, the system should not prescribe every step, but provide graduated feedback in which support increases according to the learner’s needs. This preserves opportunities for independent error analysis while preventing learners from becoming unable to continue because the feedback is insufficient or incomprehensible. @shute2008focus @butler1995feedback
 
-Gerade bei unterschiedlichen sensorischen, kognitiven und kommunikativen Voraussetzungen sind anpassbare und redundante Rückmeldungen relevant.
+==== Criteria for Effective Feedback and Design Factors for Children <feedback-children>
 
-MEHR AUF FÖRDERSCHWERPUNKT EINGEHEN
+The effectiveness of feedback depends not only on its technical form but, more importantly, on whether it is understandable and relevant to the user’s subsequent actions. @hattie2007power @shute2008focus Effective feedback should therefore meet the following criteria:
+
+- Timeliness: Feedback should occur in a recognisable temporal relationship to the action that triggered it. If it is delayed, users may no longer be able to identify its cause. The appropriate timing nevertheless depends on the task, learning objective and learner’s prerequisites. @shute2008focus
+
+- Clarity: It should be evident which action, object, or system state the feedback refers to. @bellotti2002making @shute2008focus
+
+- Consistency: Similar states and events should be represented by consistent signals. Colours, sounds and symbols should not change their meaning without a comprehensible reason. @iso9241-110-2020
+
+- Perceptibility: Feedback should be sufficiently noticeable without obscuring other relevant information. @iso9241-110-2020
+
+- Proportionality: The intensity and extent of feedback should correspond to the significance of the event. A routine confirmation, for example, should be less prominent than a critical error message. @wensveen2004interaction @shute2008focus
+
+- Actionability: Feedback should not only communicate the current state but, where necessary, also indicate how the interaction can be continued or corrected. @hattie2007power @shute2008focus
+
+Particularly where learners have different sensory, cognitive and communicative prerequisites, feedback should be adaptable and essential information should not be conveyed through only one perceptual channel. @Geistige_entwicklung @lernen @autismus For digitally presented feedback, this requirement is additionally supported by accessibility guidelines stating that information should not depend exclusively on properties such as colour or other individual sensory characteristics. @w3c2024wcag
 
 === Conclusion
 

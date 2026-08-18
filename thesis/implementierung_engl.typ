@@ -299,6 +299,9 @@ The connection between the learning application and the Baseplate uses the ATtin
 
   table-label: <application-Baseplate-communication>,
 
+  breakable: true,
+  placement: none,
+
   header: (
     [Message],
     [Value],
