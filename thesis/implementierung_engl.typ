@@ -13,26 +13,10 @@ The square connection faces have a side length of approximately 40 mm. The selec
 
 Both Brick types were modelled using Autodesk Inventor and manufactured using a 3D printer. Their housings implement the modular structure introduced in the concept chapter and consist of a black structural frame, colour-coded connection-side modules and a removable black cover. The side modules are inserted individually into the supporting frame and can be removed separately. This allowes the electronic components to be mounted and tested before the complete Brick is assembled. In addition, individual modules can also be replaced without manufacturing an entirely new housing.
 
-#grid(
-  columns: (1fr, 1fr,),
-  column-gutter: 1em,
-  [
-    #figure(
-      image("figures/cube-exploded.jpg", width: 90%),
-      caption: [Exploded view of the cube Brick],
-      supplement: [Figure],
-      kind: "figure",
-    ) <exploded-cube>
-  ],
-  [
-    #figure(
-      image("figures/smashed-exploded.jpg", width: 90%),
-      caption: [Exploded view of the smashed Brick],
-      supplement: [Figure],
-      kind: "figure",
-    ) <exploded-smashed>
-  ],
-  )
+#figure(
+  image("figures/exploded@3x.png", width: 90%),
+  caption:[Exploded views of the prototype housings: (a) cube Brick and (b) smashed Brick]
+)<exploded-bricks>
 
 The Baseplate is implemented as the root element of the construction. Its housing contains the Baseplate electronics and provides one receiving sides for connecting the first Brick.
 
@@ -47,7 +31,7 @@ The implemented contact arrangements are shown in @contact-arrangement-physical.
 
 
 #figure(
-  image("figures/kontakt-arrangement.jpg", width: 90%),
+  image("figures/kontakt-arrangement.jpg", width: 70%),
   caption: [contact arrangment of left: receiving face; right: docking face]
 )<contact-arrangement-physical>
 
@@ -500,9 +484,9 @@ times
 q_("twist")(o).
 $
 
-The attachment quaternion $q_("attachment")(t, p)$ aligns the docking face of the child with the selected receiving face of the parent. The twist quaternion $q_("twist"))(o)$ represents the detected relative rotation $o$. The four transmitted orientation values are mapped to rotations of $90 degree$, $0 degree$, $-90 degree$ and $-180 degree$ around the local $z$-axis. This assignments aligns the orientation of the digital models with the orientation convention used by the connection-detection system
+The attachment quaternion $q_("attachment")(t, p)$ aligns the docking face of the child with the selected receiving face of the parent. The twist quaternion $q_("twist"))(o)$ represents the detected relative rotation $o$. The four transmitted orientation values are mapped to rotations of $90 degree$, $0 degree$, $-90 degree$ and $-180 degree$ around the local $z$-axis. This assignments aligns the orientation of the digital models with the orientation convention used by the connection-detection system.
 
-The first brcik connected to the Baseplate forms root of the displayed construction and has therefore no parent Brick. Beause of that, its local positon is set to the origin of the scene and its local orientation is derived solely from its transmitted relative rotation value. For every other subordinate Brick, the local transformation is combined with the transfomration of its parent: 
+The first brick connected to the Baseplate forms root of the displayed construction and has therefore no parent Brick. Beause of that, its local positon is set to the origin of the scene and its local orientation is derived solely from its transmitted relative rotation value. For every other subordinate Brick, the local transformation is combined with the transfomration of its parent: 
 $
 T_("global", c)
 =

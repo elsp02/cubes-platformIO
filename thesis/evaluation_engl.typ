@@ -23,25 +23,25 @@ The evaluation not investigate long-term use or learning outcomes.
 
   caption: [Overview of the applied evaluation methods and corresponding requirements],
 
-  [Target-group evaluation],
-  [Observation of brick handling, usability, visual comprehension and assistance needs],
-  [TASK1; IA1–IA5; TUI1–TUI3; C1–C4],
+[Target-group evaluation],
+[Observation of brick handling, usability, visual comprehension and assistance needs],
+[TASK1; IA1–IA5; TUI1–TUI3; C1–C4],
 
-  [Physical inspection and demonstration],
-  [Inspection, dimensional checks, component count and manual demonstration of connections and assembly],
-  [G1–G1; C1–C2; EL1–EL2; S1–S3],
+[Physical inspection and demonstration],
+[Inspection, dimensional checks, component count and manual demonstration of connections and assembly],
+[G1; C1–C4; EL1–EL2; S1–S3],
 
-  [Implementation analysis],
-  [Traceability analysis of contact design, communication protocol, firmware and application components],
-  [DET1–DET4; DET5–DET7; FB1–FB4; IA6; EL3],
+[Implementation analysis],
+[Traceability analysis of contact design, communication protocol, firmware and application components],
+[DET1–DET7; FB1–FB4; IA6; EL3; S4],
 
-  [Cost analysis],
-  [Bill-of-materials calculation],
-  [EC1],
+[Cost analysis],
+[Bill-of-materials calculation],
+[EC1],
 
-  [Integrated-system test],
-  [Not conducted due to insufficient electronic reliability],
-  [DET1–DET7; FB1–FB2; IA6],
+[Integrated-system test],
+[Not conducted due to insufficient electronic reliability],
+[DET1–DET7; FB1–FB2; IA6],
 )
 ==== Assessment Criteria
 Based on the available evidence, each requirement is classified as fulfilled, partially fulfilled, implemented but not verifierd, not fulfilled or not evaluated. A requirement is classified as fulfilled only if its relevant functionality or property could be demonstrated through the applied evaluation method. Requirements that were represented in the design or implementation but could not be tested in operation were classified as implemented but not verified.
@@ -59,39 +59,21 @@ For the construction tasks, eight physical prototype bricks were available, comp
 The learning application was presented on a touchscreen tablet and displayed a selection of unterschiedlich schweren target structures with varying levels of complexity from which the students could choose. 
 After confirming their selection, the chosen target structure was displayed as an interactive three-dimensional model in full-screen mode.
 
-FALSCH
-#grid(
-  columns: (1fr, 1fr, 1fr),
-  column-gutter: 0.8em,
-  [
-    #figure(
-      image("figures/level-easy.png", width: 100%),
-      caption: [Bild 1],
-      supplement: [einfach],
-      kind: "figure",
-    )
-  ],
-  [
-    #figure(
-      image("figures/level-middle.png", width: 100%),
-      caption: [Bild 2],
-      supplement: [mittel],
-      kind: "figure",
-    )
-  ],
-  [
-    #figure(
-      image("figures/level-komplex.png", width: 100%),
-      caption: [Bild 3],
-      supplement: [schwer],
-      kind: "figure",
-    )
-  ],
-)
+
+#figure(
+  image("figures/level@3x.png", width: 90%),
+  caption: [Examples of target structures used in the target-group evaluation: (a) low, (b) medium and (c) high structural complexity]
+)<evaluation-target-structures>
+
 ==== Procedure
-At the beginning of the evaluation, the students were introduced to the general purpose of the system and the reconstruction task. Each student was subsequently invited to select a target structure in the learning application and reproduce it using the physical bricks. Depending on their interest, the students could complete more than one task or work collaboratively in pairs.
+At the beginning of the evaluation, the students were introduced to the general purpose of the system and the reconstruction task. Each student was subsequently invited to select a target structure in the learning application and reproduce it using the physical bricks. Depending on their interest, the students could complete more than one task or work collaboratively in pairs as @learners show.
 During construction, the students could interact with the three-dimensional visualisation of the target structure and rotate it to inspect the construction from different viewing angles.
 The students were encouraged to complete the tasks independently and without assistance from the supervising adults but if required support was provided gradually. Initially, verbal hints were given. If these were insufficient, the target visualisation was rotated to provide a more suitable viewing angle and the relevant brick was indicated on the screen. If further assistance was required, the appropriate physical brick was provided to the student. Only when these forms of support proved insufficient did a supervising adult demonstrate or perform the required connection.
+
+#figure(
+  image("figures/learners@3x.png", width: 60%),
+  caption: [Leaners during the building process]
+)<learners>
 
 === Data Collection
 Data were collected through qualitative observation of the students’ interaction with the physical bricks and the learning application. The evaluation did not aim to measure learning outcomes. Instead, it examined the comprehensibility and usability of the interaction concept during the session.
@@ -117,6 +99,9 @@ FEHLT: wie habe ich die beobachtungen festgehalten: durch notizen während und u
 == Results
 === Results of the Target-Group Evaluation
 ==== Physical Interaction with the Building Bricks
+
+Die Kinder konnten die bricks ohne probleme greifen auch mit einer hand. nach einer kurzen erklärung welche seiten miteinander verbunden werden können, hat das auch gut geklappt. der constraint mechanismus mit dem formschluss sowie die magnethilfe dass die bricks quasi "von allein" sich verbunden haben war dabei sehr hilfreich. die magnete und der formschluss haben jedoch nicht ausgereicht um mehr als drei bausteine horizontal miteinander zu verbinden weil dann die verbindung sich gelöst hat und die construction auseinander gefallen ist. es wurden auch ungültige seitenverbindungen ausprobiert (andockseite auf andockseite), weil wegen des neodymmagneten in der mitte sich die seiten auch ein wenig angezogen haben. die beiden baustein typen wurden beidermaßen gut verstanden. auch wurde verstanden welcher physische brick zum digitalen target brick gehört und aufgrund des aussehens der bausteine ein bisschen wie bekannte klemmbausteine wurde sofort verstanden dass die bausteine zum zusammenbauen sind.  
+
 Hier behandelst du ausschließlich die physische Handhabung:
 - Erkannten die Kinder, dass die Bausteine verbunden werden können?
 - Konnten sie die Bausteine greifen und positionieren?
@@ -133,6 +118,12 @@ Hier kannst du auf C1–C4, TASK1, IA1, IA5 und TUI3 Bezug nehmen.
 // Beobachtete Ergebnisse mit requirements aufzählen
 
 ==== Learning Application and Vidual Comprehension
+
+die kinder konnten selbständig durch die auswahl konstruktionen durchgehen und haben auch verstanden dass die sich in ihrer komplexität unterscheiden. relativ häufig wurde hilfe beim bestätigen der ausgewählten konstruktion benötigt weil der digitale button nicht responisv genug war und zu klein. die kinder haben auch verstanden dass man die ansicht drehen und zoomen kann und haben das auch regelmäßig verwendet wenn sie nicht weiter wussten. die preview darstellung wurde aber meistens nicht genutzt bzw nur kurz angeschaut und hat nicht zur auswahlhilfe beigetragen. Touchbedienung war verständlich weil sie im unterricht auch höufig mit touchscreen laptops arbeiten. 
+
+auch wurde verstanden welcher physische brick zum digitalen target brick gehört und aufgrund des aussehens der bausteine ein bisschen wie bekannte klemmbausteine wurde sofort verstanden dass die bausteine zum zusammenbauen sind. manche kinder hatten schwierigkeiten die beiden bausteintypen auf der target visualisierung korrekt zu unterscheiden und den passenden typ auszuwählen. einfachere zielstrukturen waren auch verständlicher als komplexe. aufgrund dass nicht dargestellt worden ist welcher brick der root brick ist war es auch schwer diesen zu identifizieren was notwendig war um die konstruktion richtig zu bauen. am meisten fehler bzw schwierigkeiten gab es die würfel korrekt zu drehen um richtig orientiert auf den parent baustein zu setzen. zusammenarbeit war vor allem zwischen lernenden die es schlechter konnten und denen die es besser konnten, dabei hat vor allem die besser könnende person die "lehrerrolle" eingenommen und hat tips gegeben. manche kinder haben die aufgabe auch sofort verstanden und andere zunächst eine Demonstration benötigten,
+
+
 Hier geht es um die Bedienung, nicht primär um das räumliche Verständnis:
 - Konnten die Kinder selbstständig eine Zielkonstruktion auswählen?
 - Wurde die Auswahlübersicht verstanden?
@@ -147,46 +138,7 @@ Deine Beobachtung, dass der Bestätigungsbutton zu klein war oder nicht sofort r
 Beispiel:
 Most students were able to select a target structure independently. However, confirming the selection occasionally required assistance because the corresponding button was comparatively small and did not always respond immediately to touch input.
 
-Anforderung IA2 IA3 TUI3
 
-// Beobachtete Ergebnisse mit requirements aufzählen
-
-==== Comprehension of Tasks and visual representations
-Hier geht es darum, ob die Kinder verstanden, was sie bauen sollten:
-- Verstanden sie nach der Einführung das Prinzip des Nachbauens?
-- Bei wie vielen Kindern war zunächst eine Demonstration notwendig?
-- Konnten sie die digitale Zielkonstruktion den physischen Bausteinen zuordnen?
-- Wurden die beiden Bausteintypen korrekt unterschieden?
-- Konnten sie Anzahl, Position und Orientierung der Bausteine erkennen?
-- Half das Drehen der Visualisierung beim räumlichen Verständnis?
-- Waren einfache Zielstrukturen verständlicher als komplexe?
-- Wo traten Fehler bei der relativen Anordnung auf?
-- Wurde aus unterschiedlichen Perspektiven erkannt, welcher Würfel mit welchem verbunden werden musste?
-- Welche Rolle spielte die Zusammenarbeit zu zweit?
-Deine Aussage, dass manche Kinder die Aufgabe sofort verstanden und andere zunächst eine Demonstration benötigten, gehört hierher.
-
-// Beobachtete Ergebnisse mit requirements aufzählen
-
-==== (observed difficulties and required assistance)
-braucht es nicht unbedingt
-Dieses Unterkapitel ist sinnvoll, wenn du die unterschiedlichen Hilfestufen gezielt auswertest. Behandle:
-häufigste Schwierigkeiten
-- Situation, in der sie auftraten
-- Art der benötigten Hilfe
-- niedrigste ausreichende Hilfestufe
-- Unterschiede zwischen Auswahl, räumlichem Verständnis und physischem Bauen
-- wiederkehrende Probleme
-- Situationen, die vollständig übernommen werden mussten
-- ob Kinder nach einer Demonstration weitere Schritte selbstständig ausführten
-
-Du kannst deine Hilfestufen als Ordnung verwenden:
-- keine Unterstützung  
-- verbaler Hinweis  
-- Drehen oder Zeigen in der Visualisierung  
-- Bereitstellen des richtigen Bausteins  
-- Demonstration oder physisches Verbinden durch eine betreuende Person
-
-// Beobachtete Ergebnisse mit requirements aufzählen
 
 === Results of the Requirements-Based Assessment
 ==== Physical and Mechanical Requirements
