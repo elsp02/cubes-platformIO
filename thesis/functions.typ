@@ -92,6 +92,4 @@
 // Clickable requirement ID used in the text.
 #let req(id) = link(
   label("req-" + id)
-)[
-  #text("[" + id + "]")
-]
+)[#text("[" + id + "]")]

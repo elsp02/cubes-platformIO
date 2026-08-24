@@ -146,8 +146,8 @@ The following table provides the complete requirement-by-requirement assessment 
   [Fulfilled],
 
   [S4],
-  [The interface reduces short-circuit risk, but overvoltage protection was not verified],
-  [Partially fulfilled],
+  [All accessible electrical contacts carry only 5 V DC and present no electrical shock hazard under the intended dry-use conditions],
+  [Fulfilled],
 
   [EC1],
   [Material cost was approximately EUR 5 instead of the EUR 3 target],

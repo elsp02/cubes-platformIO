@@ -23,7 +23,7 @@ The baseplate is implemented as the root element of the construction. Its housin
 === Electronic Implementation
 Both brick types are equipped with an ATtiny1616 microcontroller that serves as their local control unit. The mechanical interfaces contain spring-loaded pogo pins that establish the electrical connections while compensating for minor manufacturing tolerances and small movements between connected bricks. The recessed guiding structures surrounding the contacts additionally protect the electrical interface against accidental contact, incorrect alignment and short circuits. The electronic structures of the building bricks and the baseplate are summarised in Figures @brick-electronics-block and @baseplate-electronics-block.
 
-The electrical implementation differs between the docking and receiving faces. On a receiving face, the data, supply and ground connections are implemented using spring-loaded contacts. The docking face contains the corresponding contact surfaces for the data connections, whereas the power connection uses a different construction consisting of a neodymium ring and a pogo pin mounted directly on the printed circuit board. [Figure to be added]
+The electrical implementation differs between the docking and receiving faces. On a receiving face, the data, supply and ground connections are implemented using spring-loaded contacts. The docking face contains the corresponding contact surfaces for the data connections, whereas the power connection uses a different construction consisting of a neodymium ring and a pogo pin mounted directly on the printed circuit board.
 
 The four upstream data contacts of the docking face are located in the corners of the square connection area. Ground and power of this face are transmitted through rotationally symmetrical contacts. The ground contact is positioned at the centre of the interface, while the supply contact forms a concentric connection around it. Both electrical connections therefore remain unchanged when a brick is rotated in increments of 90°.
 A receiving face provides a single downstream data contact in one defined corner as well as the power and ground contacts in the centre. Because of the limited installation space, the downstream data contact of one receiving face of the cube brick is placed in a different corner from the otherwise uniform arrangement. The resulting rotational offset is compensated for in the brick firmware, as described in @contact-offset.
@@ -35,9 +35,9 @@ The implemented contact arrangements are shown in @contact-arrangement-physical.
   caption: [Implemented contact arrangements: receiving face (left) and docking face (right)]
 )<contact-arrangement-physical>
 
-Four side-view RGB LEDs are arranged around the printed circuit board to provide local feedback directly on each building brick. The ATtiny1616, the RGB LEDs and the electrical components of the docking face are mounted on a printed circuit board designed using KiCad. The PCB is attached to the inside of the docking face using screws, while the contacts of the receiving faces are connected to the main board through the brick’s internal wiring. The complete circuit schematic and PCB layout are provided in the Appendix.
+Four side-view RGB LEDs are arranged around the printed circuit board to provide local feedback directly on each building brick. The ATtiny1616, the RGB LEDs and the electrical components of the docking face are mounted on a printed circuit board designed using KiCad. The PCB is attached to the inside of the docking face using screws, while the contacts of the receiving faces are connected to the main board through the brick’s internal wiring. The complete circuit diagram is provided in Appendix @appendix-circuit-diagram.
 
-The baseplate is also controlled by an ATtiny1616. It communicates with the computer through the microcontroller’s hardware USART interface and a connected USB-to-TTL UART adapter. The prototype is supplied with 5 V from the computer’s USB interface through this adapter. The baseplate transfers the supply voltage to the connected root brick, from which it is forwarded through the subsequent brick connections.
+The baseplate is also controlled by an ATtiny1616. It communicates with the computer through the microcontroller’s hardware USART interface and a connected USB-to-TTL UART adapter. The prototype is supplied with 5 V DC from the computer’s USB interface through this adapter. The baseplate transfers the supply voltage to the connected root brick, from which it is forwarded through the subsequent brick connections. Consequently, all accessible electrical contacts carry only 5 V DC. This remains below 15 V and does not present an electrical shock hazard under the intended dry-use conditions, thereby fulfilling #req("S4").
 
 #figure(
   image("figures/blockdiagramm-brick.pdf", width: 95%),
@@ -328,7 +328,7 @@ The baseplate waits up to two seconds for the first byte of the application’s 
 
 /////
 == Firmware of Bricks and Baseplate <firmware>
-To communicate changes in the physical construction to the learning application and return the resulting feedback to the relevant bricks, the distributed electronic components must coordinate their behaviour. The firmware of the bricks and the baseplate, explained in this chapter, implements this coordination by controlling construction detection, data transmission and feedback processing.
+To communicate changes in the physical construction to the learning application and return the resulting feedback to the relevant bricks, the distributed electronic components must coordinate their behaviour. The firmware of the bricks and the baseplate, explained in this section, implements this coordination by controlling construction detection, data transmission and feedback processing.
 
 
 === Brick Firmware <firmware-brick>
@@ -502,7 +502,7 @@ The resulting construction is then displayed using corresponding GLB models of t
 
 
 #figure(
-  image("figures/rechteck_lang@3x.png", width: 90%),
+  image("figures/bricks-and-visualization.jpg", width: 40%),
   caption: [Correspondence between a physical brick construction and its reconstructed three-dimensional model]
 )<visualisation-construction>
 
@@ -559,10 +559,19 @@ The preview window additionally contains two level options from which the learne
 
 After the target structure has been confirmed, the live construction view is opened and the selected target is transferred to the backend. During the task, this view displays the evaluated construction using the spatial reconstruction and feedback representations described in the preceding sections. The progress bar is placed at the top of the interface and indicates the proportion of the target construction that has already been completed correctly.
 
-The construction session can be terminated using the button in the upper area of the live view. The frontend then returns to the dashboard, where another target construction can be selected. The complete interaction sequence is illustrated in @user-interface-flow.
+The construction session can be terminated using the button in the upper area of the live view. The frontend then returns to the dashboard, where another target construction can be selected. The complete interaction sequence is illustrated in  @target-selection-window, @preview-window and @construction-session-view.
 
 #figure(
-  image("figures/target-selection.png", width: 90%),
-  caption: [Target-selection dashboard of the learning application]
-)<user-interface-flow>
+  image("figures/target-selection.png", width: 80%),
+  caption: [Target-selection dashboard of the learning application],
+)<target-selection-window>
 
+#figure(
+  image("figures/preview2.png", width: 80%),
+  caption: [Preview of a selected target structure],
+)<preview-window>
+
+#figure(
+  image("figures/bauen2.png", width: 80%),
+  caption: [Construction session view with brick-specific feedback and overall status information],
+)<construction-session-view>

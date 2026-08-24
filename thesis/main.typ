@@ -14,6 +14,7 @@ Special Education]
 #let thesis-subtitle = none
 
 #let author = [Elena Spitzer]
+#let matriculation-number = [2155793]
 
 #let university = [University of Applied Sciences Augsburg]
 #let faculty = [Faculty of Electrical Engineering]
@@ -163,7 +164,8 @@ Special Education]
 
   #text(size: 12pt)[
     submitted by \
-    *#author*
+    *#author* \
+    Matriculation Number: #matriculation-number
   ]
 
   #v(1.5cm)
@@ -193,13 +195,6 @@ Special Education]
   numbering: "i",
 
   footer: context [
-    #line(
-      length: 100%,
-      stroke: 0.5pt,
-    )
-
-    #v(3pt)
-
     #align(center)[
       #counter(page).display("i")
     ]
@@ -221,8 +216,7 @@ Special Education]
   outlined: false,
 )[Abstract]
 
-Children with special educational needs benefit from concrete, action-oriented learning opportunities that accommodate different cognitive, perceptual and motor abilities. This thesis presents a modular, brick-based tangible learning game that combines the haptic and spatial qualities of physical construction materials with digital task presentation, construction detection and feedback. Learners select a three-dimensional target structure in a browser-based application and reproduce it using electronically connected building bricks. The system was designed to create opportunities for spatial thinking, action planning, problem-solving and increasingly independent learning while allowing task complexity and assistance to be adapted to individual needs. A prototype comprising two brick geometries, a central baseplate, embedded communication and a learning application was developed and assessed against requirements derived from learning theory, tangible interaction and the special education context. A formative qualitative evaluation was conducted with ten students from one class at a special education school. Because electronic construction detection was not sufficiently reliable during the session, the students evaluated the physical bricks, target selection and three-dimensional visualisation, while the remaining functions were assessed analytically. The students understood the reconstruction task, interacted willingly with the physical and digital elements and completed structures of varying complexity. The tangible materials also encouraged experimentation and spontaneous peer support. However, the integrated detection and feedback cycle, graduated assistance and multimodal output remain to be implemented reliably and evaluated with the target group. The results therefore do not demonstrate learning gains, but they provide formative evidence that the central interaction concept is accessible, engaging and suitable as a foundation for a tangible learning system in special education.
-
+Children with special educational needs benefit from concrete, action-oriented learning opportunities that accommodate different cognitive, perceptual and motor abilities. This thesis presents a modular, brick-based tangible learning game that combines the haptic and spatial qualities of physical construction materials with digital task presentation, construction detection and feedback. Learners select a three-dimensional target structure in a browser-based application and reproduce it using electronically connected building bricks. The system was designed to create opportunities for spatial thinking, action planning, problem-solving and increasingly independent learning while allowing task complexity and assistance to be adapted to individual needs. A prototype comprising two brick geometries, a central baseplate, embedded communication and a learning application was developed and assessed against requirements derived from learning theory, tangible interaction and the special education context. A formative qualitative evaluation of a pyhsical prototype was conducted with ten students from one class at a special education school and the remaining functions were assessed analytically.
 
 #pagebreak()
 
@@ -232,6 +226,7 @@ Children with special educational needs benefit from concrete, action-oriented l
 // ------------------------------------------------------------
 
 #{
+  set text(size: 10.5pt)
   show outline.entry.where(level: 1): it => strong(it)
 
   outline(
@@ -391,7 +386,8 @@ Children with special educational needs benefit from concrete, action-oriented l
 #pagebreak()
 #include "evaluation_engl.typ"
 // #include "discussion.typ"
-// #include "conclusion.typ"
+#pagebreak()
+#include "conclusion.typ"
 
 
 // ============================================================
@@ -450,14 +446,15 @@ Children with special educational needs benefit from concrete, action-oriented l
  #pagebreak()
 
 
+#counter(heading).update(0)
+#set heading(numbering: "A.1")
+#include "appendix.typ"
+
+#pagebreak()
+#set page(flipped: false)
+
 #bibliography(
   ("bib.bib", "bib_manual.bib"),
   title: [References],
   style: "ieee-grouped.csl",
 )
-
-#pagebreak()
-#counter(heading).update(0)
-#set heading(numbering: "A.1")
-#include "appendix.typ"
-

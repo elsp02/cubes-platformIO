@@ -75,7 +75,7 @@ The students were encouraged to complete the tasks independently and without ass
   caption: [Learners during the construction process]
 )<learners>
 
-=== Data Collection
+==== Data Collection
 Data were collected through qualitative observation of the students’ interaction with the physical bricks and the learning application. The evaluation did not aim to measure learning outcomes. Instead, it examined the comprehensibility and usability of the interaction concept during the session.
 
 Regarding the physical bricks, the observation focused on:
@@ -137,10 +137,10 @@ Graduated support is not yet operational. Although the comparison distinguishes 
 
 Direct inspection confirmed the implementation of two geometrically distinct brick types, a central power supply without individual batteries and a housing that can be assembled and disassembled. However, only eight of the ten bricks required by #req("EL2") were produced, and the material cost of approximately EUR 5 per brick exceeded the EUR 3 target specified by #req("EC1"). Both requirements are therefore not fulfilled.
 
-No damage occurred during ordinary construction activities, but no standardised durability test was conducted. One brick broke after being thrown forcefully onto the floor, demonstrating limited impact resistance beyond the intended handling conditions. The recessed contacts, mechanical guidance and open-drain-like communication reduce the risk of incorrect contact and electrical contention, but no dedicated overvoltage test or protection verification was performed. The relevant durability and electrical-safety requirements are therefore assessed conservatively in the complete overview table.
+No damage occurred during ordinary construction activities, but no standardised durability test was conducted. One brick broke after being thrown forcefully onto the floor, demonstrating limited impact resistance beyond the intended handling conditions. All accessible electrical contacts carry only the 5 V DC USB supply. Since this remains below 15 V and does not present an electrical shock hazard under the intended dry-use conditions, the corresponding safety requirement #req("S4") is fulfilled @gordon2018shock.
 
 == Overall Requirement Fulfilment
-Of the 34 requirements, 12 were fulfilled, 10 were partially fulfilled, six were implemented but could not be verified, five were not fulfilled and one could not be evaluated. Table @requirement-summary summarises these results. The complete evidence for each requirement is documented in Appendix @appendix-requirements.
+Of the 34 requirements, 13 were fulfilled, nine were partially fulfilled, six were implemented but could not be verified, five were not fulfilled and one could not be evaluated. @requirement-summary summarises these results. The complete evidence for each requirement is documented in Appendix @appendix-requirements.
 
 #apa-table(
   columns: (1.8fr, 0.7fr, 4fr),
@@ -156,12 +156,12 @@ Of the 34 requirements, 12 were fulfilled, 10 were partially fulfilled, six were
   caption: [Summary of requirement fulfilment],
 
   [Fulfilled],
-  [12],
-  [TASK1; IA1; IA4--IA5; TUI1--TUI2; G1; C1--C3; EL1; S3],
+  [13],
+  [TASK1; IA1; IA4--IA5; TUI1--TUI2; G1; C1--C3; EL1; S3--S4],
 
   [Partially fulfilled],
-  [10],
-  [IA2--IA3; TUI3; IA6; C4; DET6; EL3; S1--S2; S4],
+  [9],
+  [IA2--IA3; TUI3; IA6; C4; DET6; EL3; S1--S2],
 
   [Implemented but not verified],
   [6],
@@ -186,23 +186,11 @@ Instead of receiving a completed solution, the learners were able to externalise
 
 The prototype also responds convincingly to the design principles for child-appropriate TUIs presented in @tui-children. The target structure provides a clear framework, while the construction process leaves room for different sequences and individual strategies. Structures of varying complexity allowed students with different support needs to participate within the same interaction concept. This balance between guidance and openness is particularly relevant for the heterogeneous learning prerequisites described in @implications-learning. Moreover, the physical availability of several bricks supported spontaneous cooperation: students exchanged suggestions and more confident learners assisted their peers. The system can therefore encourage not only individual construction but also socially shared learning without requiring a separate collaborative mode.
 
-Although differentiated assistance, multimodal output and the complete feedback process remain to be implemented reliably, the prototype already establishes the conceptual and technical foundation for these extensions. The evaluation therefore does not merely show that individual components are usable; it demonstrates that the overall learning idea is understandable, appropriate and especially engaging for the intended target group and context. The prototype can already enrich teacher-guided activities and offers a promising path towards more independent practice once automatic feedback is fully operational. While the present study does not establish measurable learning gains, it provides strong formative evidence that the system is worth developing further as an educational TUI for special education.
+Although differentiated assistance, multimodal output and the complete feedback process remain to be implemented reliably, the prototype already establishes the conceptual and technical foundation for these extensions. The evaluation therefore does not merely show that individual components are usable; it demonstrates that the overall learning idea is understandable, appropriate and especially engaging for the intended target group and context. The prototype can already enrich teacher-guided activities and offers a promising path towards more independent practice once automatic feedback is fully operational. While the present study does not establish measurable learning gains, it provides strong formative evidence that the system is worth developing further as an educational @TUI for special education.
 
 === Limitations
 The evaluation was formative and limited to ten students from one class during a single two-hour session. Its qualitative observations provide insight into the accessibility of the interaction concept, but they do not support generalisation to the full heterogeneous target group. Moreover, no learning outcomes or longer-term changes in independent task performance were measured.
 
 The children tested the physical bricks and the target visualisation, but not the integrated electronic detection and feedback process. Consequently, the comprehensibility of automatic and graduated feedback, its multimodal accessibility and its contribution to independent error correction remain unverified. The results therefore support the underlying learning concept, but not yet the effectiveness of the complete system or its adaptability to different levels of support need.
 
-= Conclusion
-The aim of this thesis was to develop a tangible learning game that makes spatial construction tasks accessible to children in special education and creates opportunities to practise planning, problem-solving and increasingly independent action. The work shows that this central idea is viable. The participating students understood the relationship between the digital target and the physical construction, engaged actively with the task and used the system according to their individual abilities. Different levels of task complexity enabled learners with varying support needs to participate within the same basic activity, while the tangible materials also encouraged experimentation and peer support.
 
-This constitutes the main achievement of the prototype: it turns the reconstruction of spatial structures into an understandable, motivating and adaptable classroom activity. The concept was meaningful to the children even before every planned technical function was available. The incomplete electronic detection and feedback therefore limit the current degree of independent use, but they do not invalidate the underlying interaction and learning concept. Instead, the evaluation identifies a functioning core around which the remaining functions can be completed.
-
-The prototype should consequently be understood as a successful proof of concept rather than a finished learning product. It demonstrates that the proposed combination of physical construction and digital guidance is suitable for the intended context and provides a convincing basis for further development. At the same time, claims about learning effects or fully independent use require a functional overall system and further evaluation. Within these boundaries, the thesis establishes a clear and practically grounded direction for an inclusive tangible learning game.
-
-== Outlook
-The next step is to complete and stabilise the electronic construction detection and feedback process. Once the entire interaction cycle operates reliably, the prototype should be tested again with the students at the participating school. This would allow the children to experience the system as originally intended and show whether automatic feedback actually supports independent error recognition and correction.
-
-The learning application should then provide genuinely different levels of assistance. Feedback could initially indicate only that a construction step requires attention and offer more specific guidance when additional support is needed. The application should also become more multimodal by supplementing visual information with spoken feedback or read-aloud assistance. Stronger colour contrasts, more pictorial guidance and less text could make the interface easier to access for learners with different perceptual and cognitive needs.
-
-The range of learning games could be expanded beyond reproducing predefined target structures. One possible collaborative activity would allow one student to create a construction that another student then attempts to reproduce. Finally, replacing the separate computer with an ESP32-based solution should be investigated. Communication with the tablet via Wi-Fi could simplify the technical setup and make the system easier to use in everyday classroom settings.

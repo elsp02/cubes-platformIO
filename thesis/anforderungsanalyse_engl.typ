@@ -23,7 +23,7 @@ The primary application scenario is a spatial reconstruction task, where student
 The level of difficulty can be varied through the number of bricks, their spatial arrangement and the required rotations. Simple tasks may consist of a small number of bricks connected primarily in a linear arrangement, whereas more challenging tasks may involve multiple spatial directions, different orientations and branching structures. Future task types could include completing unfinished structures, identifying incorrect connections, or constructing freely without a predefined target.
 
 == Pedagogical and Interaction-related Requirements
-In accordance with the constructionist understanding of learning described in Chapter @constructionism, as well as the _embodied cognition_ theory of @embodied-cognition, the active creation of a physical artefact must form the core of the learning activity #req("TASK1"). Learners must be able to observe, inspect and directly modify the emerging construction throughout the task #req("IA1"). This enables them to translate their mental representation into a concrete spatial structure through which the effects of individual actions become observable. To support independent use, the system must also be operable without technical or programming knowledge and without requiring recalibration #req("IA2").
+In accordance with the constructionist understanding of learning described in @constructionism, as well as the _embodied cognition_ theory of @embodied-cognition, the active creation of a physical artefact must form the core of the learning activity #req("TASK1"). Learners must be able to observe, inspect and directly modify the emerging construction throughout the task #req("IA1"). This enables them to translate their mental representation into a concrete spatial structure through which the effects of individual actions become observable. To support independent use, the system must also be operable without technical or programming knowledge and without requiring recalibration #req("IA2").
 
 At the same time, the tasks must accommodate the diverse learning prerequisites of the target group explained in @implications-learning and thus provide a clear and manageable framework for action #req("IA3"), without describing every individual action. Processes and sub-goals must be presented in a way that is easy to follow, whilst allowing sufficient time for completion #req("IA4") and opportunities for repetition #req("IA5").
 
@@ -185,7 +185,8 @@ For the initial proof of concept, the prototype should include at least ten buil
   )
 
 == Safety and Economic Requirements
-The prototype is not a certified toy and may therefore only be used under supervision. Nevertheless, potential risks must already be reduced through the physical design and electronic components. This includes protection against overvoltage and short circuits #req("S4"), while potentially detachable small parts must be enclosed and protected against direct access #req("S2"). The building blocks must also withstand repeated grasping, connecting and disconnecting #req("S1"). In addition, each block should be easy to assemble and disassemble without damaging its components #req("S3").
+The prototype is not a certified toy and may therefore only be used under supervision. Nevertheless, potential risks must already be reduced through the physical design and electronic components.
+Since the electrical contacts can be touched during construction, they must operate at a voltage that does not present an electrical shock hazard #req("S4"). Potentially detachable small parts must be enclosed and protected against direct access #req("S2"). The building blocks must also withstand repeated grasping, connecting and disconnecting #req("S1"). In addition, each block should be easy to assemble and disassemble without damaging its components #req("S3").
 The cost per building block should preferably remain between one and three euros. However, the total system cost cannot yet be determined precisely, as it also depends on the base station, control electronics and potential output devices #req("EC1").
 
 #apa-table(
@@ -206,7 +207,7 @@ The cost per building block should preferably remain between one and three euros
 
     req-target("S3"),  [The bricks should be assembled and disassembled easily without being damaged],
 
-    req-target("S4"), [The design of the bricks must include protection against overvoltage and short circuits],
+    req-target("S4"), [Any open electrical contacts must be safe to touch and must not present an electrical shock hazard],
   
     req-target("EC1"),  [The total cost of a brick should not exceed 3 euros],
     
