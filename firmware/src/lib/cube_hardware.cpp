@@ -1,3 +1,5 @@
+// definiert orientation ports und je nach type die anzahl der childs und weist child ports zu
+
 #include "cube_hardware.h"
 
 #include "config.h"

@@ -4,6 +4,7 @@
 #include <avr/io.h>
 #include <stdint.h>
 #include <stdbool.h>
+
 #include "config.h"
 
 bool wait_for_pc_byte(uint8_t *out, unsigned long timeout_ms);

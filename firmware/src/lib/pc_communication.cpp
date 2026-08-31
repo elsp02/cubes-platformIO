@@ -1,6 +1,9 @@
-#include "config.h"
 #include "pc_communication.h"
+
+#include "config.h"
 #include "wire_bus.h"
+
+
 #include <util/delay.h>
 // ----------------------------------------------------------
 // PC link helpers
