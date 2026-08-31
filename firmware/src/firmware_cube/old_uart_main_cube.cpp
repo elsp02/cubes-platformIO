@@ -1,11 +1,23 @@
 // ============================================================
-// Prototype v5 - child Node
+// UART building sequence - child node (pair of uart_main_baseplate.cpp)
 // ATtiny1616
 //
+// Functionally identical copy of main_cube_feedback2.cpp: the cube
+// side was already fully dynamic - it applies WHATEVER feedback frame
+// arrives (feedback_contains_own_id sets the LED from the payload) and
+// relays it to its children. This copy only exists so the PC-driven
+// test setup has its own stable firmware pair:
+//   baseplate: pio run -e uart_baseplate -t upload
+//   cube:      pio run -e uart_cube -t upload
+//
+// NOTE: flash every physical cube with its own -DNODE_ID (0x10, 0x11,
+// 0x12, ...) - cubes sharing an ID would share one LED state.
+//
 // function:
-// receives cube topology? request from parent
+// receives cube topology request from parent
 // polls all its children for their subtree cube data
 // sends aggregated cube tree data to its parent
+// applies + relays feedback frames (LED green/red/off)
 // ============================================================
 
 #include <Arduino.h>
@@ -28,20 +40,26 @@
 // Index in this array equals orientation value.
 static const wire_t upstream[] = {
     { &PORTA, PIN1_bm, 1 },     // PA1 — orientation 0
-    { &PORTA, PIN3_bm, 3 },     // PA3 — orientation 1
-    { &PORTA, PIN4_bm, 4 },     // PA4 — orientation 2
-    { &PORTA, PIN5_bm, 5 },     // PA5 — orientation 3
+    { &PORTA, PIN2_bm, 2 },     // PA3 — orientation 1
+    { &PORTA, PIN6_bm, 6 },     // PA4 — orientation 2
+    { &PORTA, PIN7_bm, 7 },     // PA5 — orientation 3
 };
 
 //suggestion: replace UPSTREAM_COUNT with upstream_count to avoid hardcoding the count
 static int upstream_count = sizeof(upstream) / sizeof(upstream[0]);
 
-static const wire_t child_0 = { &PORTB, PIN0_bm, 0 };  // PB0 — child port 0
-static const wire_t child_1 = { &PORTB, PIN1_bm, 1 };  // PB1 — child port 1
+static const wire_t child_0 = { &PORTC, PIN3_bm, 3 };  // PC3 — child port 0
+static const wire_t child_1 = { &PORTA, PIN3_bm, 3 };  // PA3 — child port 1
+static const wire_t child_2 = { &PORTA, PIN4_bm, 4 };  // PA4 — child port 2
+static const wire_t child_3 = { &PORTA, PIN5_bm, 5 };  // PA5 — child port 3
+static const wire_t child_4 = { &PORTB, PIN1_bm, 1 };  // PB1 — child port 4
 
 static const wire_t *children[CHILD_COUNT] = {
     &child_0,
-    &child_1
+    &child_1,
+    &child_2,
+    &child_3,
+    &child_4,
 };
 
 static bool last_child_present[CHILD_COUNT] = { false };
@@ -85,9 +103,9 @@ static bool wait_for_valid_upstream_cmd(
 )
 {
     while (1) {
-        int8_t ori = scan_upstream(); // detects orientation line - 0/1/2/3 or -1 if no low is detected 
+        int8_t ori = scan_upstream(); // detects orientation line - 0/1/2/3 or -1 if no low is detected
 
-        if (ori < 0) {  //if no line is low, repeat orientation scan 
+        if (ori < 0) {  //if no line is low, repeat orientation scan
             continue;
         }
 
@@ -100,11 +118,11 @@ static bool wait_for_valid_upstream_cmd(
         }
 
         //checks if received byte is CMD_STATUS, if not, repeat orientation scan and go into loop
-        if (b != CMD_STATUS) {  
+        if (b != CMD_STATUS) {
             release_all_lines();
             continue;
         }
-        
+
         // if correct CMD_STATUS is received, ausgabeparameter aus funktion: assign detected line to active_line and orientation value to orientation and return true
         *active_line = w;
         *orientation_mask = (uint8_t)ori;
@@ -138,7 +156,7 @@ static bool wait_for_cmd_status(const wire_t *w)
 // ----------------------------------------------------------
 // Handle Detection
 // ----------------------------------------------------------
-static void handle_detection(const wire_t *active_upstream, uint8_t orientation_mask){ 
+static void handle_detection(const wire_t *active_upstream, uint8_t orientation_mask){
         /*
      * 2. Send ACK_BUSY upstream on the detected active line.
      */
@@ -151,7 +169,7 @@ static void handle_detection(const wire_t *active_upstream, uint8_t orientation_
      * 3. Poll own children with retries.
      */
     uint8_t child_payload[CHILD_COUNT][MAX_CHILD_PAYLOAD_LEN];   //temporary storage (2d array) for child payload results -> child_payloads[child_index][payload_index] = byte received from child
-     // problem of child_payload: always MAX_CHILD_PAYLOAD_LEN long even if e.g actual payload is just 3 bytes long -> not RAM efficient 
+     // problem of child_payload: always MAX_CHILD_PAYLOAD_LEN long even if e.g actual payload is just 3 bytes long -> not RAM efficient
     uint8_t child_payload_len[CHILD_COUNT] = {0};                 // temporary storage for child payload lengths -> child_payload_len[child_index] = length of payload received from child
     bool child_done[CHILD_COUNT] = {false};                       // stores if child has already responded and can be skipped
     bool child_acked[CHILD_COUNT] = {false};                      // child answered ACK_BUSY at least once this cycle -> port is occupied even if its frame failed
@@ -185,6 +203,13 @@ static void handle_detection(const wire_t *active_upstream, uint8_t orientation_
             )){
                 SER_PRINTLN("CV");
                 child_done[i] = true; //mark child as done -> no more polling of this child in next attempts
+
+                // Special case: orientation offset for port 1.
+                // Future improvement: define this in cube_hardware.
+                if (i == 1) { // out2, -Y
+                    child_payload[i][1] =
+                        (child_payload[i][1] + 3u) % 4u;
+                }
             } else {
                 if (acked) {
                     child_acked[i] = true; // present but frame failed -> full retry budget from now on
@@ -215,10 +240,10 @@ static void handle_detection(const wire_t *active_upstream, uint8_t orientation_
 
     //add own payload to payload array
     payload[payload_len++] = NODE_ID;
-    payload[payload_len++] = orientation_mask; 
+    payload[payload_len++] = orientation_mask;
     payload[payload_len++] = 0x00;  //placeholder for child_mask
 
-    //in a loop add children payloads to the final payload 
+    //in a loop add children payloads to the final payload
     for (uint8_t child = 0; child < CHILD_COUNT; child ++) {
         if (!child_done[child]) {  //if child[i] didn´t respond, skip it
             continue;
@@ -301,26 +326,27 @@ static bool send_feedback_to_child(
         return false;
     }
 
-    if (b == ACK_FINISHED) {
-        SER_PRINTLN("CFF");
+    switch (b) {
+        case ACK_FINISHED:
+            SER_PRINTLN("CFF");
+            wire_release(w);
+            return true;
 
-    }
-    else if (b == ACK_FAILED) {
-        SER_PRINTLN("FFF");  // feedback failed
-        return false;
-    } 
-    else{
-        SER_PRINTLN("WFF");
-        return false;
-    }
+        case ACK_FAILED:
+            SER_PRINTLN("FFF");
+            wire_release(w);
+            return false;
 
-    wire_release(w);
-    return true;
+        default:
+            SER_PRINTLN("WFF");
+            wire_release(w);
+            return false;
+    }
 }
 
 // handle feedback -> if CMD_FEEDBACK do feedback led sequence
 static void handle_feedback (const wire_t *active_upstream){
-    
+
         uint8_t fb_payload[MAX_PAYLOAD_LEN];
         uint8_t fb_payload_len = 0;
 
@@ -332,7 +358,7 @@ static void handle_feedback (const wire_t *active_upstream){
         //_delay_us(TURNAROUND_US);
         wire_release(active_upstream);
 
-        //receive feedback payload and check if same == nothing that could be compared to the identification sequence
+        //receive feedback payload == nothing that could be compared to the identification sequence
 
         if (!rx_frame(
                 active_upstream,
@@ -348,11 +374,13 @@ static void handle_feedback (const wire_t *active_upstream){
             return;
         }
 
-        // 3. Check whether frame payload is correct and if not send ack_failed to parent
+        // 3. Apply the frame to the own LED:
+        // true  = own ID was in the payload (LED set green/red inside),
+        // false = own ID absent -> LED switched off
         if (feedback_contains_own_id(fb_payload, fb_payload_len)) {
-            SER_PRINTLN("U");  // wrong feedback payload
+            SER_PRINTLN("FI");  // feedback: own id included
         } else {
-            SER_PRINTLN("X");
+            SER_PRINTLN("FO");  // feedback: own id absent, LED off
         }
 
         //relay identical cmd_feedback to children == polling children
@@ -378,10 +406,10 @@ static void handle_feedback (const wire_t *active_upstream){
             // if all send feedback to child were valid, send ACK_FINISHED (Only reached if every existing child succeeded)
             _delay_us(TURNAROUND_US);
             tx_byte(active_upstream, ACK_FINISHED);
-    
+
         _delay_us(TURNAROUND_US);
 
-        wire_release(active_upstream);      
+        wire_release(active_upstream);
     }
 
 
@@ -397,9 +425,9 @@ void setup()
 
     // LEDs initially off.
     PORTB.OUTCLR = GREEN_LED_PIN | RED_LED_PIN;
-    
+
     Serial.begin(115200);
-    Serial.println("Prototype v2 child started");
+    Serial.println("uart_main_cube started");
 }
 
 // ----------------------------------------------------------
@@ -408,12 +436,12 @@ void setup()
 
 void loop()
 {
-    log_reset();
+    //log_reset();
     /*
      */
     static bool orientation_known = false;
     static const wire_t *active_upstream = nullptr; //code merkt sich dauerhaft die Orientierungsleitung
-    static uint8_t orientation_mask = 0x00; //orientation mask,now 1 byte, later combined with child_mask to one byte 
+    static uint8_t orientation_mask = 0x00; //orientation mask,now 1 byte, later combined with child_mask to one byte
 
     /*
      * 1. Detect orientation only once.
@@ -433,7 +461,7 @@ void loop()
             release_all_lines();
             return;
         }
-        
+
         // if orientation is already known, no need to check orientation just receive CMD_STATUS
         uint8_t b = 0;
         if (!rx_byte(active_upstream, &b, PARENT_TIMEOUT_US)) {
@@ -442,26 +470,27 @@ void loop()
         }
 
         //check if received byte is CMD_STATUS or CMD_FEEDBACK
-        if (b == CMD_STATUS){
-            SER_PRINTLN("CS");
-            handle_detection(active_upstream, orientation_mask);
+        switch (b) {
+            case CMD_STATUS:
+                handle_detection(active_upstream, orientation_mask);
+                break;
+
+            case CMD_FEEDBACK:
+                handle_feedback(active_upstream);
+                break;
+
+            default:
+                SER_PRINTLN("WC");
+                return;
         }
-        else if (b == CMD_FEEDBACK) {
-            SER_PRINTLN("CF");
-            handle_feedback(active_upstream);
-        } 
-        else {
-            SER_PRINTLN("WC");
-            return;
-                }
     }
 
     wire_release(active_upstream);
-    
+
     release_all_lines();
 
     #if SERIAL_DEBUG_END
         log_flush();
     #endif
-   
+
 }

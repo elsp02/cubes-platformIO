@@ -1,4 +1,7 @@
 // Definition of Configuration constants for the project
+// included: child counts and limits, timing definitions, protocol bytes, pc communication, feedback constants, debug constants, led konfiguration
+/// sowohl für baseplate als auch für bricks
+//// sollte passen alles 
 
 #ifndef CONFIG_H
 #define CONFIG_H
@@ -93,14 +96,14 @@
 // relays the frame sequentially, one hop per cube. Factor 2 = safety margin for loop overhead and deaf windows (log flushing). (ca 88 ms. für 3 cubes)
 #define FEEDBACK_FINISHED_TIMEOUT_US (2 * CUBES_AMOUNT * FB_HOP_US)
 
-#define GREEN_LED_PIN            PIN5_bm
-#define RED_LED_PIN              PIN4_bm
 
-// in feedback frame - which LED to turn on
-#define LED_GREEN           0x01
-#define LED_RED             0x02
-
-
+// for predefined tree comparing and feedback sequence in baseplate_feedback2 file (baseplate environment)
+#define CUBE_A_ID  0x10
+#define CUBE_B_ID  0x11
+#define CUBE_C_ID  0x12
+//-----------------------------------------------------------
+// DEBUGGING SYSTEM (only embedded in main_baseplate_feedback2.cpp)
+//-----------------------------------------------------------
 #define SERIAL_WRITING 1
 #define SERIAL_DEBUG   0
 #define SERIAL_DEBUG_END 0
@@ -127,38 +130,14 @@
     #define SER_PRINTLN2(x, y)
 #endif
 
-//-------------------------------------------------------
-// Cube type definition and instance generation
-// NODE_ID: 
-// Bits 7..5 = Cube-Type (for tree comparison)
-// Bits 4..0 = Instance number
-//-------------------------------------------------------
-constexpr uint8_t TYPE_SHIFT   = 5;
-constexpr uint8_t INSTANCE_MASK = 0x1F;
+//-----------------------------------------------------------
+// LED KONFIGURATION 
+//-----------------------------------------------------------
+#define GREEN_LED_PIN            PIN5_bm
+#define RED_LED_PIN              PIN4_bm
 
-#if defined(CUBE_TYPE_NORMAL)
-    constexpr uint8_t CUBE_TYPE = 0x00
-
-#elif defined(CUBE_TYPE_SMASHED)
-    constexpr uint8_t CUBE_TYPE = 0x01
-
-#elif defined(CUBE_TYPE_PYRAMID)
-    constexpr uint8_t CUBE_TYPE = 0x02
-
-#else
-    #error "No cube variant selected"
-#endif
-
-// create NODE_ID - klappt das dann mit der baseplate???
-constexpr uint8_t NODE_ID =
-    static_cast<uint8_t>(
-        (CUBE_TYPE << TYPE_SHIFT) |
-        (CUBE_INSTANCE & INSTANCE_MASK)
-    );
-
-// for predefined tree comparing and feedback sequence
-#define CUBE_A_ID  0x10
-#define CUBE_B_ID  0x11
-#define CUBE_C_ID  0x12
+// in feedback frame - which LED to turn on
+#define LED_GREEN           0x01
+#define LED_RED             0x02
 
 #endif // CONFIG_H

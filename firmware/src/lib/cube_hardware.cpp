@@ -1,5 +1,7 @@
 #include "cube_hardware.h"
+
 #include "config.h"
+#include "cube_identity.h"
 
 static const wire_t upstream[] = {
     { &PORTA, PIN1_bm, 1 },     // PA1 — orientation 0
@@ -8,7 +10,7 @@ static const wire_t upstream[] = {
     { &PORTA, PIN7_bm, 7 },     // PA7 — orientation 3
 };
 
-#if defined(CUBE_TYPE_NORMALE)
+#if defined(CUBE_TYPE_NORMAL)
 
 static const wire_t child_0 = { &PORTC, PIN3_bm, 3 };  // PCB Port Out1
 static const wire_t child_1 = { &PORTA, PIN3_bm, 3 };  // PCB Port Out2
@@ -43,6 +45,7 @@ const wire_t *const children[] = {
 #endif
 
 //ACHTUNG: CHILD_COUNT zu child_count umschreiben bzw hier anders definieren
+//wird das grad benutzt?
 const uint8_t child_count =
     sizeof(children) / sizeof(children[0]);
 

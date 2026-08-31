@@ -31,9 +31,11 @@
 #include "serial_writing.h"
 #include "poll_child.h"
 #include "feedback.h"
+#include "feedback_cube.h"
+#include "cube_identity.h"
 
 // ----------------------------------------------------------
-// Wire descriptors- same as v4
+// Wire descriptors- same as v4 !!brauch ich nicht mehr wegen cube_hardware.cpp
 // ----------------------------------------------------------
 
 // Upstream orientation ports.
@@ -63,6 +65,7 @@ static const wire_t *children[CHILD_COUNT] = {
     &child_4,
 };
 
+//CHILD_COUNT wie definiert?
 static bool last_child_present[CHILD_COUNT] = { false };
 //---------------------------------------------------------
 // release all lines
