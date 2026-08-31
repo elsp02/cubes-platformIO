@@ -1,0 +1,207 @@
+# Modular Mechatronic Smart-Brick System for Tangible Learning in Special Education
+
+Repository accompanying the Bachelor thesis:
+
+**Design and Development of a Tangible Learning System for Special Education**
+
+Elena Spitzer  
+University of Applied Sciences Augsburg  
+Faculty of Electrical Engineering  
+Creative Engineering  
+2026  
+
+## Overview
+This repository contains the prototype developed as part of the Bachelor thesis and investigates a modular, brick-based tangible learning game that combines the haptic and spatial qualities of physical construction materials with digital task presentation, construction detection and feedback. Learners select a three-dimensional target structure in a browser-based application and reproduce it using electronically connected building bricks. The system was designed to create opportunities for spatial thinking, action planning, problem-solving and increasingly independent learning while allowing task complexity and assistance to be adapted to individual needs. 
+
+The system consists of three main components:
+
+- **Active building bricks** that form the physical construction
+- **A baseplate** that serves as the root of the construction
+- **A learning application** that reconstructs the detected construction digitally
+
+## Repository Structure
+> **TODO**: Replace it with actual repository structure (alles was in eckige klammer muss ausgetauscht werden)
+
+```text
+.
+├── README.md
+│
+├── docs/
+│   ├── architecture.md
+│   ├── communication-protocol.md
+│   └── feedback.md
+│   └── hardware.md
+│   └── hardware.md
+│   └── timing-definitions.md
+│
+├── figures/
+│
+├── [FIRMWARE_DIRECTORY]/
+│   ├── [BRICK_FIRMWARE]/
+│   └── [BASEPLATE_FIRMWARE]/
+│
+├── [SOFTWARE_DIRECTORY]/
+│   ├── [BACKEND_DIRECTORY]/
+│   └── [FRONTEND_DIRECTORY]/
+│
+├── [HARDWARE_DIRECTORY]/
+│   ├── [PCB_FILES]
+│   ├── [CAD_FILES]
+│   └── [OTHER_HARDWARE_FILES]
+│
+└── [OTHER_RELEVANT_DIRECTORIES]
+```
+
+|Directory | Description |
+|:--|:--|
+| `docs/` | Technical documentation of the developed system |
+| `[FIRMWARE_DIRECTORY]` | Embedded firmware for the building bricks and the baseplate |
+| `[BACKEND_DIRECTORY]` | Python backend for communication and construction processing |
+| `[FRONTEND_DIRECTORY]` | Browser-based learning application and 3D visualisation |
+| `[HARDWARE_DIRECTORY]` | Electronic and mechanical design files
+| `[OTHER]` | TODO if required | 
+
+## Documentation
+Detailed technical documentation is provided separately: 
+- [System Architecuture](docs/system_architecture.md): Overall system structure, component responsibilities, software architecture and data processing
+- [Communication Protocol](docs/communication_protocol.md): Communication interfaces, message formats, communication sequences (and error handling)
+- [Hardware](docs/hardware.md): Mechanical and electronic implementation of the building bricks and baseplate
+
+Addtional information regarding the feedback output and visualisation is provided in [Feedback and Visualisation](docs/feedback.md).
+
+(Furthermore, the bachelor thesis includes the complete design rationale, theoretical background, requirement analysis, implementation details and evaluation.)
+
+
+## Requirements
+to operate the complete physical prototype, the following hard- and software is required:
+
+### Prototype Hardware
+>**TODO**: adjust link to correct one
+The building bricks and baseplate both include an ATtiny1616 and are custom developed components. Their mechanical and electronic design files are included in this repository in the [HARDWARE_DIRECTORY] and explained in [Hardware](docs/hardware.md)
+
+### Additional Hardware
+- UPDI programmer
+- USB-to-TTL UART Aadapter (used with included CH340G converter)
+- host computer
+- USB connection for 5V power supply
+
+The prototype was programmed using a jtag2updi-compatible programmer.
+Setup instructions are available in the
+[jtag2updi documentation](https://github.com/SpenceKonde/AVR-Guidance/blob/master/UPDI/jtag2updi.md).
+
+### Software
+>**TODO**: Python version, dependencies, requirements.txt file erstellen
+- [PlatformIO](https://platformio.org/)
+- [megaTinyCore](https://github.com/SpenceKonde/megaTinyCore) for ATtiny1616 support
+- Python [VERSION]
+- modern web browser
+
+Python dependencies:  
+[TODO: e.g. pyserial]   
+[TODO: e.g. websockets]   
+[TODO: additional packages]  
+
+Python dependencies can be installed via the `requirements.txt` using:  
+```bash
+pip install -r requirements.txt
+```
+
+Frontend dependencies:  
+Three.js  
+[TODO: additional dependencies]
+
+## Getting Started
+### 1. Clone the Repository
+git `clone https://github.com/elsp02/cubes-platformIO.git`  
+cd cubes-platformIO
+
+### 2. Flash the Brick and Baseplate Firmware
+> **TODO**: actual PlstformIO environment name, correct path link schauen ob das so auch wirklich funktioniert, 
+
+#### Brick Firmware
+the brick firmware is located in: [PATH_TO_BRICK_FIRMWARE]  
+Compile the firmware and upload the ATtiny1616 using PlatformIO:  
+```bash
+pio run -e [BRICK_ENVIRONMENT]
+```
+
+```bash
+pio run -e [BRICK_ENVIRONMENT] -t upload
+```
+---
+#### Baseplate Firmware
+the baseplate firmware is located in: [PATH_TO_BASEPLATE_FIRMWARE]
+
+Compile the firmware and upload the ATtiny1616 using PlatformIO: 
+```bash
+pio run -e [BASEPLATE_ENVIRONMENT]
+```
+
+```bash
+pio run -e [BASEPLATE_ENVIRONMENT] -t upload
+```
+
+### 3. Connect the Prototype
+1. Connect the baseplate to the host computer using the USB-to-TTL UART adapter
+2. ensure that the system is supplied with 5V
+3. Do not connect bricks to the baseplate yet
+For details about the physical and electronic interfaces, see the [Hardware Documentation](docs/hardware.md)
+
+### 4. Start the Backend
+> **TODO**: replace the path and filename with actual ones
+Navigate to the backend directory:  
+```bash
+cd [PATH_TO_BACKEND]
+```
+Start the backend:
+```bash
+python [BACKEND_ENTRY_FILE].py
+```
+
+### 5. Start the Frontend
+Navigate to the frontend directory:
+```bash
+cd [PATH_TO_FRONTEND]
+```
+Start the frontend and open it in a web browser:
+```bash
+npm run dev
+```
+
+## Usage
+A typical construction task follows this sequence:
+1. Start the backend and frontend
+2. Select a target construction in the learning application
+3. Inspect and confirm the selected three-dimensional target
+4. Connect the first brick to the baseplate.
+5. Continue the building process by trying to reproduce the target structure 
+5. The system processes the current construction and updates the digital representation.
+6. Rearrange a brick if it is detected and visualised as incorrect
+7. Continue modifying the construction until the task is completed
+8. End the current session or return to the target selection
+
+The visualised feedback during the construction task inlcuding pyhsical and digital feedback and feedback states is explained in detail in the[Feedback Documentation](docs/feedback.md).
+
+## Prototype Status
+>**TODO**: when final prototype is finished, a revision of this subsection is needed
+This repository contains the proof-of-concept prototype developed for the Bachelor thesis. It is not a production-ready or certified educational product.
+
+At the time of the thesis evaluation:
+
+- the physical interaction concept and learning application had been evaluated with the intended target group;
+- eight physical prototype bricks had been manufactured;
+- the electronic construction-detection and feedback functionality had been implemented but was not sufficiently reliable for an integrated target-group evaluation;
+- differentiated assistance levels were not yet functionally implemented.
+
+The repository should therefore be understood as documentation of the implemented research prototype rather than a finished learning product.
+
+Further information about the evaluation, requirement fulfilment and limitations is provided in the Bachelor thesis.
+
+## Version
+>**TODO**: adjust tag and commit 
+The version associated with the submitted Bachelor thesis is:
+
+Tag:    [TODO: e.g. v1.0-thesis]  
+Commit: [TODO: FINAL_COMMIT_HASH]  
+
+Later commits may contain modifications that are not described in the submitted thesis.
