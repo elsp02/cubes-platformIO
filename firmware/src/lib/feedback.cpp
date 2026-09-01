@@ -37,6 +37,7 @@ static bool send_feedback_to_child(
     tx_frame(w, fb_payload, fb_payload_len);
     wire_release(w);
 
+    //_delay_us(TURNAROUND_US); in main_baseplate_feedback2.cpp
 
     // receive ack_finished valid/invalid == same as data frame from child (detection sequence)
     // 3. Wait for child's recursive feedback completion
