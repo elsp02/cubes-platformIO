@@ -162,12 +162,14 @@ static void handle_detection(const wire_t *active_upstream, uint8_t orientation_
                 SER_PRINTLN("CV");
                 child_done[i] = true; //mark child as done -> no more polling of this child in next attempts
 
-                // Special case: orientation offset for port 1.
-                // Future improvement: define this in cube_hardware.
-                if (i == 1) { // out2, -Y
-                    child_payload[i][1] =
-                        (child_payload[i][1] + 3u) % 4u;
-                }
+            #if defined(CUBE_TYPE_NORMAL)
+                            // Special case: orientation offset for port 1 (Out2, -Y).
+                            // Only the normal brick's port 1 has this mounting rotation
+                            if (i == 1) {
+                                child_payload[i][1] =
+                                    (child_payload[i][1] + 3u) % 4u;
+                            }
+            #endif
             } else {
                 if (acked) {
                     child_acked[i] = true; // present but frame failed -> full retry budget from now on

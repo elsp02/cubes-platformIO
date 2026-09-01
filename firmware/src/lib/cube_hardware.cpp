@@ -8,15 +8,22 @@
 #include "cube_identity.h"
 
 
-static const wire_t upstream[] = {
+#if defined(CUBE_TYPE_BASEPLATE)
+
+const wire_t upstream[] = {};  // baseplate is the tree root, no orientation lines
+
+#else
+
+const wire_t upstream[] = {
     { &PORTA, PIN1_bm, 1 },     // PA1 — orientation 0
     { &PORTA, PIN2_bm, 2 },     // PA2 — orientation 1
     { &PORTA, PIN6_bm, 6 },     // PA6 — orientation 2
     { &PORTA, PIN7_bm, 7 },     // PA7 — orientation 3
 };
 
-//?
-static int upstream_count = sizeof(upstream) / sizeof(upstream[0]);
+#endif
+
+const int upstream_count = sizeof(upstream) / sizeof(upstream[0]);
 
 #if defined(CUBE_TYPE_NORMAL)
 
@@ -26,7 +33,7 @@ static const wire_t child_2 = { &PORTA, PIN4_bm, 4 };  // PCB Port Out3
 static const wire_t child_3 = { &PORTA, PIN5_bm, 5 };  // PCB Port Out4
 static const wire_t child_4 = { &PORTB, PIN1_bm, 1 };  // PCB Port Out5
 
-static const wire_t *children[] = {
+const wire_t *const children[] = {
     &child_0,
     &child_1,
     &child_2,
@@ -50,10 +57,17 @@ const wire_t *const children[] = {
     &child_1,
 };
 
+#elif defined(CUBE_TYPE_BASEPLATE)
+
+static const wire_t child_0 = { &PORTB, PIN1_bm, 0 };  // only child port of the baseplate
+
+const wire_t *const children[] = {
+    &child_0,
+};
+
 #endif
 
-//ACHTUNG: CHILD_COUNT zu child_count umschreiben bzw hier anders definieren
-//wird das grad benutzt?
+
 const uint8_t child_count =
     sizeof(children) / sizeof(children[0]);
 
@@ -61,7 +75,7 @@ const uint8_t child_count =
 // problem: baseplate hat keine upstream ports -> vlt fkt einfach trennen?
 void release_all_lines(void){
     for (uint8_t line = 0; line < upstream_count; line ++){
-        wire_release(&upstream[line]); // error: argument of type "const wire_t *const *" is incompatible with parameter of type "const wire_t *"
+        wire_release(&upstream[line]);
     }
 
     for (uint8_t line = 0; line < child_count; line ++){

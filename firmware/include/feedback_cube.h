@@ -2,6 +2,7 @@
 /// nur für bricks
 
 #include "wire_bus.h"
+#include "config.h"
 
 #include <stdint.h> // defines fixed-width integer types and limits in C
 
@@ -13,3 +14,8 @@ bool feedback_contains_own_id(const uint8_t *payload, uint8_t len);
 
 bool send_feedback_to_child(const wire_t *w, const uint8_t *fb_payload, uint8_t fb_payload_len);
 
+// ----------------------------------------------------------
+// predefined feedback for main_baseplate_feedback2.cpp
+// ----------------------------------------------------------
+extern const uint8_t predefined_feedback_payload[4][FB_MAX_PAYLOAD_LEN];
+extern const uint8_t predefined_feedback_payload_len[4];

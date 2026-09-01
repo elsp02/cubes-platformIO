@@ -17,7 +17,7 @@
 #include "wire_bus.h"
 #include "serial_writing.h"
 #include "poll_child.h"
-#include "feedback.h"
+#include "feedback_cube.h"
 
 #define HEARTBEAT_INTERVAL_CYCLE 50 // after 50 cycles payload is sent again even if it hasn´t changed
 static uint16_t cycles_since_last_send = 0;

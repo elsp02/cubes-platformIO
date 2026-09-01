@@ -31,32 +31,33 @@
 #include "wire_bus.h"
 #include "serial_writing.h"
 #include "poll_child.h"
-#include "feedback.h"
+#include "feedback_cube.h"
 #include "pc_communication.h"
+#include "cube_hardware.h"
 
 #define HEARTBEAT_INTERVAL_CYCLE 50 // after 50 cycles payload is sent again even if it hasn´t changed
 static uint16_t cycles_since_last_send = 0;
-static bool last_child_present[CHILD_COUNT] = { false }; // which ports had a child last cycle -> retry budget
+static bool last_child_present[MAX_CHILD_COUNT] = { false }; // which ports had a child last cycle -> retry budget
 static bool detection_running = false; // set by PC_CMD_START, cleared by PC_CMD_STOP
 
 // ----------------------------------------------------------
-// Wire descriptors
+// Wire descriptors - in cube_hardware integriert
 // ----------------------------------------------------------
 
-static const wire_t child_0 = { &PORTB, PIN1_bm, 0 };  // PB1 — child port 1 (only child port of baseplate)
-
-static const wire_t *children[CHILD_COUNT] ={
-    &child_0,
-};
-
+//static const wire_t child_0 = { &PORTB, PIN1_bm, 0 };  // PB1 — child port 1 (only child port of baseplate)
+//
+//static const wire_t *children[CHILD_COUNT] ={
+//    &child_0,
+//};
+//
 //----------------------------------------------------------
-// release all lines
+// release all lines - in cube hardware integriert
 //---------------------------------------------------------
-static void release_all_lines(void){
-    for (uint8_t line = 0; line < CHILD_COUNT; line ++){
-        wire_release(children[line]);
-    }
-}
+//static void release_all_lines(void){
+//    for (uint8_t line = 0; line < CHILD_COUNT; line ++){
+//        wire_release(children[line]);
+//    }
+//}
 
 // relay one feedback frame to every port that had a child this cycle,
 // with the same retry pattern as the detection polling.
@@ -66,14 +67,14 @@ static bool relay_feedback_to_children(
     uint8_t fb_payload_len
 )
 {
-    bool feedback_done[CHILD_COUNT] = { false };
+    bool feedback_done[MAX_CHILD_COUNT] = { false };
     bool all_done = true;
 
     for (uint8_t attempt = 0; attempt < CHILD_RETRIES; attempt++) {
         bool retry_needed = false;
         all_done = true;
 
-        for (uint8_t child = 0; child < CHILD_COUNT; child++) {
+        for (uint8_t child = 0; child < child_count; child++) {
 
             if (!last_child_present[child]) {
                 continue;   // no cube on this port
@@ -154,20 +155,20 @@ void loop()
 
     //DETECTION SEQUENCE
     // 0. make sure line is idle / give child time to get back to listening
-    wire_release(&child_0);
+    wire_release(children[0]);
     _delay_us(TURNAROUND_US);
 
 
     // 1. poll child
-    uint8_t child_payload[CHILD_COUNT][MAX_CHILD_PAYLOAD_LEN];   //temporary storage (2d array) for child payload results -> child_payloads[child_index][payload_index] = byte received from child
-    uint8_t child_payload_len[CHILD_COUNT] = {0};                // temporary storage for child payload lengths -> child_payload_len[child_index] = length of payload received from child
-    bool child_done[CHILD_COUNT] = {false};
-    bool child_acked[CHILD_COUNT] = {false}; // child answered ACK_BUSY at least once this cycle -> port is occupied even if its frame failed
+    uint8_t child_payload[MAX_CHILD_COUNT][MAX_CHILD_PAYLOAD_LEN];   //temporary storage (2d array) for child payload results -> child_payloads[child_index][payload_index] = byte received from child
+    uint8_t child_payload_len[MAX_CHILD_COUNT] = {0};                // temporary storage for child payload lengths -> child_payload_len[child_index] = length of payload received from child
+    bool child_done[MAX_CHILD_COUNT] = {false};
+    bool child_acked[MAX_CHILD_COUNT] = {false}; // child answered ACK_BUSY at least once this cycle -> port is occupied even if its frame failed
 
     for (uint8_t attempt = 0; attempt < CHILD_RETRIES; attempt ++){
         bool retry_needed = false; //true if any child still has attempts left after this round
 
-        for (uint8_t child = 0; child < CHILD_COUNT; child ++){
+        for (uint8_t child = 0; child < child_count; child ++){
 
             if (child_done[child]) {
                 continue;
@@ -207,7 +208,7 @@ void loop()
     }
 
     // remember which ports had a child this cycle (retry budget)
-    for (uint8_t child = 0; child < CHILD_COUNT; child++) {
+    for (uint8_t child = 0; child < child_count; child++) {
         last_child_present[child] = child_done[child] || child_acked[child];
     }
 
@@ -221,7 +222,7 @@ void loop()
 
 
     //in a loop add children payloads to the final payload
-    for (uint8_t child = 0; child < CHILD_COUNT; child++) {
+    for (uint8_t child = 0; child < child_count; child++) {
         if (!child_done[child]) {  //if child[i] didn´t respond, skip it
             continue;
         }

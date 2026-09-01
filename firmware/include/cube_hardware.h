@@ -6,7 +6,7 @@
 
 #include <stdint.h>
 
-extern const wire_t const upstream[];
+extern const wire_t upstream[];
 extern const int upstream_count;
 
 // Child-Ports des ausgewählten Cube-Typs

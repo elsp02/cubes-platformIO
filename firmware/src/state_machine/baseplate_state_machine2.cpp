@@ -9,18 +9,14 @@
 #include "serial_writing.h"
 #include "poll_child.h"
 #include "pc_communication.h"
-#include "feedback.h"
+#include "feedback_cube.h"
 #include "cube_hardware.h"
 
 #define HEARTBEAT_INTERVAL_CYCLE 50 // after 50 cycles payload is sent again even if it hasn´t changed
 static uint16_t cycles_since_last_send = 0;
+static bool last_child_present[MAX_CHILD_COUNT] = {false}; //error: expression must have a constant value
 
-//auslagern in wire_bus.cpp
-static void release_all_lines(void){
-    for (uint8_t line = 0; line < CHILD_COUNT; line ++){
-        wire_release(children[line]);
-    }
-}
+//////////////////////////////////////////////
 
 //auslagern in feedback - zusammen mit cube handle feedback
 // relay one feedback frame to every port that had a child this cycle,
@@ -31,14 +27,14 @@ static bool relay_feedback_to_children(
     uint8_t fb_payload_len
 )
 {
-    bool feedback_done[CHILD_COUNT] = { false };
+    bool feedback_done[MAX_CHILD_COUNT] = { false };
     bool all_done = true;
 
     for (uint8_t attempt = 0; attempt < CHILD_RETRIES; attempt++) {
         bool retry_needed = false;
         all_done = true;
 
-        for (uint8_t child = 0; child < CHILD_COUNT; child++) {
+        for (uint8_t child = 0; child < child_count; child++) {
 
             if (!last_child_present[child]) {
                 continue;   // no cube on this port

@@ -95,3 +95,32 @@ bool send_feedback_to_child(
             return false;
     }
 }
+
+// ----------------------------------------------------------
+// predefined feedback payload for main_baseplate_feedback2.cpp (debug - standalone without pc)
+// ----------------------------------------------------------
+const  uint8_t predefined_feedback_payload[4][FB_MAX_PAYLOAD_LEN] = {
+    // Payload 0: only cube A green, B and C off
+    { CUBE_A_ID, LED_GREEN },
+
+    // Payload 1: A green, B red, C off
+    { CUBE_A_ID, LED_GREEN,
+      CUBE_B_ID, LED_RED },
+
+    // Payload 2: all three green
+    { CUBE_A_ID, LED_GREEN,
+      CUBE_B_ID, LED_GREEN,
+      CUBE_C_ID, LED_GREEN },
+
+    // Payload 3: only cube C red, A and B off
+    { CUBE_C_ID, LED_RED },
+};
+
+
+// predefined feedback payload length 
+const  uint8_t predefined_feedback_payload_len[] = {
+    2,
+    4,
+    6,
+    2,
+};
