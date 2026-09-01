@@ -17,11 +17,12 @@
 #include "wire_bus.h"
 #include "serial_writing.h"
 #include "poll_child.h"
-#include "feedback_cube.h"
+#include "feedback.h"
 
 #define HEARTBEAT_INTERVAL_CYCLE 50 // after 50 cycles payload is sent again even if it hasn´t changed
 static uint16_t cycles_since_last_send = 0;
 static uint8_t feedback_index = 0;
+//static int CHILD_COUNT = 1;??
 static bool last_child_present[CHILD_COUNT] = { false }; // which ports had a child last cycle -> retry budget
 // ----------------------------------------------------------
 // Wire descriptors

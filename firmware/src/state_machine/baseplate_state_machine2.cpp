@@ -9,7 +9,7 @@
 #include "serial_writing.h"
 #include "poll_child.h"
 #include "pc_communication.h"
-#include "feedback_cube.h"
+#include "feedback.h"
 #include "cube_hardware.h"
 
 #define HEARTBEAT_INTERVAL_CYCLE 50 // after 50 cycles payload is sent again even if it hasn´t changed
@@ -22,8 +22,11 @@ static uint8_t child_payload[MAX_CHILD_COUNT][MAX_CHILD_PAYLOAD_LEN];   // child
 static uint8_t child_payload_len[MAX_CHILD_COUNT] = {0};                // length of the payload received from child[i]
 static bool child_done[MAX_CHILD_COUNT] = {false};                      // child[i] answered with a valid frame this cycle
 
-static uint8_t payload[MAX_PAYLOAD_LEN];   
+static uint8_t payload[MAX_PAYLOAD_LEN];
 static uint8_t payload_len = 0;
+
+static uint8_t fb_payload[MAX_PAYLOAD_LEN];   // filled by GET_INFO_FROM_PC, consumed by RELAY_FEEDBACK
+static uint8_t fb_payload_len = 0;
 //////////////////////////////////////////////
 
 //---------------------------------------------------
@@ -133,11 +136,17 @@ void send_payload_to_pc(const uint8_t *payload, uint8_t payload_len)
 // FEEDBACK
 //--------------------------------------------------
 
-//auslagern in feedback - zusammen mit cube handle feedback
+// outcome of relay_feedback_to_children() — a domain-level result, distinct
+// from the PC_RESP_* wire bytes; SEND_RESULT_TO_PC is where that translation happens
+enum received_feedback_t : uint8_t {
+    FB_DONE, //baseplate receives ACK_FINISHED from first brick 
+    FB_FAILED   //baseplate receives ACK_FAILED from first brick 
+};
+
 // relay one feedback frame to every port that had a child this cycle,
 // with the same retry pattern as the detection polling.
-// Returns true if every present child confirmed.
-static bool relay_feedback_to_children(
+// Returns DONE if every present child confirmed, FAILED otherwise.
+static received_feedback_t relay_feedback_to_children(
     const uint8_t *fb_payload,
     uint8_t fb_payload_len
 )
@@ -172,7 +181,7 @@ static bool relay_feedback_to_children(
         }
     }
 
-    return all_done;
+    return all_done ? FB_DONE : FB_FAILED;
 }
 
 //---------------------------------------------------
@@ -186,7 +195,7 @@ static void run_stop_sequence(void)
     static const uint8_t empty_payload[1] = { 0 };  // never read at len 0
 
     relay_feedback_to_children(empty_payload, 0);
-    detection_running = false;
+    //detection_running = false;
 }
 
 //---------------------------------------------------
@@ -306,6 +315,7 @@ void loop()
     //SEND_PAYLOAD_TO_PC STATE - send built payload to pc
     case State:: SEND_PAYLOAD_TO_PC:{
         send_payload_to_pc(payload, payload_len); 
+        //remember_sent_payload??
 
         current_state = State:: GET_INFO_FROM_PC;
         break;
@@ -315,9 +325,6 @@ void loop()
     case State:: GET_INFO_FROM_PC:
     {
         //wait for the PC reply: feedback frame, stop, or timeout
-        uint8_t fb_payload[MAX_PAYLOAD_LEN];   // MAX_PAYLOAD_LEN, not FB_MAX_PAYLOAD_LEN:
-                                               // an unexpected extra cube makes the payload longer
-        uint8_t fb_payload_len = 0;
         pc_reply_t pc_reply = read_pc_reply(fb_payload, &fb_payload_len);
 
         switch(pc_reply){
@@ -352,33 +359,55 @@ void loop()
         break;
     }
 
-    //RELAY_FEEDBACK STATE - pass on feedback to cubes for led on/off
+    //RELAY_FEEDBACK STATE - pass on feedback to cubes for led on/off oder switch 
     case State:: RELAY_FEEDBACK:
     {
-        relay_feedback_to_children(event) // entweder ack_finished oder ack failed als parameter ouput von letzten child vlt so wie bei uart_cube oder anders
-        // if event = ACK_FINISHED:
-        // current_state = SEND_INFO/FEEDBACK_TO_PC
-       // else/
-       // if event = TIMEOUT || ACK_FAILED:
-       //     current_state = REALY_FEEDBACK // nur 1x retry -> wenn dann auch gefailed: dann SEND_INFO_TO_PC (variable number retries )
+        received_feedback_t received_feedback = relay_feedback_to_children(fb_payload, fb_payload_len);
+
+        switch(received_feedback){
+            case FB_DONE:
+                pending_pc_result = PcResult:: DONE;
+                current_state =
+                    State:: SEND_RESULT_TO_PC;
+                break;
+
+            // later: vlt noch nur 1x retry -> wenn dann auch gefailed: dann SEND_INFO_TO_PC (variable number retries )
+            case FB_FAILED:
+                pending_pc_result = PcResult:: FAILED;
+                current_state =
+                    State:: SEND_RESULT_TO_PC;
+                break;
+        }
         break;
     }
 
-    
+    case State:: SEND_RESULT_TO_PC:
+    {
+        Serial.write(pending_pc_result == PcResult::DONE ? PC_RESP_DONE : PC_RESP_FB_FAILED);
+
+        remember_sent_payload(payload, payload_len);
+        cycles_since_last_send = 0;
+
+        current_state = State:: WAIT_NEXT_CYCLE;
+        break;
+    }
+
+   // case State:: WAIT_NEXT_CYCLE:
+    case State:: WAIT_NEXT_CYCLE:
+    {
+        delay(550);   // pacing between detection cycles
+        current_state = State:: DETECTION_INIT;
+        break;
+    } 
+
+    case State:: STOPPING:
+    {
+        run_stop_sequence();
+
+        current_state = State:: IDLE;
+        break;
+    }
 
 }
-
-// case State:: WAIT_NEXT_CYCLE:
-//{
-    // delay(550);
-    //current_state = State:: DETECTION INIT
-//}
-
-//case State:: STOPPING:
-//{
-//    idle zustand
-//}
-
-
 }
 
