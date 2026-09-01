@@ -214,6 +214,12 @@ static bool pc_start_signal_received(){
         }
     }
 
+    if (start_received) {
+        while (Serial.available() > 0) {   // start fresh: drop stray bytes
+            Serial.read();
+        }
+    }
+
     return start_received; //vlt hier nur return true/false?
 }
 
@@ -257,7 +263,7 @@ void loop()
         case State:: IDLE:
         {
             if (pc_start_signal_received()){
-                cycles_since_last_send = HEARTBEAT_INTERVAL_CYCLE; //damit sicher dasd erste payload an den pc geschickt wird
+                cycles_since_last_send = HEARTBEAT_INTERVAL_CYCLE; //damit sicher dass erste payload an den pc geschickt wird
             current_state = State:: DETECTION_INIT;
             }
             break;
@@ -329,6 +335,8 @@ void loop()
 
         switch(pc_reply){
             case PC_REPLY_STOP:
+                remember_sent_payload(payload, payload_len);
+                cycles_since_last_send = 0;
                 current_state = State::STOPPING;
                 break;
             
@@ -338,7 +346,11 @@ void loop()
                  break;
             
             case PC_REPLY_TIMEOUT: //either pc sends PC_REPLY_TIMEOUT or PC_REPLY_BAD message
-            case PC_REPLY_BAD: 
+            case PC_REPLY_BAD:
+                while (Serial.available() > 0) {   // drop any stray bytes from the bad/partial frame before retrying
+                    Serial.read();
+                }
+
                 if (
                     pc_reply_retry_count <
                     MAX_PC_REPLY_RETRIES
@@ -411,3 +423,5 @@ void loop()
 }
 }
 
+// stray bytes at pc_cmd_start and pc_reply_bad
+//
