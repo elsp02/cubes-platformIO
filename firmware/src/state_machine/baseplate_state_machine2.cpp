@@ -16,7 +16,122 @@
 static uint16_t cycles_since_last_send = 0;
 static bool last_child_present[MAX_CHILD_COUNT] = {false}; //error: expression must have a constant value
 
+static uint8_t pc_reply_retry_count = 0; //retry counts if pc replied with bullshit/error after baseplate sends feedback
+
+static uint8_t child_payload[MAX_CHILD_COUNT][MAX_CHILD_PAYLOAD_LEN];   // child_payload[child_index][payload_index] = byte received from child
+static uint8_t child_payload_len[MAX_CHILD_COUNT] = {0};                // length of the payload received from child[i]
+static bool child_done[MAX_CHILD_COUNT] = {false};                      // child[i] answered with a valid frame this cycle
+
+static uint8_t payload[MAX_PAYLOAD_LEN];   
+static uint8_t payload_len = 0;
 //////////////////////////////////////////////
+
+//---------------------------------------------------
+// DETECTION
+//--------------------------------------------------
+void handle_detection(void){
+
+    for (uint8_t i = 0; i < child_count; i++) {
+            child_done[i] = false;   // fresh detection cycle
+        }
+
+        bool child_acked[MAX_CHILD_COUNT] = {false}; // child answered ACK_BUSY at least once this cycle -> port is occupied even if its frame failed
+
+        for (uint8_t attempt = 0; attempt < CHILD_RETRIES; attempt++) { //retry loop
+            bool retry_needed = false; //true if any child still has attempts left after this round
+
+            for (uint8_t i = 0; i < child_count; i++) {  //child loop, iterates through children
+
+                if (child_done[i]) {
+                    continue;
+                }
+
+                // presence-aware retry budget: a port counts as occupied if it had a child last cycle OR already ACKed this cycle
+                // Occupied ports keep the full retries, empty ports get a single attempt.
+                // -> attempt_budget specifies the maximum number of attempts a the port is allowed in this detection cycle
+                uint8_t attempt_budget = (last_child_present[i] || child_acked[i]) ? CHILD_RETRIES : 1;
+
+                if (attempt >= attempt_budget) {
+                    continue;
+                }
+
+                bool acked = false;
+
+                if (poll_child(
+                        children[i],           //with wire/pin of child[i]
+                        child_payload[i],     //and receive and store the payload in child_payloads[i]
+                        MAX_CHILD_PAYLOAD_LEN, //with max length of MAX_CHILD_PAYLOAD_LEN to avoid overflow
+                        &child_payload_len[i], //and stores the received payload length from child[i]
+                        &acked
+                )){
+                    SER_PRINTLN("CV");
+                    child_done[i] = true; //mark child as done -> no more polling of this child in next attempts
+                } else {
+                    if (acked) {
+                        child_acked[i] = true; // present but frame failed -> full retry budget from now on
+                        retry_needed = true;
+                    } else if (attempt + 1 < attempt_budget) { //if child was present in the previous detection loop - then also retry
+                        retry_needed = true;
+                    }
+                }
+            }
+
+            if (!retry_needed) {
+                break;
+            }
+    }
+
+    // for the feedback state to know at which port to send the feedback frame
+    for (uint8_t child = 0; child < child_count; child++) {
+        last_child_present[child] = child_done[child] || child_acked[child];
+    }    
+}
+
+// ----------------------------------------------------------
+// PAYLOAD BUILDING : concatenate this cycle's child payloads into payload[]
+// ----------------------------------------------------------
+void build_payload(uint8_t *payload, uint8_t &payload_len)
+{
+    payload_len = 0;
+
+    //in a loop add children payloads to the final payload
+    for (uint8_t child = 0; child < child_count; child++) {
+        if (!child_done[child]) {  //if child[i] didn´t respond, skip it
+            continue;
+        }
+
+        // Check whether this child payload still fits. If not, do not include it.
+        if ((uint16_t)payload_len + child_payload_len[child] > MAX_PAYLOAD_LEN) {
+            continue;
+        }
+
+        //copy child payload into final payload
+        for (uint8_t j = 0; j < child_payload_len[child]; j++) {
+            payload[payload_len++] = child_payload[child][j];  //copies stored payload into final payload and increases payload_len for next byte
+        }
+    }
+
+    release_all_lines();
+    _delay_us(3 * BYTE_US);
+}
+
+// ----------------------------------------------------------
+// SEND PAYLOAD: send the built payload frame to the PC
+// ----------------------------------------------------------
+void send_payload_to_pc(const uint8_t *payload, uint8_t payload_len)
+{
+    uint8_t checksum = calc_checksum(payload_len, payload);
+
+    Serial.write(SYNC_BYTE);
+    Serial.write(payload_len);
+    Serial.write(payload, payload_len);
+    Serial.write(checksum);
+}
+
+/////////////////////////////////////////////////////////////////
+//---------------------------------------------------
+// FEEDBACK
+//--------------------------------------------------
 
 //auslagern in feedback - zusammen mit cube handle feedback
 // relay one feedback frame to every port that had a child this cycle,
@@ -60,6 +175,10 @@ static bool relay_feedback_to_children(
     return all_done;
 }
 
+//---------------------------------------------------
+// START END SEQUENCE
+//--------------------------------------------------
+
 // stop sequence: every cube turns its LED off when its ID is missing
 // from the feedback payload, so an EMPTY frame switches all LEDs off
 static void run_stop_sequence(void)
@@ -100,10 +219,16 @@ enum class State : uint8_t {
     SEND_RESULT_TO_PC,
     GET_INFO_FROM_PC,
     RELAY_FEEDBACK,
-    WAIT_NEXT_CYCLE,
+    WAIT_NEXT_CYCLE, //delay am ende von einem cycle
     STOPPING
 };
 
+enum class PcResult : uint8_t {
+    DONE,
+    FAILED
+};
+
+static PcResult pending_pc_result = PcResult::DONE;
 static State current_state = State::IDLE;
 //-----------------------------------
 
@@ -154,6 +279,7 @@ void loop()
             handle_detection(); //genau so wie in cube_uart.cpp
             //ich muss den payload irgendwie global machen oder übergeben richtig?
             current_state = State:: BUILD_PAYLOAD;
+            pc_reply_retry_count = 0; //is this location correct?
 
             break;
         }
@@ -172,14 +298,14 @@ void loop()
         } 
         else{
             //ccycle_wait_started_ms = millis()??????????
-            current_state = State:: WAIT_NEXT_CYCLE;
+            current_state = State:: WAIT_NEXT_CYCLE; // waits 550ms and then restarts with state DETECTION_INIT
         }
         break;
     }
 
     //SEND_PAYLOAD_TO_PC STATE - send built payload to pc
     case State:: SEND_PAYLOAD_TO_PC:{
-        send_payload_to_pc(payload, payload_len); //wie kann ich das von build_payload als parameter mitgeben?
+        send_payload_to_pc(payload, payload_len); 
 
         current_state = State:: GET_INFO_FROM_PC;
         break;
@@ -200,11 +326,12 @@ void loop()
                 break;
             
             case PC_REPLY_FRAME:
-             //pc_reply_retry_count = 0; ??
+                 //pending_pc_result = PcResult::DONE;
                  current_state = State:: RELAY_FEEDBACK;
                  break;
             
-            case (PC_REPLY_BAD || PC_REPLY_TIMEOUT): //???
+            case PC_REPLY_TIMEOUT: //either pc sends PC_REPLY_TIMEOUT or PC_REPLY_BAD message
+            case PC_REPLY_BAD: 
                 if (
                     pc_reply_retry_count <
                     MAX_PC_REPLY_RETRIES
@@ -222,16 +349,35 @@ void loop()
                 }
                 break;
         }
+        break;
     }
 
     //RELAY_FEEDBACK STATE - pass on feedback to cubes for led on/off
     case State:: RELAY_FEEDBACK:
+    {
+        relay_feedback_to_children(event) // entweder ack_finished oder ack failed als parameter ouput von letzten child vlt so wie bei uart_cube oder anders
+        // if event = ACK_FINISHED:
+        // current_state = SEND_INFO/FEEDBACK_TO_PC
+       // else/
+       // if event = TIMEOUT || ACK_FAILED:
+       //     current_state = REALY_FEEDBACK // nur 1x retry -> wenn dann auch gefailed: dann SEND_INFO_TO_PC (variable number retries )
+        break;
+    }
+
     
 
 }
 
+// case State:: WAIT_NEXT_CYCLE:
+//{
+    // delay(550);
+    //current_state = State:: DETECTION INIT
+//}
 
-
+//case State:: STOPPING:
+//{
+//    idle zustand
+//}
 
 
 }

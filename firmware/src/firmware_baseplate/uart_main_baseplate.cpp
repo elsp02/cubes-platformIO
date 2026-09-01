@@ -257,6 +257,8 @@ void loop()
         Serial.write(payload, payload_len);
         Serial.write(checksum);
 
+//bis hier in state machine übernommen
+
         //wait for the PC reply: feedback frame, stop, or timeout
         uint8_t fb_payload[MAX_PAYLOAD_LEN];   // MAX_PAYLOAD_LEN, not FB_MAX_PAYLOAD_LEN:
                                                // an unexpected extra cube makes the payload longer

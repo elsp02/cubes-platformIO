@@ -152,58 +152,58 @@ static pc_reply_t read_pc_reply(uint8_t *fb_payload, uint8_t *fb_payload_len)
 
 // send one feedback frame to one child and wait until the whole
 // subtree below it confirmed (ACK_FINISHED) or failed
-static bool send_feedback_to_child(
-    const wire_t *w,
-    const uint8_t *fb_payload,
-    uint8_t fb_payload_len
-)
-{
-    uint8_t b = 0;
-
-    wire_release(w);
-    _delay_us(TURNAROUND_US);
-
-    // 1. announce the feedback frame (like CMD_STATUS in detection)
-    tx_byte(w, CMD_FEEDBACK);
-
-    // 2. release line and wait for child ACK
-    wire_release(w);
-
-    if (!rx_byte(w, &b, CHILD_TIMEOUT_US)) {
-        return false;   // no ACK at all
-    }
-
-    if (b != ACK_BUSY) {
-        return false;   // wrong ACK
-    }
-
-    // 3. send the feedback frame itself
-    _delay_us(TURNAROUND_US);
-
-    tx_frame(w, fb_payload, fb_payload_len);
-
-    wire_release(w);
-
-    _delay_us(TURNAROUND_US);
-
-    // 4. wait until the child (and recursively its whole subtree)
-    //    reports the outcome
-    if (!rx_byte(w, &b, FEEDBACK_FINISHED_TIMEOUT_US)) {
-        return false;   // no finished byte
-    }
-
-    wire_release(w);
-    switch (b) {
-        case ACK_FINISHED:
-            return true;
-
-        case ACK_FAILED:
-            return false;
-
-        default:
-            return false;
-        }
-}
+//static bool send_feedback_to_child(
+//    const wire_t *w,
+//    const uint8_t *fb_payload,
+//    uint8_t fb_payload_len
+//)
+//{
+//    uint8_t b = 0;
+//
+//    wire_release(w);
+//    _delay_us(TURNAROUND_US);
+//
+//    // 1. announce the feedback frame (like CMD_STATUS in detection)
+//    tx_byte(w, CMD_FEEDBACK);
+//
+//    // 2. release line and wait for child ACK
+//    wire_release(w);
+//
+//    if (!rx_byte(w, &b, CHILD_TIMEOUT_US)) {
+//        return false;   // no ACK at all
+//    }
+//
+//    if (b != ACK_BUSY) {
+//        return false;   // wrong ACK
+//    }
+//
+//    // 3. send the feedback frame itself
+//    _delay_us(TURNAROUND_US);
+//
+//    tx_frame(w, fb_payload, fb_payload_len);
+//
+//    wire_release(w);
+//
+//    _delay_us(TURNAROUND_US);
+//
+//    // 4. wait until the child (and recursively its whole subtree)
+//    //    reports the outcome
+//    if (!rx_byte(w, &b, FEEDBACK_FINISHED_TIMEOUT_US)) {
+//        return false;   // no finished byte
+//    }
+//
+//    wire_release(w);
+//    switch (b) {
+//        case ACK_FINISHED:
+//            return true;
+//
+//        case ACK_FAILED:
+//            return false;
+//
+//        default:
+//            return false;
+//        }
+//}
 
 // relay one feedback frame to every port that had a child this cycle,
 // with the same retry pattern as the detection polling.

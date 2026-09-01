@@ -84,6 +84,7 @@
 // for feedback frame
 #define FB_ITEM_LEN         2 // every cube feedback is [NODE_ID LED_STATE]
 #define FB_MAX_PAYLOAD_LEN  (CUBES_AMOUNT * FB_ITEM_LEN)
+#define MAX_PC_REPLY_RETRIES 2 // if pc replied with bullshit/error after baseplate sends feedback
 
 // One feedback hop (parent -> one child, excluding the child's own
 // downstream relaying):
