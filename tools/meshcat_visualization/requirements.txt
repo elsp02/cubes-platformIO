@@ -1,3 +1,0 @@
-meshcat
-numpy
-pyserial

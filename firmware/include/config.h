@@ -105,8 +105,8 @@
 //-----------------------------------------------------------
 // DEBUGGING SYSTEM (only embedded in main_baseplate_feedback2.cpp)
 //-----------------------------------------------------------
-#define SERIAL_WRITING 0
-#define SERIAL_DEBUG   1
+#define SERIAL_WRITING 1
+#define SERIAL_DEBUG   0
 #define SERIAL_DEBUG_END 0
 
 //for debugging feedback
