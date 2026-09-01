@@ -33,6 +33,10 @@ fct(&x)                             : pass adress of x (parameter for function)
         //change(&a);
             --> give the function the adress of a (change(&a)) and go to that adresss and store 10 (*x=10)
 
+VARIABLEN
+- extern im Header:	Variable wird woanders definiert. Eine gemeinsame Variable für alle .cpp-Dateien
+- static im Header:	Variable wird in Hader Datei definiert. Jede .cpp-Datei bekommt eine eigene, unabhängige Kopie
+- static in einer .cpp:	Eine Variable, die nur in dieser .cpp sichtbar ist
 ------------------------------------------------
 
 STRUCT                      : define custom struct type

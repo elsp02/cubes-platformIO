@@ -1,0 +1,11 @@
+{
+  head: {
+    text: "Single-wire byte transmission"
+  },
+  signal: [
+    {name: "1-wire", wave: "1..01.0101.01..."},
+    {name: "Transmitter?", wave: "x..34.......3xxx", data: ["start bit", "data byte", "stop bit"]}
+  ],
+  foot:{"text": "Idle = HIGH, start bit = LOW, 8 data bits LSB first, stop bit = HIGH, bit time = 104 us"},
+  "config": {"hscale": 2}
+}

@@ -7,6 +7,9 @@
 
 #include <util/delay.h>
 
+//? für release_all_lines
+#include "cube_hardware.h"
+
 // ----------------------------------------------------------
 // Wire primitives
 // examples:

@@ -32,6 +32,7 @@ void wire_release(const wire_t *w); // releases the line (high level)
 void wire_low(const wire_t *w);     // pulls the line low (low level)
 bool is_line_high(const wire_t *w); // checks if the line is high (returns true if high)
 
+
 // ----------------------------------------------------------
 // UART-like byte transfer
 // ----------------------------------------------------------

@@ -1,9 +1,12 @@
 // definiert orientation ports und je nach type die anzahl der childs und weist child ports zu
+//baseplate miteinbinden?
+
 
 #include "cube_hardware.h"
 
 #include "config.h"
 #include "cube_identity.h"
+
 
 static const wire_t upstream[] = {
     { &PORTA, PIN1_bm, 1 },     // PA1 — orientation 0
@@ -11,6 +14,9 @@ static const wire_t upstream[] = {
     { &PORTA, PIN6_bm, 6 },     // PA6 — orientation 2
     { &PORTA, PIN7_bm, 7 },     // PA7 — orientation 3
 };
+
+//?
+static int upstream_count = sizeof(upstream) / sizeof(upstream[0]);
 
 #if defined(CUBE_TYPE_NORMAL)
 
@@ -20,7 +26,7 @@ static const wire_t child_2 = { &PORTA, PIN4_bm, 4 };  // PCB Port Out3
 static const wire_t child_3 = { &PORTA, PIN5_bm, 5 };  // PCB Port Out4
 static const wire_t child_4 = { &PORTB, PIN1_bm, 1 };  // PCB Port Out5
 
-static const wire_t *children[CHILD_COUNT] = {
+static const wire_t *children[] = {
     &child_0,
     &child_1,
     &child_2,
@@ -52,5 +58,14 @@ const uint8_t child_count =
     sizeof(children) / sizeof(children[0]);
 
 
+// problem: baseplate hat keine upstream ports -> vlt fkt einfach trennen?
+void release_all_lines(void){
+    for (uint8_t line = 0; line < upstream_count; line ++){
+        wire_release(&upstream[line]); // error: argument of type "const wire_t *const *" is incompatible with parameter of type "const wire_t *"
+    }
 
+    for (uint8_t line = 0; line < child_count; line ++){
+        wire_release(children[line]);
+    }
+}
 

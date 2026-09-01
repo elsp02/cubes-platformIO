@@ -1,4 +1,6 @@
 // für NODE_ID je nach brick type -> type in .ini datei definiert 
+///baseplate miteinbinden?
+
 #ifndef CUBE_IDENTITIY_H
 #define CUBE_IDENTITIY_H
 

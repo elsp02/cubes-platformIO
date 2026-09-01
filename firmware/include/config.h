@@ -23,9 +23,9 @@
 #define UPSTREAM_FAIL_LIMIT      3     //currently not in use
 #define CUBES_AMOUNT             3
 #define MAX_CHILD_COUNT          5     //for final timeout calculations,  when every type has a different amount of children 
-#ifndef CHILD_COUNT 
-    #define CHILD_COUNT              2
-#endif
+//#ifndef CHILD_COUNT 
+//    #define CHILD_COUNT              2
+//#endif
 
 // ----------------------------------------------------------
 //  Timing
