@@ -114,8 +114,8 @@
 
 // for debugging or serial communication
 #if SERIAL_WRITING
-    #define SER_PRINT(x)
-    #define SER_PRINTLN(x)
+    #define SER_PRINT(x)  
+    #define SER_PRINTLN(x) 
     #define SER_PRINTLN2(x, y)
 #elif SERIAL_DEBUG
     #define SER_PRINT(x)    Serial.print(x)

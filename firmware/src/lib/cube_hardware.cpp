@@ -59,7 +59,7 @@ const wire_t *const children[] = {
 
 #elif defined(CUBE_TYPE_BASEPLATE)
 
-static const wire_t child_0 = { &PORTB, PIN1_bm, 0 };  // only child port of the baseplate
+static const wire_t child_0 = { &PORTB, PIN1_bm, 1 };  // only child port of the baseplate
 
 const wire_t *const children[] = {
     &child_0,

@@ -27,14 +27,14 @@
 // the received bytes (stop between frames)
  bool stop_received(void)
 {
-    bool stop = false;
+    //bool stop = false;
 
     while (Serial.available() > 0) {
         if (Serial.read() == PC_CMD_STOP) {
-            stop = true;
+            return true;
         }
     }
-    return stop;
+    return false;
 }
 
 

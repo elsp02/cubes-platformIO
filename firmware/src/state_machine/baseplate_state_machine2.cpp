@@ -160,14 +160,14 @@ static received_feedback_t relay_feedback_to_children(
 
         for (uint8_t child = 0; child < child_count; child++) {
 
-            if (!last_child_present[child]) {
-                continue;   // no cube on this port
-            }
+            //if (!last_child_present[child]) {
+              //  continue;   // no cube on this port
+            //}
 
             //instead of (!last_child_present[child] -> relay one feedback frame to every port that had a child this cycle
-            //if (!child_done[child]) {
-            //    continue;   // no cube on this port
-            //}
+            if (!child_done[child]) {
+                continue;   // no cube on this port
+            }
 
             if (feedback_done[child]) {
                 continue;   // already confirmed
@@ -412,7 +412,7 @@ void loop()
    // case State:: WAIT_NEXT_CYCLE:
     case State:: WAIT_NEXT_CYCLE:
     {
-        delay(150);   // pacing between detection cycles
+        //delay(150);   // pacing between detection cycles
         current_state = State:: DETECTION_INIT;
         break;
     } 
