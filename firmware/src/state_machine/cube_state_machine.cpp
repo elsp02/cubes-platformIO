@@ -3,13 +3,20 @@
 // - cube (brick) main loop as an explicit state machine
 // - build_src_filter of env:uart_cube_state_machine in platformio.ini
 //
-// Sequence (states, in order):
-// 1. ORIENTATION       - one-time: blocking scan for the active upstream line + CMD_STATUS
-// 2. IDLE               - wait for CMD_STATUS/CMD_FEEDBACK on the active upstream line
-// 3. DETECTION_INIT      - ack busy upstream, prepare a detection cycle
-// 4. DETECTING            - poll_child() every child port (handle_detection)
-// 5. BUILD_SEND_PAYLOAD   - build own+children payload, send it to the parent
-//    FEEDBACK_INIT / RELAY_FEEDBACK - TODO, added later
+// Sequence (states):
+// 1. ORIENTATION        - one-time: blocking scan for the active upstream line + CMD_STATUS, then -> DETECTION_INIT
+// 2. IDLE                - wait for CMD_STATUS/CMD_FEEDBACK on the active upstream line, dispatches to one of the two cycles below
+//
+//    DETECTION CYCLE (CMD_STATUS):
+// 3. DETECTION_INIT       - ack busy upstream, prepare a detection cycle
+// 4. DETECTING             - poll_child() every child port (handle_detection)
+// 5. BUILD_SEND_PAYLOAD    - build own+children payload, send it to the parent
+//
+//    FEEDBACK CYCLE (CMD_FEEDBACK):
+// 6. FEEDBACK_INIT         - ack busy upstream, receive the feedback frame, apply it to the own LED
+// 7. RELAY_FEEDBACK        - relay the feedback frame to every child that answered detection this cycle
+//
+// 8. READY_NEXT_CYCLE      - release the lines used this cycle, back to IDLE
 // =====================================================================
 
 #include <Arduino.h>
@@ -23,6 +30,16 @@
 #include "poll_child.h"
 #include "feedback_cube.h"
 #include "cube_hardware.h"
+
+static const wire_t *active_upstream = nullptr; // orientation line locked in by ORIENTATION, used for every later parent exchange
+static uint8_t orientation_mask = 0x00;          // this cube's orientation value, sent as part of its own payload
+
+static uint8_t child_payload[MAX_CHILD_COUNT][MAX_CHILD_PAYLOAD_LEN];   // child_payload[child_index][payload_index] = byte received from child
+static uint8_t child_payload_len[MAX_CHILD_COUNT] = {0};                // length of the payload received from child[i]
+static bool child_done[MAX_CHILD_COUNT] = {false};                      // child[i] answered with a valid frame this cycle
+
+static uint8_t fb_payload[MAX_PAYLOAD_LEN];   // feedback frame received from the parent in FEEDBACK_INIT, relayed in RELAY_FEEDBACK
+static uint8_t fb_payload_len = 0;
 
 //---------------------------------------------------
 // ORIENTATION
@@ -75,16 +92,64 @@ static void wait_for_valid_upstream_cmd(
     }
 }
 
+
 //---------------------------------------------------
-// DETECTION
+// FEEDBACK
 //--------------------------------------------------
+// receive_feedback
+// - acks the parent's CMD_FEEDBACK with ACK_BUSY, then receives the feedback frame into fb_payload/fb_payload_len
+// -> if Receiving failed: sends ACK_FAILED to parent
+static bool receive_feedback(void)
+{
+    _delay_us(TURNAROUND_US);
+    tx_byte(active_upstream, ACK_BUSY);
+    wire_release(active_upstream);
 
-static uint8_t child_payload[MAX_CHILD_COUNT][MAX_CHILD_PAYLOAD_LEN];   // child_payload[child_index][payload_index] = byte received from child
-static uint8_t child_payload_len[MAX_CHILD_COUNT] = {0};                // length of the payload received from child[i]
-static bool child_done[MAX_CHILD_COUNT] = {false};                      // child[i] answered with a valid frame this cycle
+    if (!rx_frame(
+            active_upstream,
+            fb_payload,
+            MAX_PAYLOAD_LEN,
+            &fb_payload_len,
+            CHILD_TIMEOUT_US,
+            INTER_FRAME_TIMEOUT_US
+        )) {
+        _delay_us(TURNAROUND_US);
+        tx_byte(active_upstream, ACK_FAILED); // if rx_frame failed, send ack_failed to parent
+        wire_release(active_upstream);
+        return false;
+    }
 
-// handle_detection() itself now lives in poll_child.cpp (shared with baseplate_state_machine2.cpp
-// and baseplate_state_machine_debug.cpp) - see poll_child.h
+    return true;
+}
+
+// relay_feedback
+// - relays fb_payload to every child that answered during detection this cycle (child_done[]), stopping at the first failure
+//
+// - sends answer to parent:
+// -> if feedback relaying failed: ACK_FAILED
+// -> if every present children confirmed: ACK_FINISHED
+static bool relay_feedback(void)
+{
+    bool all_feedback_done = true;
+
+    for (uint8_t child = 0; child < child_count; child++) {  //child loop, iterates through children
+
+        if (!child_done[child]) {
+            continue;
+        }
+
+        if (!send_feedback_to_child(children[child], fb_payload, fb_payload_len)) {
+            all_feedback_done = false;
+            break;   // stop relaying to remaining children
+        }
+    }
+
+    _delay_us(TURNAROUND_US);
+    tx_byte(active_upstream, all_feedback_done ? ACK_FINISHED : ACK_FAILED);
+    wire_release(active_upstream);
+
+    return all_feedback_done;
+}
 
 // state definition
 enum class State : uint8_t {
@@ -99,9 +164,6 @@ enum class State : uint8_t {
 };
 
 static State current_state = State::ORIENTATION; // current state; advanced by exactly one transition per loop() call
-
-static const wire_t *active_upstream = nullptr; // orientation line locked in by ORIENTATION, used for every later parent exchange
-static uint8_t orientation_mask = 0x00;          // this cube's orientation value, sent as part of its own payload
 //-----------------------------------
 
 // setup
@@ -219,7 +281,50 @@ void loop()
        
     }
 
-    
+    //---------------------------------------------------
+    // FEEDBACK_INIT
+    // - acks the parent's CMD_FEEDBACK with ACK_BUSY, then receives the feedback frame
+    // - applies the frame to this cube's own LED
+    // - on failure, ACKs the failure upstream and ends the cycle (no retry)
+    //--------------------------------------------------
+    case State:: FEEDBACK_INIT:
+    {
+        if (!receive_feedback()) {
+            current_state = State::READY_NEXT_CYCLE;
+            break;
+        }
+
+        // Apply the frame to the own LED:
+        // true  = own ID was in the payload (LED set green/red inside),
+        // false = own ID absent -> LED switched off
+        if (feedback_contains_own_id(fb_payload, fb_payload_len)) {
+            SER_PRINTLN("FI");  // feedback: own id included
+        } else {
+            SER_PRINTLN("FO");  // feedback: own id absent, LED off
+        }
+
+        current_state = State:: RELAY_FEEDBACK;
+        break;
+    }
+
+    //---------------------------------------------------
+    // RELAY_FEEDBACK
+    // - relays the feedback frame to every child that answered during
+    //   detection this cycle (child_done[]), stopping at the first failure
+    // - sends ACK_FINISHED/ACK_FAILED upstream depending on the outcome
+    //--------------------------------------------------
+    case State:: RELAY_FEEDBACK:
+    {
+        relay_feedback();
+        current_state = State::READY_NEXT_CYCLE;
+        break;
+    }
+
+    //---------------------------------------------------
+    // READY_NEXT_CYCLE
+    // - common funnel for every cycle (DETECTION or FEEDBACK)
+    // - loops back to IDLE
+    //--------------------------------------------------
     case State::READY_NEXT_CYCLE:
     {
         wire_release(active_upstream);
