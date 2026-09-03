@@ -1,14 +1,20 @@
-// ============================================================
-// Baseplate state machine - debug/standalone variant
-// ATtiny1616
+// =====================================================================
+// baseplate_state_machine_debug.cpp
+// abbild von baseplate_state_maachine2.cpp aber als debug/standalone:
+// -> not PC-controlled: runs the detection + feedback cycle continuously,
+//   no PC_CMD_START/STOP handshake
+// -> feedback content cycles through the predefined LED patterns in
+//   feedback.h instead of PC-supplied data
+// - build_src_filter of env:baseplate_state_machine_debug in platformio.ini
 //
-// Not PC-controlled: runs the detection + feedback cycle continuously,
-// no PC_CMD_START/STOP handshake. Feedback content cycles through the
-// predefined LED patterns in feedback.h instead of PC-supplied data.
-// Payload is sent either as a binary SYNC|LEN|PAYLOAD|CHECKSUM frame
-// (SERIAL_WRITING) or as human-readable hex (print_payload_hex, when
-// SERIAL_WRITING is off) - see config.h.
-// ============================================================
+// Sequence (states, in order):
+// 1. DETECTION_INIT - release lines, prepare a cycle
+// 2. DETECTING        - poll_child() every child port (handle_detection)
+// 3. BUILD_PAYLOAD     - concatenate child payloads into one payload
+// 4. SEND_PAYLOAD      - send the payload (binary frame or hex text)
+// 5. RELAY_FEEDBACK    - relay the next predefined feedback pattern to every child
+// 6. WAIT_NEXT_CYCLE   - back to DETECTION_INIT
+// =====================================================================
 
 #include <Arduino.h>
 #include <avr/io.h>
@@ -39,70 +45,86 @@ static uint8_t feedback_index = 0;   // cycles through predefined_feedback_paylo
 //---------------------------------------------------
 // DETECTION
 //--------------------------------------------------
-static void handle_detection(void)
-{
+
+// handle_detection
+// - polls every child port with retries, using presence-aware retry budgets
+// - writes results into child_done[]/child_payload[]/child_payload_len[]
+//   and updates last_child_present[] for the next cycle
+//
+// retry logic (attempt budget per port): 
+// - a port counts as "occupied" if it had 
+//    -> a child last cycle (last_child_present[i])
+//    -> or already answered ACK_BUSY this cycle (child_acked[i]) 
+//    =>  it gets the full CHILD_RETRIES attempts, since this means a child is physically there
+// - a port counts as "unoccupied" if it didn´t sent ACK_BUSY
+//   => gets only a single attempt because it´s very likely that no child is pbhyiscally there
+void handle_detection(void){
+
     for (uint8_t i = 0; i < child_count; i++) {
-        child_done[i] = false;   // fresh detection cycle
-    }
+            child_done[i] = false;   // fresh detection cycle
+        }
 
-    bool child_acked[MAX_CHILD_COUNT] = {false}; // child answered ACK_BUSY at least once this cycle -> port is occupied even if its frame failed
+        bool child_acked[MAX_CHILD_COUNT] = {false}; // child answered ACK_BUSY at least once this cycle -> port is occupied even if its frame failed
 
-    for (uint8_t attempt = 0; attempt < CHILD_RETRIES; attempt++) { //retry loop
-        bool retry_needed = false; //true if any child still has attempts left after this round
+        for (uint8_t attempt = 0; attempt < CHILD_RETRIES; attempt++) { //retry loop
+            bool retry_needed = false; //true if any child still has attempts left after this round
 
-        for (uint8_t i = 0; i < child_count; i++) {  //child loop, iterates through children
+            for (uint8_t i = 0; i < child_count; i++) {  //child loop, iterates through children
 
-            if (child_done[i]) {
-                continue;
-            }
+                if (child_done[i]) {
+                    continue;
+                }
 
-            // presence-aware retry budget: a port counts as occupied if it had a child last cycle OR already ACKed this cycle
-            // Occupied ports keep the full retries, empty ports get a single attempt.
-            uint8_t attempt_budget = (last_child_present[i] || child_acked[i]) ? CHILD_RETRIES : 1;
+                // attempt budget - see retry logic in the function doc above
+                uint8_t attempt_budget = (last_child_present[i] || child_acked[i]) ? CHILD_RETRIES : 1;
 
-            if (attempt >= attempt_budget) {
-                continue;
-            }
+                if (attempt >= attempt_budget) {
+                    continue;
+                }
 
-            bool acked = false;
+                bool acked = false;
 
-            if (poll_child(
-                    children[i],
-                    child_payload[i],
-                    MAX_CHILD_PAYLOAD_LEN,
-                    &child_payload_len[i],
-                    &acked
-            )){
-                SER_PRINTLN("CV");
-                child_done[i] = true; //mark child as done -> no more polling of this child in next attempts
-            } else {
-                if (acked) {
-                    child_acked[i] = true; // present but frame failed -> full retry budget from now on
-                    retry_needed = true;
-                } else if (attempt + 1 < attempt_budget) {
-                    retry_needed = true;
+                if (poll_child( // polls one child
+                        children[i],           
+                        child_payload[i],     
+                        MAX_CHILD_PAYLOAD_LEN, 
+                        &child_payload_len[i], 
+                        &acked
+                )){
+                    SER_PRINTLN("CV");
+                    child_done[i] = true; //mark child as done (sent valid DATA FARME to parent) -> no more polling of this child in next attempts
+                } else {
+                    if (acked) {
+                        child_acked[i] = true; // present but frame failed -> full retry budget from now on
+                        retry_needed = true;
+                    } else if (attempt + 1 < attempt_budget) { //if child was present in the previous detection loop - full retry budget 
+                        retry_needed = true;
+                    }
                 }
             }
-        }
 
-        if (!retry_needed) {
-            break;
-        }
+            if (!retry_needed) {
+                break;
+            }
     }
 
-    // for the feedback loop to know which ports to keep giving retries next cycle
+    // feeds attempt_budget in the next handle_detection() call
     for (uint8_t child = 0; child < child_count; child++) {
         last_child_present[child] = child_done[child] || child_acked[child];
     }
 }
 
 // ----------------------------------------------------------
-// PAYLOAD BUILDING : concatenate this cycle's child payloads into payload[]
+// PAYLOAD BUILDING : 
 // ----------------------------------------------------------
-static void build_payload(uint8_t *payload, uint8_t &payload_len)
+
+// build_payload
+// - combines every responded child's payload into one PC-bound payload
+void build_payload(uint8_t *payload, uint8_t &payload_len)
 {
     payload_len = 0;
 
+    //in a loop add children payloads to the final payload
     for (uint8_t child = 0; child < child_count; child++) {
         if (!child_done[child]) {  //if child[i] didn´t respond, skip it
             continue;
@@ -113,8 +135,9 @@ static void build_payload(uint8_t *payload, uint8_t &payload_len)
             continue;
         }
 
+        //copy child payload into final payload
         for (uint8_t j = 0; j < child_payload_len[child]; j++) {
-            payload[payload_len++] = child_payload[child][j];
+            payload[payload_len++] = child_payload[child][j];  //copies stored payload into final payload and increases payload_len for next byte
         }
     }
 
@@ -122,9 +145,13 @@ static void build_payload(uint8_t *payload, uint8_t &payload_len)
     _delay_us(3 * BYTE_US);
 }
 
+
 //-----------------------------------------------------------
 // payload print - human-readable alternative to the binary frame
 //-----------------------------------------------------------
+// print_payload_hex
+// - prints payload_len and payload as space-separated hex bytes over Serial
+// - used instead of the binary frame when SERIAL_WRITING is off (see SEND_PAYLOAD state)
 static void print_payload_hex(const uint8_t *payload, uint8_t len)
 {
     Serial.print("ordered_payload_len = ");
@@ -150,11 +177,14 @@ static void print_payload_hex(const uint8_t *payload, uint8_t len)
 //---------------------------------------------------
 // FEEDBACK - predefined patterns, not PC-supplied
 //--------------------------------------------------
+// relay_feedback_to_children
+// - relays one current predefined_feedback_payload[feedback_index] every port/child that
+//   answered during detection this cycle (child_done[])
+//
+// retry logic: 
+// every such port gets up to CHILD_RETRIES attempts, retrying
+// only the ports that haven't confirmed yet each round
 
-// relay one predefined feedback pattern to every port that delivered a
-// valid frame this cycle (child_done, not last_child_present - a port
-// that only ACKed but never completed detection is excluded so a single
-// flaky port can't be mistaken for a confirmed cube here either).
 static void relay_feedback_to_children(void)
 {
     bool feedback_done[MAX_CHILD_COUNT] = { false };
@@ -164,12 +194,13 @@ static void relay_feedback_to_children(void)
 
         for (uint8_t child = 0; child < child_count; child++) {
 
+            // relay one feedback frame to every port that had a valid child this cycle (children which sent a valid DATA FRAME)
             if (!child_done[child]) {
-                continue;   // no confirmed child on this port
+                continue;   // no valid child on this port
             }
-
+            
             if (feedback_done[child]) {
-                continue;   // already confirmed
+                continue;   // child already confirmed
             }
 
             if (send_feedback_to_child(
@@ -212,19 +243,26 @@ enum class State : uint8_t {
     WAIT_NEXT_CYCLE
 };
 
-static State current_state = State::DETECTION_INIT;
+static State current_state = State::DETECTION_INIT;  // current state; advanced by exactly one transition per loop() call
 
+// setup
+// - releases all lines and opens the serial link
 void setup()
 {
     release_all_lines();
     Serial.begin(115200);
 }
 
+// loop
+// - runs one state-machine step per call; see the sequence at the top of this file
 void loop()
 {
     switch (current_state) {
 
-        //DETECTION_INIT STATE - prepare the detection sequence
+        //---------------------------------------------------
+        // DETECTION_INIT
+        // - releases all lines, waits one turnaround, and moves on to DETECTING
+        //--------------------------------------------------
         case State::DETECTION_INIT:
         {
             release_all_lines();
@@ -234,7 +272,11 @@ void loop()
             break;
         }
 
-        //DETECTING STATE - poll children for tree information
+        //---------------------------------------------------
+        // DETECTING
+        // - runs handle_detection() once: polls every child port with retries
+        //   and fills child_payload[]/child_payload_len[]/child_done[]
+        //--------------------------------------------------
         case State::DETECTING:
         {
             handle_detection();
@@ -242,7 +284,14 @@ void loop()
             break;
         }
 
-        //BUILD_PAYLOAD STATE - accumulates received information from cubes into one payload
+    //---------------------------------------------------
+    // BUILD_PAYLOAD
+    // - links this cycle's child payloads into payload[] via build_payload()
+    // - only proceeds to actually send if the payload changed since the
+    //   last send, or HEARTBEAT_INTERVAL_CYCLE cycles passed without a
+    //   send (keep-alive so the PC knows the link is still up)
+    // -> otherwise skips sending this cycle and goes straight to WAIT_NEXT_CYCLE
+    //--------------------------------------------------
         case State::BUILD_PAYLOAD:
         {
             build_payload(payload, payload_len);
@@ -258,7 +307,11 @@ void loop()
             break;
         }
 
-        //SEND_PAYLOAD STATE - binary frame or human-readable hex, depending on config.h
+        //---------------------------------------------------
+        // SEND_PAYLOAD
+        // - sends the built payload as a binary frame (SERIAL_WRITING) or as
+        //   human-readable hex text (print_payload_hex), depending on config.h
+        //--------------------------------------------------
         case State::SEND_PAYLOAD:
         {
             #if SERIAL_WRITING
@@ -275,7 +328,11 @@ void loop()
             break;
         }
 
-        //RELAY_FEEDBACK STATE - cycle through the predefined LED patterns
+        //---------------------------------------------------
+        // RELAY_FEEDBACK
+        // - relays the next predefined feedback pattern to every confirmed child
+        // - remembers this cycle's payload as "sent" and resets the heartbeat counter
+        //--------------------------------------------------
         case State::RELAY_FEEDBACK:
         {
             relay_feedback_to_children();
@@ -287,7 +344,11 @@ void loop()
             break;
         }
 
-        //WAIT_NEXT_CYCLE STATE - back to the top
+    //---------------------------------------------------
+    // WAIT_NEXT_CYCLE (maybe rename)
+    // - no time delay here - adding one desynchronises the wire timing
+    // - immediately loops back to DETECTION_INIT to start the next cycle
+    //--------------------------------------------------
         case State::WAIT_NEXT_CYCLE:
         {
             current_state = State::DETECTION_INIT;
