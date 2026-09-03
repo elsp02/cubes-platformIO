@@ -31,10 +31,6 @@
 
 static bool last_child_present[MAX_CHILD_COUNT] = {false}; //error: expression must have a constant value
 
-//---------------------------------------------------------
-// release all lines - in cube_hardware.cpp verschoben
-//---------------------------------------------------------
-
 
 // ----------------------------------------------------------
 // Fast upstream scan - vlt woanders hin verschieben
@@ -329,7 +325,7 @@ void setup()
     PORTB.OUTCLR = GREEN_LED_PIN | RED_LED_PIN;
 
     Serial.begin(115200);
-    Serial.println("uart_main_cube started");
+    Serial.println("final_uart_main_cube started");
 }
 
 // ----------------------------------------------------------

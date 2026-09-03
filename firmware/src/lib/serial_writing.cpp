@@ -105,6 +105,32 @@ void send_payload_to_pc(const uint8_t *payload, uint8_t payload_len)
 }
 
 
+// print_payload_hex
+// - prints payload_len and payload as space-separated hex bytes over Serial
+// - used instead of the binary frame when SERIAL_WRITING is off (see SEND_PAYLOAD state)
+void print_payload_hex(const uint8_t *payload, uint8_t len)
+{
+    Serial.print("ordered_payload_len = ");
+    Serial.println(len);
+
+    Serial.print("ordered_payload = ");
+
+    for (uint8_t i = 0; i < len; i++) {
+        if (payload[i] < 0x10) {
+            Serial.print("0");
+        }
+
+        Serial.print(payload[i], HEX);
+
+        if (i < len - 1) {
+            Serial.print(" ");
+        }
+    }
+
+    Serial.println();
+}
+
+
 // ----------------------------------------------------------
 // Debug Log Buffer - currently not in use
 // - in-RAM buffer, flushed to Serial in one write instead of many small ones

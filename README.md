@@ -184,6 +184,9 @@ The visualised feedback during the construction task inlcuding pyhsical and digi
 
 ## Prototype Status
 >**TODO**: when final prototype is finished, a revision of this subsection is needed
+
+//baseplate flashed currently with uart_baseplate_sate_machine env of commit 89c1055ab03e6bade8f2c494344d17d41a6eff1b
+//cube flashed currently with uart_cube env of commit 89c1055ab03e6bade8f2c494344d17d41a6eff1b (ungetestet) and b65bacb49b7ec45e51fe05621d1cff7b89f50d17
 This repository contains the proof-of-concept prototype developed for the Bachelor thesis. It is not a production-ready or certified educational product.
 
 At the time of the thesis evaluation:

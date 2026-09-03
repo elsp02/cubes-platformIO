@@ -13,7 +13,7 @@
 // 3. BUILD_PAYLOAD     - concatenate child payloads into one payload
 // 4. SEND_PAYLOAD      - send the payload (binary frame or hex text)
 // 5. RELAY_FEEDBACK    - relay the next predefined feedback pattern to every child
-// 6. WAIT_NEXT_CYCLE   - back to DETECTION_INIT
+// 6. READY_NEXT_CYCLE   - back to DETECTION_INIT
 // =====================================================================
 
 #include <Arduino.h>
@@ -113,36 +113,6 @@ void handle_detection(void){
         last_child_present[child] = child_done[child] || child_acked[child];
     }
 }
-
-
-//-----------------------------------------------------------
-// payload print - human-readable alternative to the binary frame
-//-----------------------------------------------------------
-// print_payload_hex
-// - prints payload_len and payload as space-separated hex bytes over Serial
-// - used instead of the binary frame when SERIAL_WRITING is off (see SEND_PAYLOAD state)
-static void print_payload_hex(const uint8_t *payload, uint8_t len)
-{
-    Serial.print("ordered_payload_len = ");
-    Serial.println(len);
-
-    Serial.print("ordered_payload = ");
-
-    for (uint8_t i = 0; i < len; i++) {
-        if (payload[i] < 0x10) {
-            Serial.print("0");
-        }
-
-        Serial.print(payload[i], HEX);
-
-        if (i < len - 1) {
-            Serial.print(" ");
-        }
-    }
-
-    Serial.println();
-}
-
 //---------------------------------------------------
 // FEEDBACK - predefined patterns, not PC-supplied
 //--------------------------------------------------
@@ -209,7 +179,7 @@ enum class State : uint8_t {
     BUILD_PAYLOAD,
     SEND_PAYLOAD,
     RELAY_FEEDBACK,
-    WAIT_NEXT_CYCLE
+    READY_NEXT_CYCLE
 };
 
 static State current_state = State::DETECTION_INIT;  // current state; advanced by exactly one transition per loop() call
@@ -259,7 +229,7 @@ void loop()
     // - only proceeds to actually send if the payload changed since the
     //   last send, or HEARTBEAT_INTERVAL_CYCLE cycles passed without a
     //   send (keep-alive so the PC knows the link is still up)
-    // -> otherwise skips sending this cycle and goes straight to WAIT_NEXT_CYCLE
+    // -> otherwise skips sending this cycle and goes straight to READY_NEXT_CYCLE
     //--------------------------------------------------
         case State::BUILD_PAYLOAD:
         {
@@ -271,7 +241,7 @@ void loop()
             if (changed || cycles_since_last_send >= HEARTBEAT_INTERVAL_CYCLE) {
                 current_state = State::SEND_PAYLOAD;
             } else {
-                current_state = State::WAIT_NEXT_CYCLE;
+                current_state = State::READY_NEXT_CYCLE;
             }
             break;
         }
@@ -304,16 +274,16 @@ void loop()
             remember_sent_payload(payload, payload_len);
             cycles_since_last_send = 0;
 
-            current_state = State::WAIT_NEXT_CYCLE;
+            current_state = State::READY_NEXT_CYCLE;
             break;
         }
 
     //---------------------------------------------------
-    // WAIT_NEXT_CYCLE (maybe rename)
+    // READY_NEXT_CYCLE
     // - no time delay here - adding one desynchronises the wire timing
     // - immediately loops back to DETECTION_INIT to start the next cycle
     //--------------------------------------------------
-        case State::WAIT_NEXT_CYCLE:
+        case State::READY_NEXT_CYCLE:
         {
             current_state = State::DETECTION_INIT;
             break;

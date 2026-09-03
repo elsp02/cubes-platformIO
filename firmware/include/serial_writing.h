@@ -29,6 +29,8 @@ void build_payload( // combines every responded child's payload into one PC-boun
 
 void send_payload_to_pc(const uint8_t *payload, uint8_t payload_len); // sends the built DATA FRAME with SYNC | LEN | PAYLOAD | CHECKSUM to the PC
 
+void print_payload_hex(const uint8_t *payload, uint8_t len); // prints payload_len and payload as space-separated hex bytes over Serial
+
 //------------------------------
 // error message buffer for SERIAL_DEBUG_END
 // -> currently not in use somewhere (alternative: SERIAL_DEBUG)

@@ -12,7 +12,7 @@
 // 6. GET_INFO_FROM_PC     - wait for the PC's reply (feedback/stop/bad)
 // 7. RELAY_FEEDBACK       - relay the feedback frame to every child
 // 8. SEND_RESULT_TO_PC    - report PC_RESP_DONE/PC_RESP_FB_FAILED
-// 9. WAIT_NEXT_CYCLE      - back to DETECTION_INIT
+// 9. READY_NEXT_CYCLE      - back to DETECTION_INIT
 //    STOPPING             - run the stop sequence, back to IDLE
 // =====================================================================
 
@@ -100,6 +100,16 @@ void handle_detection(void){
                 )){
                     SER_PRINTLN("CV");
                     child_done[i] = true; //mark child as done (sent valid DATA FARME to parent) -> no more polling of this child in next attempts
+                
+                #if defined(CUBE_TYPE_NORMAL)
+                    // Special case: orientation offset for port 1 (Out2, -Y).
+                    // Only the normal brick's port 1 has this mounting rotation
+                    if (i == 1) {
+                        child_payload[i][1] =
+                        (child_payload[i][1] + 3u) % 4u;
+                    }
+                #endif
+                
                 } else {
                     if (acked) {
                         child_acked[i] = true; // present but frame failed -> full retry budget from now on
@@ -207,7 +217,7 @@ enum class State : uint8_t {
     SEND_RESULT_TO_PC,
     GET_INFO_FROM_PC,
     RELAY_FEEDBACK,
-    WAIT_NEXT_CYCLE,
+    READY_NEXT_CYCLE,
     STOPPING
 };
 
@@ -297,7 +307,7 @@ void loop()
     // - only proceeds to actually send if the payload changed since the
     //   last send, or HEARTBEAT_INTERVAL_CYCLE cycles passed without a
     //   send (keep-alive so the PC knows the link is still up)
-    // -> otherwise skips sending this cycle and goes straight to WAIT_NEXT_CYCLE
+    // -> otherwise skips sending this cycle and goes straight to READY_NEXT_CYCLE
     //--------------------------------------------------
     case State:: BUILD_PAYLOAD:
     {
@@ -311,7 +321,7 @@ void loop()
             current_state = State:: SEND_PAYLOAD_TO_PC;
         } 
         else{
-            current_state = State:: WAIT_NEXT_CYCLE; // restarts with state DETECTION_INIT
+            current_state = State:: READY_NEXT_CYCLE; // restarts with state DETECTION_INIT
         }
         break;
     }
@@ -417,16 +427,16 @@ void loop()
         remember_sent_payload(payload, payload_len);
         cycles_since_last_send = 0;
 
-        current_state = State:: WAIT_NEXT_CYCLE;
+        current_state = State:: READY_NEXT_CYCLE;
         break;
     }
 
     //---------------------------------------------------
-    // WAIT_NEXT_CYCLE (maybe rename)
+    // READY_NEXT_CYCLE
     // - no time delay here - adding one desynchronises the wire timing
     // - immediately loops back to DETECTION_INIT to start the next cycle
     //--------------------------------------------------
-    case State:: WAIT_NEXT_CYCLE:
+    case State:: READY_NEXT_CYCLE:
     {
         //delay(150);   // pacing between detection cycles
         current_state = State:: DETECTION_INIT;
