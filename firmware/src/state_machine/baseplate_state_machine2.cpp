@@ -121,54 +121,7 @@ void handle_detection(void){
     }
 }
 
-// ----------------------------------------------------------
-// PAYLOAD BUILDING : 
-// ----------------------------------------------------------
 
-// build_payload
-// - combines every responded child's payload into one PC-bound payload
-void build_payload(uint8_t *payload, uint8_t &payload_len)
-{
-    payload_len = 0;
-
-    //in a loop add children payloads to the final payload
-    for (uint8_t child = 0; child < child_count; child++) {
-        if (!child_done[child]) {  //if child[i] didn´t respond, skip it
-            continue;
-        }
-
-        // Check whether this child payload still fits. If not, do not include it.
-        if ((uint16_t)payload_len + child_payload_len[child] > MAX_PAYLOAD_LEN) {
-            continue;
-        }
-
-        //copy child payload into final payload
-        for (uint8_t j = 0; j < child_payload_len[child]; j++) {
-            payload[payload_len++] = child_payload[child][j];  //copies stored payload into final payload and increases payload_len for next byte
-        }
-    }
-
-    release_all_lines();
-    _delay_us(3 * BYTE_US);
-}
-
-// ----------------------------------------------------------
-// SEND PAYLOAD
-// ----------------------------------------------------------
-
-// send_payload_to_pc
-// - sends the built DATA FRAME with SYNC | LEN | PAYLOAD | CHECKSUM to the PC
-void send_payload_to_pc(const uint8_t *payload, uint8_t payload_len)
-{
-    uint8_t checksum = calc_checksum(payload_len, payload);
-
-    Serial.write(SYNC_BYTE);
-    Serial.write(payload_len);
-    Serial.write(payload, payload_len);
-    Serial.write(checksum);
-}
-
-/////////////////////////////////////////////////////////////////
 //---------------------------------------------------
 // FEEDBACK
 //--------------------------------------------------
@@ -230,7 +183,7 @@ static received_feedback_t relay_feedback_to_children(
 }
 
 //---------------------------------------------------
-// START END SEQUENCE
+// END SEQUENCE
 //--------------------------------------------------
 
 // run_stop_sequence
@@ -243,35 +196,6 @@ static void run_stop_sequence(void)
     relay_feedback_to_children(empty_payload, 0);
     //detection_running = false;
 }
-
-//---------------------------------------------------
-//PC COMMUNICATION
-//--------------------------------------------------
-// pc_start_signal_received
-// - scans available serial bytes for PC_CMD_START
-// - true if found; also drains any bytes left in the buffer after it
-static bool pc_start_signal_received(){
-    bool start_received = false; //vlt hier nur return true/false?
-
-    while(
-        Serial.available() > 0 &&
-    !start_received
-    ){
-        uint8_t received_byte= (uint8_t)Serial.read();
-    if (received_byte == PC_CMD_START) {
-            start_received = true;
-        }
-    }
-
-    if (start_received) {
-        while (Serial.available() > 0) {   // start fresh: drop stray bytes
-            Serial.read();
-        }
-    }
-
-    return start_received; //vlt hier nur return true/false?
-}
-
 
 // state definition
 enum class State : uint8_t {
@@ -377,7 +301,7 @@ void loop()
     //--------------------------------------------------
     case State:: BUILD_PAYLOAD:
     {
-        build_payload(payload, payload_len);
+        build_payload(payload, payload_len, child_done, child_payload, child_payload_len);
 
         bool changed = payload_changed(payload, payload_len);
 

@@ -43,6 +43,33 @@
 }
 
 
+// pc_start_signal_received
+// - scans available serial bytes for PC_CMD_START
+// - true if found; also drains any bytes left in the buffer after it
+bool pc_start_signal_received(void)
+{
+    bool start_received = false; //vlt hier nur return true/false?
+
+    while(
+        Serial.available() > 0 &&
+    !start_received
+    ){
+        uint8_t received_byte= (uint8_t)Serial.read();
+    if (received_byte == PC_CMD_START) {
+            start_received = true;
+        }
+    }
+
+    if (start_received) {
+        while (Serial.available() > 0) {   // start fresh: drop stray bytes
+            Serial.read();
+        }
+    }
+
+    return start_received; //vlt hier nur return true/false?
+}
+
+
 // read_pc_reply
 // - waits for the PC's reply to a sent frame
 // - if it is a feedback frame, reads and validates it into fb_payload/fb_payload_len

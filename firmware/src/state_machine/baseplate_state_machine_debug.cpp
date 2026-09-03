@@ -114,37 +114,6 @@ void handle_detection(void){
     }
 }
 
-// ----------------------------------------------------------
-// PAYLOAD BUILDING : 
-// ----------------------------------------------------------
-
-// build_payload
-// - combines every responded child's payload into one PC-bound payload
-void build_payload(uint8_t *payload, uint8_t &payload_len)
-{
-    payload_len = 0;
-
-    //in a loop add children payloads to the final payload
-    for (uint8_t child = 0; child < child_count; child++) {
-        if (!child_done[child]) {  //if child[i] didn´t respond, skip it
-            continue;
-        }
-
-        // Check whether this child payload still fits. If not, do not include it.
-        if ((uint16_t)payload_len + child_payload_len[child] > MAX_PAYLOAD_LEN) {
-            continue;
-        }
-
-        //copy child payload into final payload
-        for (uint8_t j = 0; j < child_payload_len[child]; j++) {
-            payload[payload_len++] = child_payload[child][j];  //copies stored payload into final payload and increases payload_len for next byte
-        }
-    }
-
-    release_all_lines();
-    _delay_us(3 * BYTE_US);
-}
-
 
 //-----------------------------------------------------------
 // payload print - human-readable alternative to the binary frame
@@ -294,7 +263,7 @@ void loop()
     //--------------------------------------------------
         case State::BUILD_PAYLOAD:
         {
-            build_payload(payload, payload_len);
+            build_payload(payload, payload_len, child_done, child_payload, child_payload_len);
 
             bool changed = payload_changed(payload, payload_len);
             cycles_since_last_send++;
@@ -315,12 +284,7 @@ void loop()
         case State::SEND_PAYLOAD:
         {
             #if SERIAL_WRITING
-                        uint8_t checksum = calc_checksum(payload_len, payload);
-
-                        Serial.write(SYNC_BYTE);
-                        Serial.write(payload_len);
-                        Serial.write(payload, payload_len);
-                        Serial.write(checksum);
+                        send_payload_to_pc(payload, payload_len);
             #else
                         print_payload_hex(payload, payload_len);
             #endif

@@ -1,12 +1,15 @@
 // =====================================================================
 // serial_writing.cpp
 // - payload-change tracking (baseplate: skips resending an unchanged detection frame)
+// - payload building and sending
 // 
 // currently not used:
 //- buffered debug log, used when SERIAL_DEBUG_END is active (config.h)
 // =====================================================================
 #include "config.h"
 #include "serial_writing.h"
+#include "wire_bus.h"
+#include "cube_hardware.h"
 
 #include <util/delay.h>
 
@@ -49,6 +52,56 @@ void remember_sent_payload(const uint8_t *payload, uint8_t payload_len)
     }
     last_sent_payload_len = payload_len;
     have_sent_before = true;
+}
+
+
+// ----------------------------------------------------------
+// Payload Building / Sending for Baseplate
+// ----------------------------------------------------------
+
+// build_payload
+// - combines every responded child's payload into one PC-bound payload
+void build_payload(
+    uint8_t *payload,
+    uint8_t &payload_len,
+    const bool *child_done,
+    const uint8_t child_payload[][MAX_CHILD_PAYLOAD_LEN],
+    const uint8_t *child_payload_len
+)
+{
+    payload_len = 0;
+
+    //in a loop add children payloads to the final payload
+    for (uint8_t child = 0; child < child_count; child++) {
+        if (!child_done[child]) {  //if child[i] didn´t respond, skip it
+            continue;
+        }
+
+        // Check whether this child payload still fits. If not, do not include it.
+        if ((uint16_t)payload_len + child_payload_len[child] > MAX_PAYLOAD_LEN) {
+            continue;
+        }
+
+        //copy child payload into final payload
+        for (uint8_t j = 0; j < child_payload_len[child]; j++) {
+            payload[payload_len++] = child_payload[child][j];  //copies stored payload into final payload and increases payload_len for next byte
+        }
+    }
+
+    release_all_lines();
+    _delay_us(3 * BYTE_US);
+}
+
+// send_payload_to_pc
+// - sends the built DATA FRAME with SYNC | LEN | PAYLOAD | CHECKSUM to the PC
+void send_payload_to_pc(const uint8_t *payload, uint8_t payload_len)
+{
+    uint8_t checksum = calc_checksum(payload_len, payload);
+
+    Serial.write(SYNC_BYTE);
+    Serial.write(payload_len);
+    Serial.write(payload, payload_len);
+    Serial.write(checksum);
 }
 
 
