@@ -1,3 +1,9 @@
+// =====================================================================
+// pc_communication.cpp
+// - byte-level link between the baseplate and the controlling PC
+// =====================================================================
+
+
 #include "pc_communication.h"
 
 #include "config.h"
@@ -5,11 +11,9 @@
 
 
 #include <util/delay.h>
-// ----------------------------------------------------------
-// PC link helpers
-// ----------------------------------------------------------
 
-// wait for one byte from the PC, with millis() timeout
+// wait_for_pc_byte
+// - waits for one byte from the PC, with a millis() timeout
  bool wait_for_pc_byte(uint8_t *out, unsigned long timeout_ms)
 {
     unsigned long started_waiting = millis();
@@ -23,8 +27,9 @@
     return false;
 }
 
-// drain the serial input buffer, return true if PC_CMD_STOP was among
-// the received bytes (stop between frames)
+// stop_received
+// - drains the serial input buffer
+// - true if PC_CMD_STOP was among the received bytes (stop between frames)
  bool stop_received(void)
 {
     //bool stop = false;
@@ -38,8 +43,9 @@
 }
 
 
-// waits for the PC reply and, if it is a feedback frame, reads and
-// validates it into fb_payload/fb_payload_len
+// read_pc_reply
+// - waits for the PC's reply to a sent frame
+// - if it is a feedback frame, reads and validates it into fb_payload/fb_payload_len
 pc_reply_t read_pc_reply(uint8_t *fb_payload, uint8_t *fb_payload_len)
 {
     uint8_t b = 0;

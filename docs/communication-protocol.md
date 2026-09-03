@@ -105,7 +105,7 @@ The learning application controls an interaction session using the following sin
 | `DATA_FRAME` | variable | Baseplate → Application | Current serialised construction |
 | `FEEDBACK_FRAME` | variable | Application → Baseplate | Brick-specific feedback |
 | `PC_RESP_FB_DONE` | `0x44` (`D`) | Baseplate → Application | Feedback successfully forwarded |
-| `PC_RESP_FB_FAILED` | `0x4E` (`N`) | Baseplate → Application | Feedback invalid or forwarding failed |
+| `PC_RESP_FB_FAILED` | `0x4E` (`N`) | Baseplate → Application | Feedback invalid or forwarding failed, PC feedback communication invalid |
 | `PC_CMD_STOP` | `0x58` (`X`) | Application → Baseplate | Stop detection and clear feedback |
 
 A session begins with `PC_CMD_START` of the learning application. The baseplate then detects the construction and transmits a `DATA_FRAME`.
@@ -115,3 +115,76 @@ After evaluating the construction, the application returns a `FEEDBACK_FRAME`. T
 `PC_CMD_STOP` terminates cyclic detection and causes an empty feedback frame to be forwarded so that all brick LEDs are switched off.
 
 ## Validation and Error Handling??
+
+### Debug Log Codes
+When `SERIAL_DEBUG` or `SERIAL_DEBUG_END` is enabled (see `config.h`), `SER_PRINTLN` emits short codes over serial to trace protocol state without a debugger. Codes reflect the currently active source files only; legacy files under `old_versions/`/`archiv/` use a few additional codes not listed here.
+
+**Wire layer** (`wire_bus.cpp`, `rx_frame`):
+
+| Code | Meaning |
+|---|---|
+| `RS` | rx_frame started, waiting for SYNC |
+| `NS` | no SYNC byte arrived (timeout) |
+| `WS` | wrong byte received instead of SYNC |
+| `TD` | no LEN byte arrived (timeout) |
+| `PL` | LEN exceeds the max payload length |
+| `WP` | a payload byte failed to arrive in time |
+| `NCS` | no checksum byte arrived (timeout) |
+| `WCS` | checksum mismatch |
+
+**Child polling** (`poll_child.cpp`):
+
+| Code | Meaning |
+|---|---|
+| `NA` | no ACK_BUSY arrived after CMD_STATUS (timeout) |
+| `WA` | wrong byte received instead of ACK_BUSY |
+| `CV` | child valid - poll succeeded with a valid data frame |
+| `WC` | wrong/unexpected command byte received while scanning for CMD_STATUS/CMD_FEEDBACK |
+
+**Feedback relay** (`feedback.cpp` / `feedback_cube.cpp`, `send_feedback_to_child`):
+
+| Code | Meaning |
+|---|---|
+| `NFA` | no ACK_BUSY arrived after CMD_FEEDBACK (timeout) |
+| `WFA` | wrong byte received instead of ACK_BUSY |
+| `NFF` | child's feedback relay did not finish in time (timeout) |
+| `CFF` | confirmed feedback finished - child returned ACK_FINISHED |
+| `FFF` | failed feedback finished - child returned ACK_FAILED |
+| `WFF` | wrong/unexpected byte instead of ACK_FINISHED/ACK_FAILED |
+
+**Local LED feedback** (`feedback_cube.cpp`, `feedback_contains_own_id`):
+
+| Code | Meaning |
+|---|---|
+| `g` | own NODE_ID found in payload, LED set green |
+| `r` | own NODE_ID found in payload, LED set red |
+| `n` | own NODE_ID not found in payload, LED off |
+| `FI` | feedback: own ID was included in the payload |
+| `FO` | feedback: own ID absent, LED switched off |
+
+**Baseplate state machine** (`baseplate_state_machine2.cpp` / `baseplate_state_machine_debug.cpp`):
+
+| Code | Meaning |
+|---|---|
+| `CFA` | confirmed feedback ack - child confirmed the feedback frame |
+| `FFA` | failed feedback ack - child never confirmed after all retries |
+
+### Communication Timing
+All timeouts are derived from one base bit time, `BAUD_US` (104 µs, ≈ 9600 baud), and are defined in `firmware/include/config.h`.
+
+| Constant | Value (with 3 bricks in system) | Meaning |
+|---|---|---|
+| `BAUD_US` | 104 µs | time for 1 bit |
+| `BYTE_US` | 1.04 ms | time for 1 byte (start + 8 data + stop bit) |
+| `TURNAROUND_US` | 312 µs | delay before a cube transmits, between direction changes |
+| `CHILD_TIMEOUT_US` | 1.248 ms | max wait for `ACK_BUSY` after `CMD_STATUS` |
+| `CMD_ACK_TIME` | 2.392 ms | budget for a full CMD + ACK exchange |
+| `INTER_FRAME_TIMEOUT_US` | 1.04 ms | max wait for the next byte inside a data frame after SYNC |
+| `PARENT_TIMEOUT_US` | 1.248 ms | max wait for the parent (same as `CHILD_TIMEOUT_US`) |
+| `FAILED_ATTEMPT_US` | 11.544 ms | time spent on one failed child-polling attempt (all retries) |
+| `DATA_FRAME_TIME` | 31.2 ms | time to transmit one child data frame after ACK |
+| `FRAME_TIMEOUT_US` | ≈ 2.566 s | worst-case wait for a full data frame across recursive child polling |
+| `FB_HOP_US` | 14.664 ms | time for one feedback hop (parent → one child) |
+| `FEEDBACK_FINISHED_TIMEOUT_US` | ≈ 88 ms | worst-case wait for feedback to finish relaying (3 cubes) |
+| `PC_REPLY_TIMEOUT_MS` | 2 s | max wait for the PC's reply (first byte) |
+| `PC_FRAME_BYTE_TIMEOUT_MS` | 100 ms | max gap between bytes within a PC feedback frame |

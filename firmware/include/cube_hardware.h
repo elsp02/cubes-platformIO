@@ -1,18 +1,18 @@
-// brick child ports und anzahl je nach brick type 
-//// nicht vorhanden in code_improved
-
-//#include "config.h"
+// =====================================================================
+// cube_hardware.h
+// - declares the upstream (orientation) and child (downstream) wire
+//   ports for the currently selected brick type
+// - actual port/pin assignment and port counts are defined in
+//   cube_hardware.cpp, selected via the CUBE_TYPE_* build flag
+// =====================================================================
 #include "wire_bus.h"
 
 #include <stdint.h>
 
-extern const wire_t upstream[];
-extern const int upstream_count;
+extern const wire_t upstream[];        // orientation-detection ports (docking face)
+extern const int upstream_count;       // number of entries in upstream[]
 
-// Child-Ports des ausgewählten Cube-Typs
-extern const wire_t *const children[];
+extern const wire_t *const children[]; // downstream child ports (receiving face(s))
+extern const uint8_t child_count;      // number of entries in children[]
 
-// Anzahl der Child-Ports
-extern const uint8_t child_count;
-
-void release_all_lines(void);
+void release_all_lines(void); // releases every upstream and child line (idle/HIGH)

@@ -1,5 +1,9 @@
-// enthält allgemeinen Bus Treiber und keine konkrete Hardwarebelegung (damit die Funktionen von allen Modulen genutzt werden können)
-// -> wie art schablone bzw lückentext und das spezielle wird dann in den Modulen definiert
+// =====================================================================
+// wire_bus.cpp
+// - generic single-wire bus driver: no hardware specifics, just byte-
+//   and frame-level primitives built on wire_t (port/pin/index), so the
+//   same functions work for every module
+// =====================================================================
 
 #include "config.h"
 #include "wire_bus.h"
@@ -7,8 +11,6 @@
 
 #include <util/delay.h>
 
-//? für release_all_lines
-#include "cube_hardware.h"
 
 // ----------------------------------------------------------
 // Wire primitives
@@ -53,7 +55,7 @@ bool is_line_high(const wire_t *w)
 
 // ----------------------------------------------------------
 // Byte transmit
-// transmission of data frame (start bit, data bits, stop bit)
+// transmission of data frame (start bit, 8 data bits LSB-first, stop bit)
 // ----------------------------------------------------------
 
 void tx_byte(const wire_t *w, uint8_t b)
@@ -86,18 +88,19 @@ void tx_byte(const wire_t *w, uint8_t b)
     _delay_us(BAUD_US);
 }
 
+
 // ----------------------------------------------------------
-// Normal byte receive
-// Detection of start bit and then reception of data frame (data bits and stop bit)
-//
-// micros: better than the previous timeout measurement (before v7) because of an
-// specific time rather than just an approximate number of passes through the loop.
-// Timing constraint: entry latency shifts every bit sample point of the
-// byte late, and inside a frame the next start bit may already be on the
-// line. So: check the line BEFORE any micros() call, and while waiting
-// poll the line several times per (comparatively slow) micros() read.
+// Byte Receive
+// - detects the start bit, then reads data bits and stop bit
+// - uses micros() for a precise deadline instead of counting loop passes
 // ----------------------------------------------------------
 
+// rx_byte
+// - waits up to timeout_us for a start bit, then hands off to rx_byte_frame
+// - timing invariant: must check the line BEFORE any micros() call, and
+//   poll it several times per micros() read while waiting - entry latency
+//   shifts every bit sample point of the byte late, and inside a frame the
+//   next start bit may already be on the line when this is called
 bool rx_byte(const wire_t *w, uint8_t *out, uint32_t timeout_us)
 {
     // Fast path: start bit (low) already on the line (before micros() since the call takes time).
@@ -125,10 +128,8 @@ bool rx_byte(const wire_t *w, uint8_t *out, uint32_t timeout_us)
 }
 
 
-// ----------------------------------------------------------
-// Receive byte after start bit was already detected
-// ----------------------------------------------------------
-
+// rx_byte_frame
+// - receives one byte once the start bit is already known to be on the line
 bool rx_byte_frame(const wire_t *w, uint8_t *out)
 {
     /*
@@ -169,9 +170,11 @@ bool rx_byte_frame(const wire_t *w, uint8_t *out)
 }
 
 // ----------------------------------------------------------
-// Frame Rolling checksum
+// Checksum
 // ----------------------------------------------------------
 
+// calc_checksum
+// - simple XOR checksum over LEN + PAYLOAD
 uint8_t calc_checksum(uint8_t payload_len, const uint8_t *payload)
 {
     //Simple XOR checksum. Protected fields: LEN + PAYLOAD
@@ -185,11 +188,13 @@ uint8_t calc_checksum(uint8_t payload_len, const uint8_t *payload)
     return checksum;
 }
 
-//----------------------------------------------------
-// Frame transmit
-// Frame format:
-// SYNC LEN PAYLOAD CRC
-//----------------------------------------------------
+// ----------------------------------------------------------
+// Frame Transmit / Receive
+// - frame format: SYNC | LEN | PAYLOAD | CHECKSUM
+// ----------------------------------------------------------
+
+// tx_frame
+// - sends SYNC, LEN, PAYLOAD and the checksum over LEN + PAYLOAD
 void tx_frame(const wire_t *w, const uint8_t *payload, uint8_t payload_len){
 
     //calculate checksum for payload and payload_len
@@ -209,14 +214,12 @@ void tx_frame(const wire_t *w, const uint8_t *payload, uint8_t payload_len){
     wire_release(w);
 }
 
-//----------------------------------------------------
-// Frame Receive
-// Receives SYNC LEN PAYLOAD CRC
+
+// rx_frame
+//  -r eceives SYNC LEN PAYLOAD CRC
 //
 // returns only:
 // PAYLOAD and PAYLOAD_len
-//----------------------------------------------------
-
 bool rx_frame(
     const wire_t *w,
     uint8_t *payload,

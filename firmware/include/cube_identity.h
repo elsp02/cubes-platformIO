@@ -1,5 +1,9 @@
-// für NODE_ID je nach brick type -> type in .ini datei definiert 
-///baseplate miteinbinden?
+// =====================================================================
+// cube_identity.h
+// - builds this brick's NODE_ID from its cube type and instance number
+// - CUBE_TYPE_* and CUBE_INSTANCE are set as build flags in platformio.ini
+// - not used for CUBE_TYPE_BASEPLATE -> has no NODE_ID
+// =====================================================================
 
 #ifndef CUBE_IDENTITIY_H
 #define CUBE_IDENTITIY_H
@@ -12,8 +16,8 @@
 // Bits 7..5 = Cube-Type (for tree comparison)
 // Bits 4..0 = Instance number
 //-------------------------------------------------------
-constexpr uint8_t TYPE_SHIFT   = 5;
-constexpr uint8_t INSTANCE_MASK = 0x1F;
+constexpr uint8_t TYPE_SHIFT   = 5; // bit offset of the type field
+constexpr uint8_t INSTANCE_MASK = 0x1F; // mask for the 5-bit instance field
 
 #if !defined(CUBE_TYPE_BASEPLATE)
     #if defined(CUBE_TYPE_NORMAL)
@@ -33,7 +37,7 @@ constexpr uint8_t INSTANCE_MASK = 0x1F;
         #error "No cube instance selected"
     #endif
 
-    // create NODE_ID - klappt das dann mit der baseplate???
+    // creates NODE_ID = (CUBE_TYPE << TYPE_SHIFT) | (CUBE_INSTANCE & INSTANCE_MASK)
     constexpr uint8_t NODE_ID =
         static_cast<uint8_t>(
             (CUBE_TYPE << TYPE_SHIFT) |

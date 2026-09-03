@@ -1,4 +1,10 @@
-// Definition of functions for wire/bus
+// =====================================================================
+// wire_bus.h
+// - generic single-wire bus driver: no hardware specifics, just byte-
+//   and frame-level primitives built on wire_t (port/pin/index)
+// - concrete pin assignments live in cube_hardware.cpp per brick type
+// =====================================================================
+
 #ifndef WIRE_BUS_H
 #define WIRE_BUS_H
 
@@ -66,7 +72,7 @@ bool rx_frame(                  // receiving data frame
 
 );
 
-uint8_t calc_checksum(
+uint8_t calc_checksum(         // XOR checksum over LEN + PAYLOAD
     uint8_t payload_len,
     const uint8_t *payload
 );

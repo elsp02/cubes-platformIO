@@ -109,17 +109,49 @@ The four side-view RGB LEDs provide local visual feedback directly on the affect
 
 Further information about the feedback is provided in[Feedback and Visualization](docs/feedback.md).
 
-### Pin Assignment?
->**TODO**: check correctness
-| Pin | Function | Description |
-|-----|----------|-------------|
-| PA1 | Upstream orientation 0 | Parent communication line for orientation 0 |
-| PA3 | Upstream orientation 1 | Parent communication line for orientation 1 |
-| PA4 | Upstream orientation 2 | Parent communication line for orientation 2 |
-| PA5 | Upstream orientation 3 | Parent communication line for orientation 3 |
-| PB0 | Downstream child port 0 | Data line to child port 0 |
-| PB1 | Downstream child port 1 | Data line to child port 1 |
-| PB4 | Debug LED | Status/debug output |
+### Pin Assignment
+Derived from `firmware/src/lib/cube_hardware.cpp` and `firmware/include/cube_identity.h`.
+
+**Cube type codes** (`NODE_ID` bits 7..5):
+
+| Brick Type | `CUBE_TYPE` | Notes |
+|---|---|---|
+| Normal (cube brick) | `0x00` | 5 receiving faces |
+| Smashed brick | `0x01` | 1 receiving face |
+| Pyramid | `0x02` | 2 receiving faces - not yet listed under [Brick Types](#brick-types) above |
+| Baseplate | — | tree root, has no `NODE_ID` |
+
+**Upstream (orientation) ports** - identical for every non-baseplate brick type, one per docking-face orientation contact:
+
+| Pin | Bitmask | Orientation |
+|---|---|---|
+| PA1 | `PIN1_bm` | 0 |
+| PA2 | `PIN2_bm` | 1 |
+| PA6 | `PIN6_bm` | 2 |
+| PA7 | `PIN7_bm` | 3 |
+
+The baseplate has no upstream ports - it is the tree root and has no docking face.
+
+**Downstream (child) ports** - one receiving-face contact per port, set differs by brick type:
+
+| Brick Type | Port | Pin | Bitmask |
+|---|---|---|---|
+| Normal | Out1 | PC3 | `PIN3_bm` |
+| Normal | Out2 | PA3 | `PIN3_bm` |
+| Normal | Out3 | PA4 | `PIN4_bm` |
+| Normal | Out4 | PA5 | `PIN5_bm` |
+| Normal | Out5 | PB1 | `PIN1_bm` |
+| Smashed | Out1 | PC3 | `PIN3_bm` |
+| Pyramid | Out1 | PC3 | `PIN3_bm` |
+| Pyramid | Out2 | PB1 | `PIN1_bm` |
+| Baseplate | (only port) | PB1 | `PIN1_bm` |
+
+**Feedback LEDs** (from `config.h`, driven on `PORTB`):
+
+| Pin | Function |
+|---|---|
+| PB5 | Green feedback LED |
+| PB4 | Red feedback LED |
 
 ### Electrical Principle?
  All lines are single-wire, open-drain-emulated UART/NRZ by switching each pin between output-low and input-with-pullup. The communication is half duplex, meaning that only one device may transmit at a time.

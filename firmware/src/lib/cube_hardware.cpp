@@ -1,13 +1,21 @@
-// definiert orientation ports und je nach type die anzahl der childs und weist child ports zu
-//baseplate miteinbinden?
-
+// =====================================================================
+// cube_hardware.cpp
+// - defines the upstream (orientation) and child (downstream) wire
+//   ports for each brick type, selected via the CUBE_TYPE_* build flag in plaftormIO.ini
+//
+// - baseplate: no upstream ports
+// =====================================================================
 
 #include "cube_hardware.h"
 
 #include "config.h"
 #include "cube_identity.h"
 
-
+// ----------------------------------------------------------
+// Upstream (Orientation) Ports
+// - docking-face contacts used to detect relative orientation to the parent
+// -> not included in baseplate
+// ----------------------------------------------------------
 #if defined(CUBE_TYPE_BASEPLATE)
 
 const wire_t upstream[] = {};  // baseplate is the tree root, no orientation lines
@@ -25,6 +33,11 @@ const wire_t upstream[] = {
 
 const int upstream_count = sizeof(upstream) / sizeof(upstream[0]);
 
+
+// ----------------------------------------------------------
+// Child (Downstream) Ports
+// - receiving-face contacts, one port set per brick type
+// ----------------------------------------------------------
 #if defined(CUBE_TYPE_NORMAL)
 
 static const wire_t child_0 = { &PORTC, PIN3_bm, 3 };  // PCB Port Out1
@@ -72,6 +85,8 @@ const uint8_t child_count =
     sizeof(children) / sizeof(children[0]);
 
 
+// release_all_lines
+// - releases every upstream and child line (idle/HIGH)
 // problem: baseplate hat keine upstream ports -> vlt fkt einfach trennen?
 void release_all_lines(void){
     for (uint8_t line = 0; line < upstream_count; line ++){

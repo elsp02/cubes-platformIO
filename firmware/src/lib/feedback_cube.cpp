@@ -1,3 +1,9 @@
+// =====================================================================
+// feedback_cube.cpp
+// - feedback handling for bricks: local LED control and relaying
+//   feedback frames one hop further down the tree
+// =====================================================================
+
 #include "feedback_cube.h"
 
 #include "config.h"
@@ -9,6 +15,10 @@
 #include <avr/io.h>
 #include <util/delay.h>
 
+
+// feedback_contains_own_id
+// - scans payload for this brick's NODE_ID and sets the local LED accordingly
+// - true only once this brick's own ID was found in the payload
 bool feedback_contains_own_id(const uint8_t *payload, uint8_t len)
 {   bool found_own_id = false;
     // i + 1 < len: each entry is an (ID, LED_STATE) pair, so never read
@@ -18,9 +28,10 @@ bool feedback_contains_own_id(const uint8_t *payload, uint8_t len)
             found_own_id = true;
             uint8_t led_state = payload[i+1];
 
+            // currently incorrect because a adressable rgb led is used
             if (led_state == LED_GREEN) {
-                  PORTB.OUTSET = GREEN_LED_PIN;  //set green pin high
-                  PORTB.OUTCLR = RED_LED_PIN;       //set red pin low (or turn rgb led to red)}
+                  PORTB.OUTSET = GREEN_LED_PIN;  
+                  PORTB.OUTCLR = RED_LED_PIN;   
                   SER_PRINTLN("g");
                   return true;
               } else if (led_state == LED_RED){
@@ -31,7 +42,7 @@ bool feedback_contains_own_id(const uint8_t *payload, uint8_t len)
               return true; 
           }
     }
-    // if own ID not inlcuded, turn led off
+    // if own ID not inlcuded in FEEDBACK PAYLOAD, turn LED off
       if (!found_own_id){    
           PORTB.OUTCLR = GREEN_LED_PIN | RED_LED_PIN;
           SER_PRINTLN("n");
@@ -40,7 +51,10 @@ bool feedback_contains_own_id(const uint8_t *payload, uint8_t len)
     return false;
 }
 
-// static bool oder einfach so bool?
+// send_feedback_to_child
+// - relays a feedback frame to one child port and waits for it to finish
+// - true only on ACK_FINISHED from the child (after its own recursive relay)
+// -> mirrors the CMD_STATUS/ACK/DATA_FRAME shape of poll_child, but for feedback
 bool send_feedback_to_child(
     const wire_t *w,
     const uint8_t *fb_payload,
@@ -51,7 +65,7 @@ bool send_feedback_to_child(
     wire_release(w);
     _delay_us(TURNAROUND_US);
 
-    // 1. Send feedback command == CMD_STATUS to child (detection sequence)
+    // 1. Send feedback command == same as in detection sequence (but with CMD_STATUS)
     tx_byte(w, CMD_FEEDBACK);
 
     wire_release(w);
@@ -67,14 +81,14 @@ bool send_feedback_to_child(
         return false;
     }
 
-    // 3. Send feedback frame == nothing that could be compared to the identification sequence
+    // 3. Send feedback frame
     _delay_us(TURNAROUND_US);
     tx_frame(w, fb_payload, fb_payload_len);
     wire_release(w);
 
 
-    // receive ack_finished valid/invalid == same as data frame from child (detection sequence)
-    // 3. Wait for child's recursive feedback completion
+
+    // 3. Wait for child's recursive feedback relay to finish == comparable with DATA_FRAME from child in detection sequence
     if (!rx_byte(w, &b, FEEDBACK_FINISHED_TIMEOUT_US)) {
         SER_PRINTLN("NFF");   // no feedback finished
         return false;
