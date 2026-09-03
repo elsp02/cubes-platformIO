@@ -1,8 +1,8 @@
 // =====================================================================
 // serial_writing.cpp
-// - payload-change tracking (baseplate: skips resending an unchanged detection frame)
-// - payload building and sending
-// 
+// - payload building: shared by baseplate and brick (see build_payload())
+// - payload-change tracking and PC-frame sending: baseplate only
+//
 // currently not used:
 //- buffered debug log, used when SERIAL_DEBUG_END is active (config.h)
 // =====================================================================
@@ -10,6 +10,7 @@
 #include "serial_writing.h"
 #include "wire_bus.h"
 #include "cube_hardware.h"
+#include "cube_identity.h"
 
 #include <util/delay.h>
 
@@ -56,20 +57,34 @@ void remember_sent_payload(const uint8_t *payload, uint8_t payload_len)
 
 
 // ----------------------------------------------------------
-// Payload Building / Sending for Baseplate
+// Payload Building - shared by baseplate and cube
 // ----------------------------------------------------------
 
 // build_payload
-// - combines every responded child's payload into one PC-bound payload
+// - combines every responded child's payload into one payload
+// - cube builds additionally prefix NODE_ID | ORIENTATION | CHILD_MASK and
+//   set a bit in child_mask for every included child (baseplate has neither)
 void build_payload(
     uint8_t *payload,
     uint8_t &payload_len,
     const bool *child_done,
     const uint8_t child_payload[][MAX_CHILD_PAYLOAD_LEN],
     const uint8_t *child_payload_len
+
+    #if !defined(CUBE_TYPE_BASEPLATE)
+    , uint8_t orientation_mask
+    #endif
 )
 {
     payload_len = 0;
+
+    #if !defined(CUBE_TYPE_BASEPLATE)
+        uint8_t child_mask = 0x00;
+
+        payload[payload_len++] = NODE_ID;
+        payload[payload_len++] = orientation_mask;
+        payload[payload_len++] = 0x00;  // placeholder for child_mask
+    #endif
 
     //in a loop add children payloads to the final payload
     for (uint8_t child = 0; child < child_count; child++) {
@@ -82,14 +97,19 @@ void build_payload(
             continue;
         }
 
+        #if !defined(CUBE_TYPE_BASEPLATE)
+            child_mask |= (1 << child);   // set bit for child[i] in child_mask (LSB = child 0)
+        #endif
+
         //copy child payload into final payload
         for (uint8_t j = 0; j < child_payload_len[child]; j++) {
             payload[payload_len++] = child_payload[child][j];  //copies stored payload into final payload and increases payload_len for next byte
         }
     }
 
-    release_all_lines();
-    _delay_us(3 * BYTE_US);
+    #if !defined(CUBE_TYPE_BASEPLATE)
+        payload[2] = child_mask;
+    #endif
 }
 
 // send_payload_to_pc

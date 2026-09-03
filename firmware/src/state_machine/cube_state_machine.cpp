@@ -23,7 +23,6 @@
 #include "poll_child.h"
 #include "feedback_cube.h"
 #include "cube_hardware.h"
-#include "cube_identity.h"
 
 //---------------------------------------------------
 // ORIENTATION
@@ -77,84 +76,15 @@ static void wait_for_valid_upstream_cmd(
 }
 
 //---------------------------------------------------
-// DETECTION - same as baseplate - zusammenfassen
+// DETECTION
 //--------------------------------------------------
 
 static uint8_t child_payload[MAX_CHILD_COUNT][MAX_CHILD_PAYLOAD_LEN];   // child_payload[child_index][payload_index] = byte received from child
 static uint8_t child_payload_len[MAX_CHILD_COUNT] = {0};                // length of the payload received from child[i]
 static bool child_done[MAX_CHILD_COUNT] = {false};                      // child[i] answered with a valid frame this cycle
-static bool last_child_present[MAX_CHILD_COUNT] = {false};              // feeds attempt_budget in the next handle_detection() call
 
-// handle_detection
-// - polls every child port with retries, using presence-aware retry budgets
-// - writes results into child_done[]/child_payload[]/child_payload_len[]
-//   and updates last_child_present[] for the next cycle
-// (same retry logic as baseplate_state_machine2.cpp's handle_detection())
-static void handle_detection(void)
-{
-    for (uint8_t i = 0; i < child_count; i++) {
-        child_done[i] = false;   // fresh detection cycle
-    }
-
-    bool child_acked[MAX_CHILD_COUNT] = {false}; // child answered ACK_BUSY at least once this cycle -> port is occupied even if its frame failed
-
-    for (uint8_t attempt = 0; attempt < CHILD_RETRIES; attempt++) { //retry loop
-        bool retry_needed = false; //true if any child still has attempts left after this round
-
-        for (uint8_t i = 0; i < child_count; i++) {  //child loop, iterates through children
-
-            if (child_done[i]) {
-                continue;
-            }
-
-            // attempt budget - see retry logic in handle_detection() doc above
-            uint8_t attempt_budget = (last_child_present[i] || child_acked[i]) ? CHILD_RETRIES : 1;
-
-            if (attempt >= attempt_budget) {
-                continue;
-            }
-
-            bool acked = false;
-
-            if (poll_child(
-                    children[i],
-                    child_payload[i],
-                    MAX_CHILD_PAYLOAD_LEN,
-                    &child_payload_len[i],
-                    &acked
-            )) {
-                SER_PRINTLN("CV");
-                child_done[i] = true; //mark child as done -> no more polling of this child in next attempts
-
-            #if defined(CUBE_TYPE_NORMAL)
-                // Special case: orientation offset for port 1 (Out2, -Y).
-                // Only the normal brick's port 1 has this mounting rotation
-                if (i == 1) {
-                    child_payload[i][1] =
-                        (child_payload[i][1] + 3u) % 4u;
-                }
-            #endif
-
-            } else {
-                if (acked) {
-                    child_acked[i] = true; // present but frame failed -> full retry budget from now on
-                    retry_needed = true;
-                } else if (attempt + 1 < attempt_budget) { //if child was present in the previous detection loop - full retry budget
-                    retry_needed = true;
-                }
-            }
-        }
-
-        if (!retry_needed) {
-            break;
-        }
-    }
-
-    // feeds attempt_budget in the next handle_detection() call
-    for (uint8_t child = 0; child < child_count; child++) {
-        last_child_present[child] = child_done[child] || child_acked[child];
-    }
-}
+// handle_detection() itself now lives in poll_child.cpp (shared with baseplate_state_machine2.cpp
+// and baseplate_state_machine_debug.cpp) - see poll_child.h
 
 // state definition
 enum class State : uint8_t {
@@ -204,7 +134,7 @@ void loop()
     case State::ORIENTATION:
     {
         wait_for_valid_upstream_cmd(&active_upstream, &orientation_mask);
-        current_state = State::IDLE;
+        current_state = State::DETECTION_INIT;
         break;
     }
 
@@ -257,56 +187,41 @@ void loop()
     //--------------------------------------------------
     case State::DETECTING:
     {
-        handle_detection();
+        handle_detection(child_payload, child_payload_len, child_done);
         current_state = State::BUILD_SEND_PAYLOAD;
         break;
     }
 
     //---------------------------------------------------
-    // BUILD_SEND_PAYLOAD - irgendwie vlt auch  mit baseplate code vereinen (mithilfe der flags??)
+    // BUILD_SEND_PAYLOAD
     // - builds this cube's own payload: NODE_ID | ORIENTATION | CHILD_MASK | CHILD_PAYLOADS...
+    //   via build_payload() (shared with the baseplate, see serial_writing.cpp)
     // - sends it upstream to the parent, then releases the lines for the next cycle
     //--------------------------------------------------
     case State::BUILD_SEND_PAYLOAD:
     {
         uint8_t payload[MAX_PAYLOAD_LEN]; // final payload to be sent upstream
         uint8_t payload_len = 0;          // length of final payload
-        uint8_t child_mask = 0x00;        // child_mask to be sent in final payload
 
-        payload[payload_len++] = NODE_ID;
-        payload[payload_len++] = orientation_mask;
-        payload[payload_len++] = 0x00;  // placeholder for child_mask
-
-        for (uint8_t child = 0; child < child_count; child++) {
-            if (!child_done[child]) {  // if child[i] didn't respond, skip it
-                continue;
-            }
-
-            // if this child payload doesn't fit anymore, skip it and leave its bit unset
-            if ((uint16_t)payload_len + child_payload_len[child] > MAX_PAYLOAD_LEN) {
-                continue;
-            }
-
-            child_mask |= (1 << child);   // set bit for child[i] in child_mask (LSB = child 0)
-
-            for (uint8_t j = 0; j < child_payload_len[child]; j++) {
-                payload[payload_len++] = child_payload[child][j];
-            }
-        }
-
-        payload[2] = child_mask;
+        build_payload(payload, payload_len, child_done, child_payload, child_payload_len, orientation_mask);
 
         SER_PRINT("CM");
-        if ((child_mask & 0b10) == 0) {
+        if ((payload[2] & 0b10) == 0) {
             SER_PRINT("0");
         }
-        SER_PRINTLN2(child_mask, BIN);
+        SER_PRINTLN2(payload[2], BIN);
 
         _delay_us(TURNAROUND_US);
         tx_frame(active_upstream, payload, payload_len);
+        current_state = State:: READY_NEXT_CYCLE;
+        break;
 
+       
+    }
 
-        // in READY_NEXT_CYCLE
+    
+    case State::READY_NEXT_CYCLE:
+    {
         wire_release(active_upstream);
         release_all_lines();
 

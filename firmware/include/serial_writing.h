@@ -1,7 +1,7 @@
 // =====================================================================
 // serial_writing.h
-// - payload-change tracking, building and sending (baseplate: skips resending an unchanged detection frame)
-// -> just basplate uses file
+// - payload building, shared by baseplate and brick 
+// - payload-change tracking and PC-frame sending: baseplate only
 // currently not used:
 //- buffered debug log, used when SERIAL_DEBUG_END is active (config.h)
 // =====================================================================
@@ -19,12 +19,15 @@ bool payload_changed(const uint8_t *payload, uint8_t payload_len);  // true if p
 
 void remember_sent_payload(const uint8_t *payload, uint8_t payload_len); // stores payload as the new "last sent" baseline
 
-void build_payload( // combines every responded child's payload into one PC-bound payload
-    uint8_t *payload,
+void build_payload( // combines every responded child's payload into one payload;
+    uint8_t *payload,                        // brick builds: prefixes NODE_ID | ORIENTATION | CHILD_MASK and sets child_mask bits
     uint8_t &payload_len,
     const bool *child_done,
     const uint8_t child_payload[][MAX_CHILD_PAYLOAD_LEN],
     const uint8_t *child_payload_len
+    #if !defined(CUBE_TYPE_BASEPLATE)
+    , uint8_t orientation_mask
+    #endif
 );
 
 void send_payload_to_pc(const uint8_t *payload, uint8_t payload_len); // sends the built DATA FRAME with SYNC | LEN | PAYLOAD | CHECKSUM to the PC

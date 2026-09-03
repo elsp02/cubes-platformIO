@@ -31,7 +31,6 @@
 
 #define HEARTBEAT_INTERVAL_CYCLE 50 // after 50 cycles payload is sent again even if it hasn´t changed
 static uint16_t cycles_since_last_send = 0;
-static bool last_child_present[MAX_CHILD_COUNT] = {false};
 
 static uint8_t pc_reply_retry_count = 0; //retry counts if pc replied with bullshit/error after baseplate sends feedback
 
@@ -45,92 +44,8 @@ static uint8_t payload[MAX_PAYLOAD_LEN];
 static uint8_t payload_len = 0;
 
 // feedback payload received from pc (read_pc_reply)
-static uint8_t fb_payload[MAX_PAYLOAD_LEN]; 
+static uint8_t fb_payload[MAX_PAYLOAD_LEN];
 static uint8_t fb_payload_len = 0;
-//////////////////////////////////////////////
-
-//---------------------------------------------------
-// DETECTION
-//--------------------------------------------------
-
-// handle_detection
-// - polls every child port with retries, using presence-aware retry budgets
-// - writes results into child_done[]/child_payload[]/child_payload_len[]
-//   and updates last_child_present[] for the next cycle
-//
-// retry logic (attempt budget per port): 
-// - a port counts as "occupied" if it had 
-//    -> a child last cycle (last_child_present[i])
-//    -> or already answered ACK_BUSY this cycle (child_acked[i]) 
-//    =>  it gets the full CHILD_RETRIES attempts, since this means a child is physically there
-// - a port counts as "unoccupied" if it didn´t sent ACK_BUSY
-//   => gets only a single attempt because it´s very likely that no child is pbhyiscally there
-void handle_detection(void){
-
-    for (uint8_t i = 0; i < child_count; i++) {
-            child_done[i] = false;   // fresh detection cycle
-        }
-
-        bool child_acked[MAX_CHILD_COUNT] = {false}; // child answered ACK_BUSY at least once this cycle -> port is occupied even if its frame failed
-
-        for (uint8_t attempt = 0; attempt < CHILD_RETRIES; attempt++) { //retry loop
-            bool retry_needed = false; //true if any child still has attempts left after this round
-
-            for (uint8_t i = 0; i < child_count; i++) {  //child loop, iterates through children
-
-                if (child_done[i]) {
-                    continue;
-                }
-
-                // attempt budget - see retry logic in the function doc above
-                uint8_t attempt_budget = (last_child_present[i] || child_acked[i]) ? CHILD_RETRIES : 1;
-
-                if (attempt >= attempt_budget) {
-                    continue;
-                }
-
-                bool acked = false;
-
-                if (poll_child( // polls one child
-                        children[i],           
-                        child_payload[i],     
-                        MAX_CHILD_PAYLOAD_LEN, 
-                        &child_payload_len[i], 
-                        &acked
-                )){
-                    SER_PRINTLN("CV");
-                    child_done[i] = true; //mark child as done (sent valid DATA FARME to parent) -> no more polling of this child in next attempts
-                
-                #if defined(CUBE_TYPE_NORMAL)
-                    // Special case: orientation offset for port 1 (Out2, -Y).
-                    // Only the normal brick's port 1 has this mounting rotation
-                    if (i == 1) {
-                        child_payload[i][1] =
-                        (child_payload[i][1] + 3u) % 4u;
-                    }
-                #endif
-                
-                } else {
-                    if (acked) {
-                        child_acked[i] = true; // present but frame failed -> full retry budget from now on
-                        retry_needed = true;
-                    } else if (attempt + 1 < attempt_budget) { //if child was present in the previous detection loop - full retry budget 
-                        retry_needed = true;
-                    }
-                }
-            }
-
-            if (!retry_needed) {
-                break;
-            }
-    }
-
-    // feeds attempt_budget in the next handle_detection() call
-    for (uint8_t child = 0; child < child_count; child++) {
-        last_child_present[child] = child_done[child] || child_acked[child];
-    }
-}
-
 
 //---------------------------------------------------
 // FEEDBACK
@@ -294,7 +209,7 @@ void loop()
     //--------------------------------------------------
         case State:: DETECTING:
         {
-            handle_detection(); //genau so wie in cube_uart.cpp
+            handle_detection(child_payload, child_payload_len, child_done);
             current_state = State:: BUILD_PAYLOAD;
             pc_reply_retry_count = 0; //is this location correct??
 
@@ -312,6 +227,8 @@ void loop()
     case State:: BUILD_PAYLOAD:
     {
         build_payload(payload, payload_len, child_done, child_payload, child_payload_len);
+        release_all_lines();
+        _delay_us(3*BYTE_US);
 
         bool changed = payload_changed(payload, payload_len);
 
