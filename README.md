@@ -29,23 +29,27 @@ The system consists of three main components:
 ├── docs/
 │   ├── architecture.md
 │   ├── communication-protocol.md
-│   └── feedback.md
-│   └── hardware.md
-│   └── hardware.md
-│   └── timing-definitions.md
+│   ├── feedback.md
+│   ├── hardware.md
+│   ├── timing-definitions.md
 │
 ├── figures/
 │
-├── [FIRMWARE_DIRECTORY]/
-│   ├── [BRICK_FIRMWARE]/
-│   └── [BASEPLATE_FIRMWARE]/
+├── firmware/
+│   ├── include/
+│   │   └── include/
+│   └── src/
+│        ├── lib/
+│        ├── firmware_baseplate/
+│        ├── firmware_cube/
+│        └── state_machine/
 │
 ├── [SOFTWARE_DIRECTORY]/
 │   ├── [BACKEND_DIRECTORY]/
 │   └── [FRONTEND_DIRECTORY]/
 │
-├── [HARDWARE_DIRECTORY]/
-│   ├── [PCB_FILES]
+├── hardware/
+│   ├── pcb_files/
 │   ├── [CAD_FILES]
 │   └── [OTHER_HARDWARE_FILES]
 │
@@ -55,16 +59,16 @@ The system consists of three main components:
 |Directory | Description |
 |:--|:--|
 | `docs/` | Technical documentation of the developed system |
-| `[FIRMWARE_DIRECTORY]` | Embedded firmware for the building bricks and the baseplate |
+| `firmware` | Embedded firmware for the building bricks and the baseplate |
 | `[BACKEND_DIRECTORY]` | Python backend for communication and construction processing |
 | `[FRONTEND_DIRECTORY]` | Browser-based learning application and 3D visualisation |
-| `[HARDWARE_DIRECTORY]` | Electronic and mechanical design files
+| `hardware` | Electronic and mechanical design files
 | `[OTHER]` | TODO if required | 
 
 ## Documentation
 Detailed technical documentation is provided separately: 
 - [System Architecuture](docs/system_architecture.md): Overall system structure, component responsibilities, software architecture and data processing
-- [Communication Protocol](docs/communication_protocol.md): Communication interfaces, message formats, communication sequences (and error handling)
+- [Communication Protocol](docs/communication_protocol.md): Communication interfaces, message formats, communication sequences (and error and timeout handling)
 - [Hardware](docs/hardware.md): Mechanical and electronic implementation of the building bricks and baseplate
 
 Addtional information regarding the feedback output and visualisation is provided in [Feedback and Visualisation](docs/feedback.md).
@@ -77,38 +81,44 @@ to operate the complete physical prototype, the following hard- and software is 
 
 ### Prototype Hardware
 >**TODO**: adjust link to correct one
-The building bricks and baseplate both include an ATtiny1616 and are custom developed components. Their mechanical and electronic design files are included in this repository in the [HARDWARE_DIRECTORY] and explained in [Hardware](docs/hardware.md)
+
+The building bricks and baseplate both include an ATtiny1616 and are custom developed components. Their mechanical and electronic design files are included in this repository in the [hardware](hardware/) and explained in [Hardware](docs/hardware.md)
 
 ### Additional Hardware
-- UPDI programmer
-- USB-to-TTL UART Aadapter (used with included CH340G converter)
+- 2× USB-to-TTL UART adapter (CH340/CH340G-based)
+  - one modified with a TX/RX diode, used as UPDI programmer (jtag2updi)
+  - one unmodified, used for host–baseplate UART communication and 5V supply
 - host computer
 - USB connection for 5V power supply
 
-The prototype was programmed using a jtag2updi-compatible programmer.
+The prototype was programmed using the jtag2updi-compatible programmer.
 Setup instructions are available in the
 [jtag2updi documentation](https://github.com/SpenceKonde/AVR-Guidance/blob/master/UPDI/jtag2updi.md).
 
 ### Software
->**TODO**: Python version, dependencies, requirements.txt file erstellen
 - [PlatformIO](https://platformio.org/)
 - [megaTinyCore](https://github.com/SpenceKonde/megaTinyCore) for ATtiny1616 support
-- Python [VERSION]
+- Python 3.14
 - modern web browser
 
-Python dependencies:  
-[TODO: e.g. pyserial]   
-[TODO: e.g. websockets]   
-[TODO: additional packages]  
+**Python dependencies**:  
+- `pyserial` (UART communication, e.g. [handshake_test.py](software/uart_test/handshake_test.py), [binary_serial_reader.py](software/threejs_visualization/backend/binary_serial_reader.py))
+- `websockets` (backend WebSocket server, [ws_server.py](software/threejs_visualization/backend/ws_server.py))
 
-Python dependencies can be installed via the `requirements.txt` using:  
+Python dependencies can be installed via:  
 ```bash
-pip install -r requirements.txt
+pip install -r software/threejs_visualization/backend/requirements_backend.txt
 ```
 
-Frontend dependencies:  
-Three.js  
-[TODO: additional dependencies]
+**Frontend dependencies** (in [software/threejs_visualization/frontend/package.json](software/threejs_visualization/frontend/package.json)):  
+- `three` (^0.185.1)  
+- `vite` (^8.1.2) — dev server / bundler
+
+Install with:  
+```bash
+cd software/threejs_visualization/frontend
+npm install
+```
 
 ## Getting Started
 ### 1. Clone the Repository
@@ -116,52 +126,58 @@ git `clone https://github.com/elsp02/cubes-platformIO.git`
 cd cubes-platformIO
 
 ### 2. Flash the Brick and Baseplate Firmware
-> **TODO**: actual PlstformIO environment name, correct path link schauen ob das so auch wirklich funktioniert, 
+for flashing use the modified USB-to-TTL UART adapter
 
 #### Brick Firmware
-the brick firmware is located in: [PATH_TO_BRICK_FIRMWARE]  
+the brick firmware is located in: [firmware/src/state_machine]  
 Compile the firmware and upload the ATtiny1616 using PlatformIO:  
 ```bash
-pio run -e [BRICK_ENVIRONMENT]
+pio run -e [uart_cube_state_machine]
 ```
 
 ```bash
-pio run -e [BRICK_ENVIRONMENT] -t upload
+pio run -e [uart_cube_state_machine] -t upload
 ```
 ---
 #### Baseplate Firmware
-the baseplate firmware is located in: [PATH_TO_BASEPLATE_FIRMWARE]
+the baseplate firmware is located in: [firmware/src/state_machine]
 
 Compile the firmware and upload the ATtiny1616 using PlatformIO: 
 ```bash
-pio run -e [BASEPLATE_ENVIRONMENT]
+pio run -e [uart_baseplate_state_machine]
 ```
 
 ```bash
-pio run -e [BASEPLATE_ENVIRONMENT] -t upload
+pio run -e [uart_baseplate_state_machine] -t upload
 ```
+---
+#### Debugging
+ to run the baseplate standalone without a PC connection, cycling the predefined feedback patterns instead of PC-supplied data, flash the `[baseplate_state_machine_debug]` environment instead:
+ ```bash
+ pio run -e [baseplate_state_machine_debug]
+ ```
 
 ### 3. Connect the Prototype
-1. Connect the baseplate to the host computer using the USB-to-TTL UART adapter
+1. Connect the baseplate to the host computer using the unmodified USB-to-TTL UART adapter
 2. ensure that the system is supplied with 5V
 3. Do not connect bricks to the baseplate yet
 For details about the physical and electronic interfaces, see the [Hardware Documentation](docs/hardware.md)
 
 ### 4. Start the Backend
-> **TODO**: replace the path and filename with actual ones
+> **TODO**: ordner tools zu software
 Navigate to the backend directory:  
 ```bash
-cd [PATH_TO_BACKEND]
+cd software/threejs_visualization/backend
 ```
 Start the backend:
 ```bash
-python [BACKEND_ENTRY_FILE].py
+python ws_server.py
 ```
 
 ### 5. Start the Frontend
 Navigate to the frontend directory:
 ```bash
-cd [PATH_TO_FRONTEND]
+cd software/threejs_visualization/frontend
 ```
 Start the frontend and open it in a web browser:
 ```bash

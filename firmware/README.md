@@ -184,7 +184,7 @@ PC -> ATtiny: F    ATtiny -> PC: D
 ```
 
 It can be exercised manually with a serial monitor or with
-[`tools/uart_test/handshake_test.py`](../tools/uart_test/handshake_test.py).
+[`software/uart_test/handshake_test.py`](../software/uart_test/handshake_test.py).
 
 ## Current development status
 

@@ -6,6 +6,9 @@
 - hardware files
 - 3d druck einstellungen
 
+- hardware 
+    - baseplate schaltplan 
+
 
 code
 - von baseplate state machine code alle pc communication funktionen in pc_communication.cpp intergrieren

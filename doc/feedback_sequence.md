@@ -11,7 +11,7 @@ The cube system's feedback logic (doc/feedback.txt, steps 3–5) runs on the PC 
 - LED mapping v1 = **persistent**: green while correct, red while wrong. Transition-green ("newest cube only") comes later as a drop-in `derive_led_states(prev, curr)` layer — so `compare()` must not bake LED colors into its result.
 - Two outputs from one compare result: binary **feedback frame** (present cubes only, `SYNC LEN [NODE_ID, LED]×n CRC`) and JSON-ready **evaluated tree** (incl. attachable/blocked ghost slots).
 
-All new code in `tools/threejs_visualization/backend/` (the living copy; `meshcat_visualization` duplicate untouched for now).
+All new code in `software/threejs_visualization/backend/` (the living copy; `meshcat_visualization` duplicate untouched for now).
 
 ## Existing code to reuse
 
@@ -63,7 +63,7 @@ Plain pytest-style functions (also runnable via `python test_compare.py` with a 
 
 ## Verification
 
-- Run `python -m pytest tools/threejs_visualization/backend/test_compare.py -v` (or `python test_compare.py`) — all scenarios green.
+- Run `python -m pytest software/threejs_visualization/backend/test_compare.py -v` (or `python test_compare.py`) — all scenarios green.
 - Round-trip test proves fixture helper and parser agree.
 - Perfect-match test asserts exact frame bytes incl. checksum → locks the frame format against the firmware side (`wire_bus.cpp` uses the same XOR scheme).
 
