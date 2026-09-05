@@ -17,7 +17,7 @@
 #include "config.h"
 #include "wire_bus.h"
 #include "serial_writing.h"
-#include "poll_child.h"
+#include "detection.h"
 #include "feedback.h"
 #include "feedback_cube.h"
 #include "cube_identitiy.h"

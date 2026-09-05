@@ -173,7 +173,7 @@ In the `baseplate_state_machine_debug` PlatformIO environment, short debug codes
 | `NCS` | no checksum byte arrived (timeout) |
 | `WCS` | checksum mismatch |
 
-**Child polling** (`poll_child.cpp`):
+**Child polling** (`detection.cpp`):
 
 | Code | Meaning |
 |---|---|

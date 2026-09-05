@@ -12,7 +12,7 @@ firmware/
 │   ├── cube_identity.h               # NODE_ID (cube type + instance) generation
 │   ├── feedback.h / feedback_cube.h  # Feedback transmission and LED handling
 │   ├── pc_communication.h            # Baseplate-to-PC communication helpers
-│   ├── poll_child.h                  # Child polling interface
+│   ├── detection.h                  # Child polling interface
 │   ├── serial_writing.h              # Serial logging and payload-change tracking
 │   └── wire_bus.h                    # Single-wire byte and frame interface
 └── src/      

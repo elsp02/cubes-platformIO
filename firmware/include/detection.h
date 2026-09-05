@@ -1,5 +1,5 @@
 // =====================================================================
-// poll_child.h
+// detection.h
 // - polls a single child port for status and its data frame,
 //   and polls every child port with retries (in baseplate and brick)
 // =====================================================================

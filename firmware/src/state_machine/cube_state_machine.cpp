@@ -27,7 +27,7 @@
 #include "config.h"
 #include "wire_bus.h"
 #include "serial_writing.h"
-#include "poll_child.h"
+#include "detection.h"
 #include "feedback_cube.h"
 #include "cube_hardware.h"
 
@@ -297,7 +297,7 @@ void loop()
         // Apply the frame to the own LED:
         // true  = own ID was in the payload (LED set green/red inside),
         // false = own ID absent -> LED switched off
-        if (feedback_contains_own_id(fb_payload, fb_payload_len)) {
+        if (feedback_contains_own_id_rgb(fb_payload, fb_payload_len)) {
             SER_PRINTLN("FI");  // feedback: own id included
         } else {
             SER_PRINTLN("FO");  // feedback: own id absent, LED off

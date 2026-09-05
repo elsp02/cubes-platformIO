@@ -6,7 +6,7 @@
 // cube_identity.h -> für brick types (in environment uart_cube bestimmt)
 // feedback_cube.h -> für prüfen ob eigene ID in feedback payload integriert ist
 // feedback.h -> für feedback weiter an bricks senden
-// poll_child.h -> für child polling
+// detection.h -> für child polling
 // serial_writing.h -> für debug end (entscheiden ob ich das benutze)
 // wire_bus.h -> für bus definitionen
 
@@ -24,7 +24,7 @@
 #include "cube_hardware.h"
 #include "cube_identity.h"
 #include "feedback_cube.h"
-#include "poll_child.h"
+#include "detection.h"
 #include "serial_writing.h"
 #include "wire_bus.h"
 

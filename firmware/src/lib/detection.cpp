@@ -1,5 +1,5 @@
 // =====================================================================
-// poll_child.cpp
+// detection.cpp
 // - polls a single child port for status and its data frame (poll_child)
 // - polls every child port with retries (handle_detection)
 // (in baseplate and brick)
@@ -8,7 +8,7 @@
 #include "config.h"
 #include "wire_bus.h"
 #include "serial_writing.h"
-#include "poll_child.h"
+#include "detection.h"
 #include "cube_hardware.h"
 
 #include <util/delay.h>

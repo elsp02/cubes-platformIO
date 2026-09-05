@@ -29,7 +29,7 @@
 #include "config.h"
 #include "wire_bus.h"
 #include "serial_writing.h"
-#include "poll_child.h"
+#include "detection.h"
 #include "feedback.h"
 
 // ----------------------------------------------------------

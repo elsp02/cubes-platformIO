@@ -164,7 +164,7 @@ The baseplate has no upstream ports - it is the tree root and has no docking fac
 | Brick Type | Port | Pin | Face Direction | Wire Color | Notes |
 |---|---|---|---|---|---|
 | Normal | Out1 | PC3 | -x | red | |
-| Normal | Out2 | PA3 | -y | yellow | data contact offset by one corner due to space constraints; compensated in firmware ([poll_child.cpp](../firmware/src/lib/poll_child.cpp)) |
+| Normal | Out2 | PA3 | -y | yellow | data contact offset by one corner due to space constraints; compensated in firmware ([detection.cpp](../firmware/src/lib/detection.cpp)) |
 | Normal | Out3 | PA4 | +z | purple | |
 | Normal | Out4 | PA5 | +x | orange | |
 | Normal | Out5 | PB1 | +y | blue | |
