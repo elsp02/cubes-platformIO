@@ -11,9 +11,27 @@
 #include "cube_identity.h"
 #include "serial_writing.h"
 
+#include <tinyNeoPixel_Static.h>
 
 #include <avr/io.h>
 #include <util/delay.h>
+
+namespace {
+    constexpr uint8_t RGB_LED_DATA_PIN = PIN_PB5;
+    constexpr uint8_t RGB_LED_COUNT = 1;
+    uint8_t rgb_pixel_buffer[RGB_LED_COUNT * 3] = {0};
+    tinyNeoPixel rgb_led(RGB_LED_COUNT, RGB_LED_DATA_PIN, NEO_GRB + NEO_KHZ800, rgb_pixel_buffer);
+
+    void rgb_led_init()
+    {
+        static bool initialized = false;
+        if (initialized) return;
+        pinMode(RGB_LED_DATA_PIN, OUTPUT);
+        digitalWrite(RGB_LED_DATA_PIN, LOW);
+        delay(10); // LED benötigt mindestens 200 µs LOW als Reset
+        initialized = true;
+    }
+}
 
 
 // feedback_contains_own_id
@@ -50,6 +68,40 @@ bool feedback_contains_own_id(const uint8_t *payload, uint8_t len)
         }
     return false;
 }
+
+bool feedback_contains_own_id_rgb(const uint8_t *payload, uint8_t len)
+{   rgb_led_init();
+    bool found_own_id = false;
+    // i + 1 < len: each entry is an (ID, LED_STATE) pair, so never read
+    // a state byte past the end of an odd-length payload
+    for (uint8_t i = 0; i + 1 < len; i+=2) {
+        if (payload[i] == NODE_ID) {
+            found_own_id = true;
+            uint8_t led_state = payload[i+1];
+
+            if (led_state == LED_GREEN) {
+                  rgb_led.setPixelColor(0, 0, 40, 0);
+                  rgb_led.show();
+                  SER_PRINTLN("g");
+              } else if (led_state == LED_RED){
+                  rgb_led.setPixelColor(0, 40, 0, 0);
+                  rgb_led.show();
+                  SER_PRINTLN("r");
+              }
+              return true;
+          }
+    }
+    // if own ID not inlcuded in FEEDBACK PAYLOAD, turn LED off
+      if (!found_own_id){
+          rgb_led.setPixelColor(0, 0, 0, 0);
+          rgb_led.show();
+          SER_PRINTLN("n");
+
+        }
+    return false;
+}
+
+
 
 // send_feedback_to_child
 // - relays a feedback frame to one child port and waits for it to finish
