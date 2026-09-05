@@ -32,6 +32,4 @@ Digital brick feedback: correct (left), wrong or unexptected (center) and attach
 
 Local feedback is addressed using the individual brick identifier and returned through the baseplate to the connected brick structure (see [Communication Protocol](docs/communication-protocol.md)).
 
->**AHCTUNG** im schaltplan sind LED falsch angeordnet deswegen aktuell nicht funktionstüchtig
-
 A progress bar additionally indicates the proportion of the target structure that has already been completed correctly.

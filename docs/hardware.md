@@ -1,10 +1,8 @@
->**TODO**: Design and Manufacturing Files, Schaltplan LED, docking face separat, verbinder erklärung und link, vlt anders anorden alles
+>**TODO**: Design and Manufacturing Files, Schaltplan Baseplate, 3d modell mit allem integrierten,
 
 # Hardware
 ## Overview
-The physical prototype consists of two types of active bricks and a central baseplate. The components combine a modular 3D-printed housing, magnetic and form-fit connections, electrical contacts and electronics with an ATtiny1616.
-
-The building bricks are supplied centrally through the baseplate and therefore do not require individual batteries.
+The physical prototype consists of two types of active bricks and a central baseplate. The components combine a modular 3D-printed housing, magnetic and form-fit connections, electrical contacts and electronics with an ATtiny1616. The building bricks are supplied centrally through the baseplate and therefore do not require individual batteries.
 
 For the overall system structure, see [System Architecture](docs/architecture.md).
 For the communication between the electronic components, see [Communication Protocol](docs/communication-protocol.md).
@@ -18,34 +16,40 @@ Two brick geometries were implemented:
 | Cube brick | Approx. 40 mm × 40 mm × 40 mm | One docking face and five receiving faces |
 | Smashed brick | Half-height brick | One docking face and one opposing receiving face |
 
-Brick types: cube brick (left) and smashed brick (right)
-![Brick type](../figures/bricks-physisch.jpg)
 
-Each brick type has two different connection face types die beide aber eine quadratische grundfläche besitzen:
+<center>
+<img src="../figures/bricks-physisch.jpg" alt="Brick type" style="width: 50%;">
+<p> Brick types: cube brick (left) and smashed brick (right)</p>
+</center>
+
+### Connection Faces
+Each brick type has two different connection face types:
 #### Docking face
 The docking face connects a brick to the existing construction. Each brick has just one of it. 
 
 #### Receiving face
-The receiving face allow additional bricks to be attached through their respective docking face at a brick. The amount of this face in a brick depends on its type. 
+The receiving face allow additional bricks to be attached through their respective docking face at a brick. The amount of this face in a brick depends on its type.
 
-Interface types: Receiving face (left) and docking face (right)
-![connection face type](../figures/interface_type.jpg)
+>BILD 3D brick mit pfeilen docking und receiving face oder sogar zwei verbunden
 
-Consequently, a valid connection can only be established between a receiving face of the parent brick and the docking face of the child brick.
-
-The cube brick supports linear and branching three-dimensional constructions. The smashed brick supports connections along its local vertical axis.  
+Consequently, a valid connection can only be established between a receiving face of the parent brick and the docking face of the child brick. The cube brick supports linear and branching three-dimensional constructions. The smashed brick supports connections along its local vertical axis.  
 All connection faces use the same square interface geometry and allow four relative orientations in increments of 90°.
 
-### Housing
+
+### Housing and 3D printed parts 
 The housings were designed in Autodesk Inventor and manufactured using 3D printing.  
 Each brick uses a modular housing consisting of:
 
-- a supporting frame containing the docking face (dockinf face separat)
+- a supporting frame with transparent parts for the LED light
+- a docking face (glued into the frame) and a magnet holder for its vcc contact construction (see [contacts](#contacts))
 - interchangeable side modules containing the receiving faces
 - a removable cover 
 
 This structure allows the electronic components and individual side modules to be assembled, accessed and replaced separately.  
+
 The design and manufacturing files are listed at the end of this document.
+
+>BILD auseinandergebaut
 
 ## Connection
 A valid connection is established between the receiving face of a parent brick and the docking face of a child brick.
@@ -61,142 +65,127 @@ The bricks can therefore be connected through different receiving faces and can 
 The same connection also provides Spring-loaded pogo pin contacts for `5 V`, ground and data. Each receiving face provides a single downstream child contact for communication, while the docking face contains four upstream orientation contacts corresponding to rotations around the connection axis in 90° increments. 
 Power and ground contacts are arranged rotationally symmetrically so that they remain connected in all four orientations.
 
-On one receiving face of the cube brick, the data contact is offset by one corner due to space constraints; this orientation offset is corrected in the firmware.
+On one receiving face of the cube brick (Out2), the data contact is offset by one corner due to space constraints; this orientation offset is corrected in the firmware.
+<center>
+<img src="../figures/interface-types_contact.jpg" alt="Brick type" style="width: 60%;">
+<p> Connection face types and electrical contact arrangement</p>
+</center>
 
-Contact arrangement on receiving face (left) and docking face (right):
-![connection face type](../figures/contact-arrangement.svg)
+### Electrical Principle
+All communication lines are single-wire, half-duplex and open-drain-emulated: only one device may transmit at a time, and no device ever actively drives the line high. Each pin toggles between two GPIO modes to produce the line's two logical states:
+
+| Logical state | GPIO mode | Effect |
+|---|---|---|
+| **LOW** (actively driven) | output, level LOW | pin pulls the line low |
+| **HIGH** (idle / released) | input, pull-up enabled | pin releases the line; a pull-up resistor restores the high level |
+
+Because HIGH is never driven, only released, this behaves like a classic open-drain bus and avoids electrical conflicts between devices sharing the line.
+
 
 ## Orientation Detection
-Relative orientation is detected through the electrical contact
-arrangement of the connection. Depending on the rotational alignment of  two bricks, one of the four orientation contacts of the docking face connects to the communication contact of the parent’s receiving face. By detecting which orientation contact is active, the child brick determines its orientation relative to the parent. The same established signal path is subsequently used for data communication with the parent
+Relative orientation is detected through the electrical contact arrangement of the connection. Depending on the rotational alignment of  two bricks, one of the four orientation contacts of the docking face connects to the downstream child contact of the parent’s receiving face. By detecting which orientation contact is active, the child brick determines its orientation relative to the parent. The same established signal path is subsequently used for data communication with the parent
 
 
-## Brick Electronics
-Each active brick is controlled by an ATtiny1616 microcontroller.  
-The main brick electronics include:
+# Brick Electronics
+Each active brick is controlled by an ATtiny1616 microcontroller. The main brick electronics include:
 
 - ATtiny1616 microcontroller
 - PCB
-- four data in/ upstream orientation contacts (docking face)
-- one or five data out/communication/downstream contacts (receiving face(s))
+- four - data in - upstream orientation contacts (docking face)
+- one or five - data out - downstream child contacts (receiving face(s))
 - power distribution
 - four side-view RGB LEDs
 
-The ATtiny1616 and the components of the docking interface are mounted on a custom PCB designed using KiCad.  
-The receiving-face contacts are connected to the main PCB through internal wiring.
+The ATtiny1616 and the components of the docking interface are mounted on a custom PCB designed using KiCad. The receiving-face contacts are connected to the main PCB through internal wiring.
 
-Blockdiagram of a brick:
-![Blockdiagram Brick](../figures/blockdiagramm-brick.svg)
+<center>
+<img src="../figures/blockdiagramm-brick.svg" alt="Blockdiagram Brick" style="width: 60%;">
+<p> Blockdiagram of a brick</p>
+</center>
 
 PCB layout and the schematic are listed at the end of this document. 
 
 ### contacts
 - docking face:
-    - upstream: 4 female pogo pins mounted on pcb
-    - ground: 1 female pogo pin mounted on  pcb
-    - vcc: combination of smd pogo pin on pcb and neodym ring (pogo pin kontaktiert neodym ring)
+    - upstream orientation contacts: 4 female pogo pins mounted on pcb
+    - ground: 1 female pogo pin mounted on pcb
+    - vcc: combination of smd pogo pin on pcb and neodym ring - washer construction -> the smd pogo pin contacts the washer which contacts the neodym ring and the neodym ring is contacted by the vcc contact of the downstream face (pogo pin kontaktiert neodym ring)
 - downstream face:
-    - downstream: 1 solder cup pogo pin
+    - downstream child contact: 1 solder cup pogo pin
     - ground: 1 solder cup pogo pin
     - vcc: 1 solder cup pogo pin
     -> über kabel und stecker an pcb befestigt
 
 
-#### Local Feedback Hardware
-The four side-view RGB LEDs provide local visual feedback directly on the affected physical brick. The implemented application uses green and red illumination.
-
->**ACHTUNG** im schaltplan sind sie falsch angeordnet deswegen aktuell nicht funktionstüchtig
-
+### Local Feedback Hardware
+The four side-view RGB LEDs provide local visual feedback directly on the affected physical brick. The implemented application uses green and red illumination.  
 Further information about the feedback is provided in[Feedback and Visualization](docs/feedback.md).
 
-### Pin Assignment
-Derived from `firmware/src/lib/cube_hardware.cpp` and `firmware/include/cube_identity.h`.
 
-**Cube type codes** (`NODE_ID` bits 7..5):
-
-| Brick Type | `CUBE_TYPE` | Notes |
-|---|---|---|
-| Normal (cube brick) | `0x00` | 5 receiving faces |
-| Smashed brick | `0x01` | 1 receiving face |
-| Pyramid | `0x02` | 2 receiving faces - not yet listed under [Brick Types](#brick-types) above |
-| Baseplate | — | tree root, has no `NODE_ID` |
-
-**Upstream (orientation) ports** - identical for every non-baseplate brick type, one per docking-face orientation contact:
-
-| Pin | Bitmask | Orientation |
-|---|---|---|
-| PA1 | `PIN1_bm` | 0 |
-| PA2 | `PIN2_bm` | 1 |
-| PA6 | `PIN6_bm` | 2 |
-| PA7 | `PIN7_bm` | 3 |
-
-The baseplate has no upstream ports - it is the tree root and has no docking face.
-
-**Downstream (child) ports** - one receiving-face contact per port, set differs by brick type:
-
-| Brick Type | Port | Pin | Bitmask |
-|---|---|---|---|
-| Normal | Out1 | PC3 | `PIN3_bm` |
-| Normal | Out2 | PA3 | `PIN3_bm` |
-| Normal | Out3 | PA4 | `PIN4_bm` |
-| Normal | Out4 | PA5 | `PIN5_bm` |
-| Normal | Out5 | PB1 | `PIN1_bm` |
-| Smashed | Out1 | PC3 | `PIN3_bm` |
-| Pyramid | Out1 | PC3 | `PIN3_bm` |
-| Pyramid | Out2 | PB1 | `PIN1_bm` |
-| Baseplate | (only port) | PB1 | `PIN1_bm` |
-
-**Feedback LEDs** (from `config.h`, driven on `PORTB`):
-
-| Pin | Function |
-|---|---|
-| PB5 | Green feedback LED |
-| PB4 | Red feedback LED |
-
-### Electrical Principle?
- All lines are single-wire, open-drain-emulated UART/NRZ by switching each pin between output-low and input-with-pullup. The communication is half duplex, meaning that only one device may transmit at a time.
-
-The line has two logical states:
-
-- HIGH = idle / released
-- LOW  = actively pulled low
-
-The line is therefore not actively driven high. Instead, similar to an open drain interface, the microcontroller releases the line and a pull-up resistor brings it to the high state.
-
-#### Open Drain like Operation?
-The open-drain-like behavior is implemented by switching the GPIO mode:
-
-Transmit LOW:
-    GPIO configured as output
-    output level = LOW
-
-Transmit / idle HIGH:
-    GPIO configured as input
-    pull-up enabled
-
-This approach reduces the risk of electrical conflicts, because no device actively drives the line high.
-
----
-## Baseplate Design and Electronics
-The baseplate forms the physical starting point of every construction. Because it is the root, it has no docking interface. Right now, only one brick can connect to the baseplate, it therefore has just one receiving face. 
-
-It contains:
+# Baseplate Design and Electronics
+The baseplate forms the physical starting point of every construction. Because it is the root, it has no docking interface. Right now, only one brick can connect to the baseplate, it therefore has just one receiving face. It contains:
 - an ATtiny1616 microcontroller
-- one data out/communication/downstream contact (receiving face)
+- one - data out - downstream child contact (receiving face)
 - the connection to the host computer
 - the central power input
 
-Blockdiagram of the baseplate:
-![Blockdiagram Baseplate](../figures/blockdiagramm-baseplate.svg)
+The baseplate communicates with the host computer using its hardware USART and the unmodified USB-to-TTL UART adapter.
 
-The baseplate communicates with the host computer using its hardware USART and a USB-to-TTL UART adapter.
+<center>
+<img src="../figures/blockdiagramm-baseplate.svg" alt="Blockdiagram Baseplate" style="width: 60%;">
+<p> Blockdiagram of the baseplate</p>
+</center>
+
+
+PCB layout and the schematic are listed at the end of this document.
 
 ## Power Supply
 The complete brick structure is supplied centrally with 5 V DC through the baseplate. Power is forwarded through every connected brick. The building bricks therefore contain no individual batteries or rechargeable cells.
 
 In the implemented prototype, the 5 V supply is provided from the host computer through the USB-to-TTL UART adapter.
 
-## Design and Manufacturing Files
+
+# Pin Assignment
+Derived from `firmware/src/lib/cube_hardware.cpp` and `firmware/include/cube_identity.h`. Covers both brick types and the baseplate.
+
+**Upstream orientation ports** - identical for every non-baseplate brick type, one per docking-face orientation contact:
+
+| Pin | Bitmask | Orientation Index | Rotation |
+|---|---|---|---|
+| PA1 | `PIN1_bm` | 0 | 0 degree |
+| PA2 | `PIN2_bm` | 1 | 90 degree |
+| PA6 | `PIN6_bm` | 2 | 180 degree |
+| PA7 | `PIN7_bm` | 3 | 270 degree |
+
+The baseplate has no upstream ports - it is the tree root and has no docking face.
+
+**Downstream child ports** - one receiving-face contact per port, set differs by brick type:
+
+| Brick Type | Port | Pin | Face Direction | Wire Color | Notes |
+|---|---|---|---|---|---|
+| Normal | Out1 | PC3 | -x | red | |
+| Normal | Out2 | PA3 | -y | yellow | data contact offset by one corner due to space constraints; compensated in firmware ([poll_child.cpp](../firmware/src/lib/poll_child.cpp)) |
+| Normal | Out3 | PA4 | +z | purple | |
+| Normal | Out4 | PA5 | +x | orange | |
+| Normal | Out5 | PB1 | +y | blue | |
+| Smashed | Out1 | PC3 | +z | purple | |
+| Baseplate | (only port) | PB1 | +z | purple | |
+
+<center>
+<img src="../figures/brick-orientation.png" alt="Blockdiagram Baseplate" style="width: 40%;">
+<p> Ports and Face Direction</p>
+</center>
+
+
+**Feedback LED** (from `config.h`):
+
+| Pin | Function |
+|---|---|
+| PB5 | rgb LED |
+
+
+
+# Design and Manufacturing Files
 >**TODO**: erstellen und files hochladen
 The repository contains the files required to document and reproduce the developed hardware.
 
@@ -212,7 +201,7 @@ The repository contains the files required to document and reproduce the develop
 | Bill of materials? | `[PATH]` |
 | Additional manufacturing files | `[PATH]` |
 
-## Prototype Status
+# Prototype Status
 Eight physical prototype bricks were manufactured. The mechanical interaction and handling of the bricks were evaluated with the intended target group, while the integrated electronic construction-detection system was not sufficiently reliable for a complete end-to-end evaluation.  
 No standardised durability or product-safety certification was conducted.
 

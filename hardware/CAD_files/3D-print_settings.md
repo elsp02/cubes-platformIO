@@ -1,0 +1,6 @@
+- gedruckt mit bambu lab h2d und h2s 
+- pla + (amazon link?)
+- 0,4 düse
+- stützmaterial petg
+- schichthöhe 0,1mm
+- reihenfolge der wände außen innen 

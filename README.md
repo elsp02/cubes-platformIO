@@ -19,6 +19,10 @@ The system consists of three main components:
 - **A baseplate** that serves as the root of the construction
 - **A learning application** that reconstructs the detected construction digitally
 
+<center>
+<img src="figures/bricks-and-visualization.jpg" alt="bricks and visualization" style="width: 50%;">
+</center>
+
 ## Repository Structure
 > **TODO**: Replace it with actual repository structure (alles was in eckige klammer muss ausgetauscht werden)
 
@@ -44,9 +48,9 @@ The system consists of three main components:
 │        ├── firmware_cube/
 │        └── state_machine/
 │
-├── [SOFTWARE_DIRECTORY]/
-│   ├── [BACKEND_DIRECTORY]/
-│   └── [FRONTEND_DIRECTORY]/
+├── software/
+│   ├── backend/
+│   └── frontend/
 │
 ├── hardware/
 │   ├── pcb_files/
@@ -59,9 +63,9 @@ The system consists of three main components:
 |Directory | Description |
 |:--|:--|
 | `docs/` | Technical documentation of the developed system |
-| `firmware` | Embedded firmware for the building bricks and the baseplate |
-| `[BACKEND_DIRECTORY]` | Python backend for communication and construction processing |
-| `[FRONTEND_DIRECTORY]` | Browser-based learning application and 3D visualisation |
+| `firmware/` | Embedded firmware for the building bricks and the baseplate |
+| `software/backend` | Python backend for communication and construction processing |
+| `software/frontend` | Browser-based learning application and 3D visualisation |
 | `hardware` | Electronic and mechanical design files
 | `[OTHER]` | TODO if required | 
 
@@ -164,7 +168,6 @@ pio run -e [uart_baseplate_state_machine] -t upload
 For details about the physical and electronic interfaces, see the [Hardware Documentation](docs/hardware.md)
 
 ### 4. Start the Backend
-> **TODO**: ordner tools zu software
 Navigate to the backend directory:  
 ```bash
 cd software/threejs_visualization/backend

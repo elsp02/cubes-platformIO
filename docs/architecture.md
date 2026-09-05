@@ -25,10 +25,9 @@ For the communication between the electronic components, see [Communication Prot
 
 
 ## Construction Model
-The physical construction is represented as a directed tree with the baseplate as the root. Each connected building brick forms one node and each physical connection represents a parent-child relationship. A brick is connected to its parent through its single upstream interface/connection and, depending on the brick type, provides one or more downstream interfaces/connections for child bricks.
+The physical construction is represented as a directed tree with the baseplate as the root. Each connected building brick forms one node and each physical connection represents a parent-child relationship. A brick is connected to its parent through its single docking face and, depending on the brick type, provides one or more receiving faces for child bricks (brick interfaces explained in [Hardware](hardware.md#brick-design) ).
 
-Each node contains the information required to reconstruct the structure:
-
+Each node contains the information required to reconstruct the structure: 
 - brick identity and type,
 - orientation relative to its parent,
 - occupied receiving interfaces,
@@ -41,27 +40,30 @@ Communication follows the same parent-child hierarchy. Starting from the basepla
 Details of the recursive communication and transmitted data are provided in the [Communication Protocol](docs/communication_protocol.md).
 
 ## Data Flow
-The interaction between the learner, learning application, baseplate and brick system is shown below.
+The interaction between the user, learning application, baseplate and brick system is shown below.
 
-![System data flow](../figures/architektur-sequenzdiagramm.svg)
+
+<center>
+<img src="../figures/architektur-sequenzdiagramm.svg" alt="System data flow" style="width: 70%;">
+<p>System data flow</p>
+</center>
 
 During each detection cycle, the baseplate initiates the acquisition of the physical construction. Starting from the root brick, the connected structure is collected recursively through the parent-child hierarchy and returned to the learning application.
 
-The application reconstructs the detected structure and compares it with the selected target. Based on the comparison, digital feedback is displayed to the learner and brick-specific feedback is sent back through the baseplate and forwarded through the connected brick structure. The cycle is repeated while the construction session is active.
+The application reconstructs the detected structure and compares it with the selected target. Based on the comparison, digital feedback is displayed to the user and brick-specific feedback is sent back through the baseplate and forwarded through the connected brick structure. The cycle is repeated while the construction session is active.
 
 
 ## Software Architecture
-The learning application consists of a Python backend and a browser-based
-JavaScript frontend.  
+The learning application consists of a Python backend and a browser-based JavaScript frontend.  
 The backend communicates with the baseplate through a serial connection and with the frontend through a WebSocket connection.
 
-The backend is responsible for:
+The **backend** is responsible for:
 - deserialising the detected construction
 - reconstructing the tree representation
 - comparing it with the selected target
 - generating feedback
 
-The frontend is responsible for:
+The **frontend** is responsible for:
 - target selection
 - 3D visualisation
 - spatial placement of the digital brick models
