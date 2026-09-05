@@ -18,7 +18,7 @@
 
 namespace {
     constexpr uint8_t RGB_LED_DATA_PIN = PIN_PB5;
-    constexpr uint8_t RGB_LED_COUNT = 1;
+    constexpr uint8_t RGB_LED_COUNT = 4; // 4-LED strip, all LEDs always show the same color
     uint8_t rgb_pixel_buffer[RGB_LED_COUNT * 3] = {0};
     tinyNeoPixel rgb_led(RGB_LED_COUNT, RGB_LED_DATA_PIN, NEO_GRB + NEO_KHZ800, rgb_pixel_buffer);
 
@@ -31,43 +31,51 @@ namespace {
         delay(10); // LED benötigt mindestens 200 µs LOW als Reset
         initialized = true;
     }
+
+    void set_all_pixels(uint8_t r, uint8_t g, uint8_t b)
+    {
+        for (uint8_t i = 0; i < RGB_LED_COUNT; i++) {
+            rgb_led.setPixelColor(i, r, g, b);
+        }
+        rgb_led.show();
+    }
 }
 
 
 // feedback_contains_own_id
 // - scans payload for this brick's NODE_ID and sets the local LED accordingly
 // - true only once this brick's own ID was found in the payload
-bool feedback_contains_own_id(const uint8_t *payload, uint8_t len)
-{   bool found_own_id = false;
-    // i + 1 < len: each entry is an (ID, LED_STATE) pair, so never read
-    // a state byte past the end of an odd-length payload
-    for (uint8_t i = 0; i + 1 < len; i+=2) {
-        if (payload[i] == NODE_ID) {
-            found_own_id = true;
-            uint8_t led_state = payload[i+1];
-
-            // currently incorrect because a adressable rgb led is used
-            if (led_state == LED_GREEN) {
-                  PORTB.OUTSET = GREEN_LED_PIN;  
-                  PORTB.OUTCLR = RED_LED_PIN;   
-                  SER_PRINTLN("g");
-                  return true;
-              } else if (led_state == LED_RED){
-                  PORTB.OUTCLR = GREEN_LED_PIN;
-                  PORTB.OUTSET   = RED_LED_PIN;
-                  SER_PRINTLN("r");
-              } 
-              return true; 
-          }
-    }
-    // if own ID not inlcuded in FEEDBACK PAYLOAD, turn LED off
-      if (!found_own_id){    
-          PORTB.OUTCLR = GREEN_LED_PIN | RED_LED_PIN;
-          SER_PRINTLN("n");
-        
-        }
-    return false;
-}
+//bool feedback_contains_own_id(const uint8_t *payload, uint8_t len)
+//{   bool found_own_id = false;
+//    // i + 1 < len: each entry is an (ID, LED_STATE) pair, so never read
+//    // a state byte past the end of an odd-length payload
+//    for (uint8_t i = 0; i + 1 < len; i+=2) {
+//        if (payload[i] == NODE_ID) {
+//            found_own_id = true;
+//            uint8_t led_state = payload[i+1];
+//
+//            // currently incorrect because a adressable rgb led is used
+//            if (led_state == LED_GREEN) {
+//                  PORTB.OUTSET = GREEN_LED_PIN;  
+//                  PORTB.OUTCLR = RED_LED_PIN;   
+//                  SER_PRINTLN("g");
+//                  return true;
+//              } else if (led_state == LED_RED){
+//                  PORTB.OUTCLR = GREEN_LED_PIN;
+//                  PORTB.OUTSET   = RED_LED_PIN;
+//                  SER_PRINTLN("r");
+//              } 
+//              return true; 
+//          }
+//    }
+//    // if own ID not inlcuded in FEEDBACK PAYLOAD, turn LED off
+//      if (!found_own_id){    
+//          PORTB.OUTCLR = GREEN_LED_PIN | RED_LED_PIN;
+//          SER_PRINTLN("n");
+//        
+//        }
+//    return false;
+//}
 
 bool feedback_contains_own_id_rgb(const uint8_t *payload, uint8_t len)
 {   rgb_led_init();

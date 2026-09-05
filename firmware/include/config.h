@@ -127,16 +127,16 @@
 #endif
 
 // for predefined tree comparing and feedback sequence in baseplate_state_machine_debug environment
-#define CUBE_A_ID  0x10
-#define CUBE_B_ID  0x11
-#define CUBE_C_ID  0x12
+#define CUBE_A_ID  0x01
+#define CUBE_B_ID  0x21
+#define CUBE_C_ID  0x03
 
 //-----------------------------------------------------------
 // LED CONFIGURATION 
 // - pin mapping and feedback-frame LED codes
 //-----------------------------------------------------------
-#define GREEN_LED_PIN            PIN5_bm // pin bitmask for the green LED
-#define RED_LED_PIN              PIN4_bm // pin bitmask for the red LED
+//#define GREEN_LED_PIN            PIN5_bm // pin bitmask for the green LED
+//#define RED_LED_PIN              PIN4_bm // pin bitmask for the red LED
 
 // contained in FEEDBACK_FRAME - which LED to turn on
 #define LED_GREEN           0x01

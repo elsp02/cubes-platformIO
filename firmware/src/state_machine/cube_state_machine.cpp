@@ -173,10 +173,10 @@ void setup()
     release_all_lines();
 
     // Configure LED pins as outputs.
-    PORTB.DIRSET = GREEN_LED_PIN | RED_LED_PIN;
+    //PORTB.DIRSET = GREEN_LED_PIN | RED_LED_PIN;
 
     // LEDs initially off.
-    PORTB.OUTCLR = GREEN_LED_PIN | RED_LED_PIN;
+    //PORTB.OUTCLR = GREEN_LED_PIN | RED_LED_PIN;
 
     Serial.begin(115200);
     Serial.println("cube_state_machine started");
