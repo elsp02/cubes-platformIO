@@ -1,7 +1,5 @@
 # Firmware
-This directory contains the embedded firmware for the baseplate and the active
-bricks. All devices use an ATtiny1616 and are built with PlatformIO, the
-Arduino framework, and megaTinyCore.
+This directory contains the embedded firmware for the baseplate and the active bricks. All devices use an ATtiny1616 and are built with PlatformIO, the Arduino framework, and megaTinyCore.
 
 ## Directory structure
 ```text
@@ -12,7 +10,7 @@ firmware/
 │   ├── cube_identity.h               # NODE_ID (cube type + instance) generation
 │   ├── feedback.h / feedback_cube.h  # Feedback transmission and LED handling
 │   ├── pc_communication.h            # Baseplate-to-PC communication helpers
-│   ├── detection.h                  # Child polling interface
+│   ├── detection.h                   # functions for child detection
 │   ├── serial_writing.h              # Serial logging and payload-change tracking
 │   └── wire_bus.h                    # Single-wire byte and frame interface
 └── src/      
@@ -23,8 +21,7 @@ firmware/
     └── lib/                          # Shared implementation used by all entry points
 ```
 
-`platformio.ini` is located at the repository root (`src_dir = firmware/src`, `include_dir = firmware/include`) — build commands are run from the
-repository root, not from `firmware/`.
+`platformio.ini` is located at the repository root (`src_dir = firmware/src`, `include_dir = firmware/include`) — build commands are run from the repository root, not from `firmware/`.
 
 ## Firmware targets
 | Environment | Device | Entry point | Status |

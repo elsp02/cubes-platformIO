@@ -9,7 +9,7 @@ uint8_t pixelBuffer[LED_COUNT * 3] = {0};
 tinyNeoPixel led(
     LED_COUNT,
     LED_DATA_PIN,
-    NEO_GRB + NEO_KHZ800,
+    NEO_RGB + NEO_KHZ800,
     pixelBuffer
 );
 
@@ -28,11 +28,11 @@ void loop()
     led.show();
     delay(1000);
 
-    led.setPixelColor(0, 0, 40, 0);   // Grün
-    led.show();
-    delay(1000);
-
-    led.setPixelColor(0, 0, 0, 40);   // Blau
-    led.show();
-    delay(1000);
+    //led.setPixelColor(0, 0, 40, 0);   // Grün
+    //led.show();
+    //delay(1000);
+//
+    //led.setPixelColor(0, 0, 0, 40);   // Blau
+    //led.show();
+    //delay(1000);
 }

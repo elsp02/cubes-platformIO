@@ -20,7 +20,7 @@ namespace {
     constexpr uint8_t RGB_LED_DATA_PIN = PIN_PB5;
     constexpr uint8_t RGB_LED_COUNT = 4; // 4-LED strip, all LEDs always show the same color
     uint8_t rgb_pixel_buffer[RGB_LED_COUNT * 3] = {0};
-    tinyNeoPixel rgb_led(RGB_LED_COUNT, RGB_LED_DATA_PIN, NEO_GRB + NEO_KHZ800, rgb_pixel_buffer);
+    tinyNeoPixel rgb_led(RGB_LED_COUNT, RGB_LED_DATA_PIN, NEO_RGB + NEO_KHZ800, rgb_pixel_buffer);
 
     void rgb_led_init()
     {
@@ -34,9 +34,7 @@ namespace {
 
     void set_all_pixels(uint8_t r, uint8_t g, uint8_t b)
     {
-        for (uint8_t i = 0; i < RGB_LED_COUNT; i++) {
-            rgb_led.setPixelColor(i, r, g, b);
-        }
+        rgb_led.fill(tinyNeoPixel::Color(r, g, b));
         rgb_led.show();
     }
 }
@@ -88,12 +86,10 @@ bool feedback_contains_own_id_rgb(const uint8_t *payload, uint8_t len)
             uint8_t led_state = payload[i+1];
 
             if (led_state == LED_GREEN) {
-                  rgb_led.setPixelColor(0, 0, 40, 0);
-                  rgb_led.show();
+                  set_all_pixels(0, 40, 0);
                   SER_PRINTLN("g");
               } else if (led_state == LED_RED){
-                  rgb_led.setPixelColor(0, 40, 0, 0);
-                  rgb_led.show();
+                  set_all_pixels(40, 0, 0);
                   SER_PRINTLN("r");
               }
               return true;
@@ -101,8 +97,7 @@ bool feedback_contains_own_id_rgb(const uint8_t *payload, uint8_t len)
     }
     // if own ID not inlcuded in FEEDBACK PAYLOAD, turn LED off
       if (!found_own_id){
-          rgb_led.setPixelColor(0, 0, 0, 0);
-          rgb_led.show();
+          set_all_pixels(0, 0, 0);
           SER_PRINTLN("n");
 
         }

@@ -100,8 +100,8 @@
 // DEBUGGING SYSTEM (only embedded in uart_baseplate_state_machine_debug env)
 // - switches for where SER_PRINT/SER_PRINTLN output goes
 //-----------------------------------------------------------
-#define SERIAL_WRITING 0
-#define SERIAL_DEBUG   1
+#define SERIAL_WRITING 1
+#define SERIAL_DEBUG   0
 #define SERIAL_DEBUG_END 0
 
 //for debugging feedback
@@ -109,8 +109,8 @@
 
 // for debugging or serial communication
 #if SERIAL_WRITING
-    #define SER_PRINT(x)  
-    #define SER_PRINTLN(x) 
+    #define SER_PRINT(x)  _delay_us(180)
+    #define SER_PRINTLN(x)  _delay_us(430)
     #define SER_PRINTLN2(x, y)
 #elif SERIAL_DEBUG
     #define SER_PRINT(x)    Serial.print(x)

@@ -1,20 +1,22 @@
 """
-from user selected target tree model - received from client/browser
-
-Port numbers are TYPE-RELATIVE: the firmware's child_mask bit N is the
-Nth entry of that cube type's children[] wiring array (0-based), so the
-same port number can mean a different face on a different cube type.
-Target trees must use these per-type port numbers; the geometry lives
-in frontend/src/layout.js (PORT_GEOMETRY) - keep the two in sync:
-
-  type 0 = cube    (IDs 0x00-0x1F): 0=-X, 1=-Z, 2=+Z, 3=X, 4=Y
-  type 1 = smashed (IDs 0x20-0x3F): 0=+Z (only usable face)
-  //type 2 = wedge   (IDs 0x40-0x5F): 0=+X (square face), 1=45deg slope -> currently not in use
+target_tree.py (same as cube_node.py just for target tree)
+- defines TargetNode: the target construction selected by the user in the browser
+- used by ws_server.py (parses the client's start_session message) and compare_core.py (comparison target)
 """
+
 from dataclasses import dataclass, field
 
 """One Node in target tree construction
     Parent and port are implicit in the tree structure (like in the actual tree), children is a dict mapping child port -> TargetNode.
+"""
+
+# ----------------------------------------------------------
+# TargetNode
+# ----------------------------------------------------------
+
+"""
+TargetNode
+- one node of the target construction: its type/ orientation plus its children
 """
 @dataclass
 class TargetNode:
@@ -22,8 +24,11 @@ class TargetNode:
     orientation: int
     children: dict[int, "TargetNode"] = field(default_factory=dict)
 
-#new for client sending target tree to server
-"""Parses the frontend target-tree JSON node into a TargetNode."""
+"""
+target_node_from_json
+- turns the JSON sent by the frontend into a TargetNode tree
+    -> parses the frontend's target-tree JSON node into a TargetNode, recursively
+"""
 def target_node_from_json(data: dict) -> TargetNode:
     if not isinstance(data, dict):
         raise ValueError(f"tree node must be an object, got {type(data).__name__}")

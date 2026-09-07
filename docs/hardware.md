@@ -57,9 +57,7 @@ A valid connection is established between the receiving face of a parent brick a
 ### Mechanical Connection
 The mechanical connection uses complementary guiding structures and magnets. Recessed elements on the docking face fit into corresponding protruding elements on the receiving face and align the two interfaces. Magnets assist the alignment and hold the connected bricks together. This recessed interface geometry protects the contacts and reduces the risk of incorrect contacting.  
 The square interface geometry permits four valid relative orientations in increments of 90°.
-
-### Connection Possibilities
-The bricks can therefore be connected through different receiving faces and can additionally be rotated relative to each other in increments of 90°. This enables linear, angled and branching three-dimensional constructions.
+The bricks can therefore be connected through different receiving faces and can additionally be rotated relative to each other. This enables linear, angled and branching three-dimensional constructions.
 
 ### Electrical Connection
 The same connection also provides Spring-loaded pogo pin contacts for `5 V`, ground and data. Each receiving face provides a single downstream child contact for communication, while the docking face contains four upstream orientation contacts corresponding to rotations around the connection axis in 90° increments. 
@@ -71,22 +69,11 @@ On one receiving face of the cube brick (Out2), the data contact is offset by on
 <p> Connection face types and electrical contact arrangement</p>
 </center>
 
-### Electrical Principle
-All communication lines are single-wire, half-duplex and open-drain-emulated: only one device may transmit at a time, and no device ever actively drives the line high. Each pin toggles between two GPIO modes to produce the line's two logical states:
-
-| Logical state | GPIO mode | Effect |
-|---|---|---|
-| **LOW** (actively driven) | output, level LOW | pin pulls the line low |
-| **HIGH** (idle / released) | input, pull-up enabled | pin releases the line; a pull-up resistor restores the high level |
-
-Because HIGH is never driven, only released, this behaves like a classic open-drain bus and avoids electrical conflicts between devices sharing the line.
-
-
 ## Orientation Detection
 Relative orientation is detected through the electrical contact arrangement of the connection. Depending on the rotational alignment of  two bricks, one of the four orientation contacts of the docking face connects to the downstream child contact of the parent’s receiving face. By detecting which orientation contact is active, the child brick determines its orientation relative to the parent. The same established signal path is subsequently used for data communication with the parent
 
 
-# Brick Electronics
+## Brick Electronics
 Each active brick is controlled by an ATtiny1616 microcontroller. The main brick electronics include:
 
 - ATtiny1616 microcontroller
@@ -105,24 +92,33 @@ The ATtiny1616 and the components of the docking interface are mounted on a cust
 
 PCB layout and the schematic are listed at the end of this document. 
 
-### contacts
+### electric contact interfaces
 - docking face:
-    - upstream orientation contacts: 4 female pogo pins mounted on pcb
-    - ground: 1 female pogo pin mounted on pcb
-    - vcc: combination of smd pogo pin on pcb and neodym ring - washer construction -> the smd pogo pin contacts the washer which contacts the neodym ring and the neodym ring is contacted by the vcc contact of the downstream face (pogo pin kontaktiert neodym ring)
+    - **upstream orientation contacts**: 4 female pogo pins mounted on pcb
+    - **ground**: 1 female pogo pin mounted on pcb
+    - **vcc**: combination of smd pogo pin on pcb and neodym ring - washer construction -> the smd pogo pin contacts the washer which contacts the neodym ring and the neodym ring is contacted by the vcc contact of the downstream face
 - downstream face:
-    - downstream child contact: 1 solder cup pogo pin
-    - ground: 1 solder cup pogo pin
-    - vcc: 1 solder cup pogo pin
+    - **downstream child contact**: 1 solder cup pogo pin
+    - **ground**: 1 solder cup pogo pin
+    - **vcc**: 1 solder cup pogo pin
     -> über kabel und stecker an pcb befestigt
 
+### Electrical Principle
+All communication lines are single-wire, half-duplex and open-drain-emulated: only one device may transmit at a time, and no device ever actively drives the line high. Each pin toggles between two GPIO modes to produce the line's two logical states:
+
+| Logical state | GPIO mode | Effect |
+|---|---|---|
+| **LOW** (actively driven) | output, level LOW | pin pulls the line low |
+| **HIGH** (idle / released) | input, pull-up enabled | pin releases the line; a pull-up resistor restores the high level |
+
+Because HIGH is never driven, only released, this behaves like a classic open-drain bus and avoids electrical conflicts between devices sharing the line.
 
 ### Local Feedback Hardware
 The four side-view RGB LEDs provide local visual feedback directly on the affected physical brick. The implemented application uses green and red illumination.  
 Further information about the feedback is provided in[Feedback and Visualization](docs/feedback.md).
 
 
-# Baseplate Design and Electronics
+## Baseplate Design and Electronics
 The baseplate forms the physical starting point of every construction. Because it is the root, it has no docking interface. Right now, only one brick can connect to the baseplate, it therefore has just one receiving face. It contains:
 - an ATtiny1616 microcontroller
 - one - data out - downstream child contact (receiving face)
@@ -139,13 +135,13 @@ The baseplate communicates with the host computer using its hardware USART and t
 
 PCB layout and the schematic are listed at the end of this document.
 
-## Power Supply
+### Power Supply
 The complete brick structure is supplied centrally with 5 V DC through the baseplate. Power is forwarded through every connected brick. The building bricks therefore contain no individual batteries or rechargeable cells.
 
 In the implemented prototype, the 5 V supply is provided from the host computer through the USB-to-TTL UART adapter.
 
 
-# Pin Assignment
+## Pin Assignment
 Derived from `firmware/src/lib/cube_hardware.cpp` and `firmware/include/cube_identity.h`. Covers both brick types and the baseplate.
 
 **Upstream orientation ports** - identical for every non-baseplate brick type, one per docking-face orientation contact:
@@ -185,21 +181,18 @@ The baseplate has no upstream ports - it is the tree root and has no docking fac
 
 
 
-# Design and Manufacturing Files
+## Design and Manufacturing Files
 >**TODO**: erstellen und files hochladen
 The repository contains the files required to document and reproduce the developed hardware.
 
 | Content | Repository Location |
 |---|---|
-| Brick CAD files | `[PATH]` |
-| Baseplate CAD files | `[PATH]` |
-| Printable models? | `[PATH]` |
+| CAD files | [hardware/CAD_files](../hardware/CAD_files) |
 | KiCad project | `[PATH]` |
-| Circuit schematic | `[PATH]` |
+| Brick and baseplate Circuit schematic | [hardware/pcb_files](.../hardware/pcb_files) |
 | PCB layout | `[PATH]` |
 | Gerber files? | `[PATH]` |
-| Bill of materials? | `[PATH]` |
-| Additional manufacturing files | `[PATH]` |
+| Bill of materials | [hardware/pcb_files](.../hardware/pcb_files) |
 
 # Prototype Status
 Eight physical prototype bricks were manufactured. The mechanical interaction and handling of the bricks were evaluated with the intended target group, while the integrated electronic construction-detection system was not sufficiently reliable for a complete end-to-end evaluation.  
