@@ -102,24 +102,27 @@
 //-----------------------------------------------------------
 #define SERIAL_WRITING 1
 #define SERIAL_DEBUG   0
-#define SERIAL_DEBUG_END 0
+#define SERIAL_DEBUG_END 1
 
 //for debugging feedback
 #define LOG_BUF_SIZE        192 // one ASCII character uses one byte -> because of appenln: letter + \r \n = letter+3 (im durchschnitt 2 zeichen pro text) :: 192/5 =
 
 // for debugging or serial communication
-#if SERIAL_WRITING
-    #define SER_PRINT(x)  //_delay_us(180)
-    #define SER_PRINTLN(x)  //_delay_us(430)
-    #define SER_PRINTLN2(x, y)
+// - SERIAL_DEBUG_END is intentionally independent of SERIAL_WRITING: it only
+//   buffers (log_append/log_appendln), nothing is written to Serial until
+//   log_flush() is called explicitly at a safe point between binary frames
+//   (see baseplate_state_machine_debug2.cpp) - so it can run alongside a
+//   binary SERIAL_WRITING session without corrupting frame parsing.
+// - SERIAL_DEBUG (immediate Serial.print) is NOT safe to combine with
+//   SERIAL_WRITING - it stays mutually exclusive.
+#if SERIAL_DEBUG_END
+    #define SER_PRINT(x)    log_append(x)
+    #define SER_PRINTLN(x)  log_appendln(x)
+    #define SER_PRINTLN2(x, y) log_appendln(x, y)
 #elif SERIAL_DEBUG
     #define SER_PRINT(x)    Serial.print(x)
     #define SER_PRINTLN(x)  Serial.println(x)
     #define SER_PRINTLN2(x, y) Serial.println(x, y)
-#elif SERIAL_DEBUG_END
-    #define SER_PRINT(x)    log_append(x)
-    #define SER_PRINTLN(x)  log_appendln(x)
-    #define SER_PRINTLN2(x, y) log_appendln(x, y)
 #else
     #define SER_PRINT(x)
     #define SER_PRINTLN(x)

@@ -38,24 +38,46 @@ from framing import (
 # ----------------------------------------------------------
 """
 wait_for_valid_sync_cmd
-- reads single bytes until a SYNC byte is found or timeout (1sec) with nothing arriving at all 
+- reads single bytes until a SYNC byte is found or timeout (1sec) with nothing arriving at all
 (idle = normal, since the sender only transmits on change)
 - returns True if SYNC was found, False on idle timeout
     -> same structure as in hardware wait_for_valid_sync_cmd()
+
+- non-SYNC bytes are collected instead of printed one at a time: firmware
+  builds with a buffered SER_PRINTLN debug log (SERIAL_DEBUG_END, flushed
+  via log_flush() between binary frames - see baseplate_state_machine_debug2.cpp)
+  interleave plain ASCII text between frames, so accumulating and printing
+  it as one block (_flush_skipped) makes it actually readable, instead of
+  one hex byte per line.
 """
 def wait_for_valid_sync_cmd(ser: serial.Serial, verbose: bool) -> bool:
+
+    #debug zusatz 
+    skipped = bytearray()
+
+    def flush_skipped():
+        if not skipped or not verbose:
+            skipped.clear()
+            return
+        try:
+            text = skipped.decode("ascii")
+            print(f"Skipped (debug log?): {text!r}")
+        except UnicodeDecodeError:
+            print(f"Skipping unexpected bytes while resyncing: {skipped.hex(' ')}")
+        skipped.clear()
 
     while True:
         b = ser.read(1)   # reads exactly one byte (or nothing on timeout)
 
         if not b:
+            flush_skipped()
             return False   # idle timeout, nothing arrived at all
 
         if b[0] == SYNC:   # arrived byte is correct SYNC byte
+            flush_skipped()
             return True
 
-        if verbose:
-            print(f"Skipping unexpected byte while resyncing: 0x{b[0]:02X}")
+        skipped.append(b[0])
 
 
 """
