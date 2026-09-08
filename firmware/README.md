@@ -55,5 +55,5 @@ The baseplate is a single, fixed device, so no per-instance build flags are need
 ## Current development status
 As of the latest development iteration, `uart_cube_state_machine` is
 functional; `baseplate_state_machine_debug` is also working, but `uart_baseplate_state_machine` has an open, unresolved issue under
-investigation: baseplate freezes when connecting with specific bricks -> after some connections and reconnections, the pc receives no frames from the baseplate anymore.
+investigation: baseplate freezes when connecting with specific bricks -> after some connections and reconnections, the pc receives no frames from the baseplate anymore. environment worked in commit 
  `uart_baseplate`, `uart_cube` and `uart_test` remain buildable as earlier reference implementations.
