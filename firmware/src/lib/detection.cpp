@@ -47,7 +47,7 @@ bool poll_child(const wire_t *w, uint8_t *data_out, uint8_t max_child_payload_le
 
     *acked_out = true;
 
-    //SER_PRINT("CA");
+    SER_PRINT("CA");
     /*
      * 3. ACK received, now wait for childs DATA FRAME.
      */

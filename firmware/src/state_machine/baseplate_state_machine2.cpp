@@ -190,6 +190,7 @@ void loop()
                 current_state = State:: STOPPING;
             }
             else{
+                SER_PRINT("x");
                 //log_reset();
                 //reset_detection_buffers(); brauche ich das?????
 
@@ -212,7 +213,7 @@ void loop()
             handle_detection(child_payload, child_payload_len, child_done);
             release_all_lines();
             current_state = State:: BUILD_PAYLOAD;
-            pc_reply_retry_count = 0; //is this location correct??
+            //pc_reply_retry_count = 0; //is this location correct??
 
             break;
         }
@@ -266,6 +267,7 @@ void loop()
             // PC sent PC_CMD_STOP instead of a feedback frame -> abandon
             // this cycle's payload and go stop the whole sequence
             case PC_REPLY_STOP:
+                SER_PRINT("x");
                 remember_sent_payload(payload, payload_len);
                 cycles_since_last_send = 0;
                 current_state = State::STOPPING;

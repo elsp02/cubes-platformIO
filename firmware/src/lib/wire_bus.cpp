@@ -136,7 +136,7 @@ bool rx_byte_frame(const wire_t *w, uint8_t *out)
      * scan_upstream() has already detected LOW.
      * double check if line is low -> if so, this should be the start bit.
      */
-
+    SER_PRINT("0xf1");
     _delay_us(BAUD_US / 2);
 
     if (is_line_high(w)) {
@@ -150,6 +150,7 @@ bool rx_byte_frame(const wire_t *w, uint8_t *out)
 
     uint8_t b = 0;
 
+    SER_PRINT("0xf2");
     for (uint8_t i = 0; i < 8; i++) {
         if (is_line_high(w)) {
             b |= (1 << i);
@@ -157,11 +158,13 @@ bool rx_byte_frame(const wire_t *w, uint8_t *out)
 
         _delay_us(BAUD_US);
     }
+    SER_PRINT("0xf3");
 
     // Stop bit check -> must be HIGH.
     if (!is_line_high(w)) {
         return false;
     }
+    SER_PRINT("0xf4");
 
     _delay_us(BAUD_US/2);
 

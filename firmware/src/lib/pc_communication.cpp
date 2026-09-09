@@ -16,15 +16,31 @@
 // - waits for one byte from the PC, with a millis() timeout
  bool wait_for_pc_byte(uint8_t *out, unsigned long timeout_ms)
 {
-    unsigned long started_waiting = millis();
+    unsigned long timeout_us = timeout_ms * 10000UL;
+    unsigned long waited_us = 0;
+    const unsigned long check_interval_us = 100UL;
 
-    while (millis() - started_waiting < timeout_ms) {
+    while (waited_us < timeout_us) {
         if (Serial.available() > 0) {
             *out = (uint8_t)Serial.read();
             return true;
         }
+    _delay_us(check_interval_us);
+    waited_us += check_interval_us;
     }
     return false;
+
+
+
+    //unsigned long started_waiting = millis();
+//
+    //while (millis() - started_waiting < timeout_ms) {
+    //    if (Serial.available() > 0) {
+    //        *out = (uint8_t)Serial.read();
+    //        return true;
+    //    }
+    //}
+    //return false;
 }
 
 // stop_received
