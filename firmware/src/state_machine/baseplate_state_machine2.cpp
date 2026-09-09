@@ -40,11 +40,11 @@ static uint8_t child_payload_len[MAX_CHILD_COUNT] = {0};                // lengt
 static bool child_done[MAX_CHILD_COUNT] = {false};                      // child[i] answered with a valid frame this cycle
 
 // final payload built by build_payload(), sent to the PC by send_payload_to_pc()
-static uint8_t payload[MAX_PAYLOAD_LEN];
+static uint8_t payload[MAX_PAYLOAD_LEN]= {0};
 static uint8_t payload_len = 0;
 
 // feedback payload received from pc (read_pc_reply)
-static uint8_t fb_payload[MAX_PAYLOAD_LEN];
+static uint8_t fb_payload[MAX_PAYLOAD_LEN] = {0};
 static uint8_t fb_payload_len = 0;
 
 //---------------------------------------------------
@@ -210,6 +210,7 @@ void loop()
         case State:: DETECTING:
         {
             handle_detection(child_payload, child_payload_len, child_done);
+            release_all_lines();
             current_state = State:: BUILD_PAYLOAD;
             pc_reply_retry_count = 0; //is this location correct??
 
@@ -282,6 +283,8 @@ void loop()
                 while (Serial.available() > 0) {  // drop any stray bytes from the bad/partial frame before retrying
                     Serial.read();
                 }
+
+                fb_payload_len = 0; // invalide feedback buffer to prevent stale data being relayed
 
                 if (
                     pc_reply_retry_count <

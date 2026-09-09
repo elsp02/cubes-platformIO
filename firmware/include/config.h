@@ -100,9 +100,9 @@
 // DEBUGGING SYSTEM (only embedded in uart_baseplate_state_machine_debug env)
 // - switches for where SER_PRINT/SER_PRINTLN output goes
 //-----------------------------------------------------------
-#define SERIAL_WRITING 1
-#define SERIAL_DEBUG   0
-#define SERIAL_DEBUG_END 1
+#define SERIAL_WRITING 0
+#define SERIAL_DEBUG   1
+#define SERIAL_DEBUG_END 0
 
 //for debugging feedback
 #define LOG_BUF_SIZE        192 // one ASCII character uses one byte -> because of appenln: letter + \r \n = letter+3 (im durchschnitt 2 zeichen pro text) :: 192/5 =

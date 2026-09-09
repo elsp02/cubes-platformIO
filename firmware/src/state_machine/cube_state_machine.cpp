@@ -34,11 +34,11 @@
 static const wire_t *active_upstream = nullptr; // orientation line locked in by ORIENTATION, used for every later parent exchange
 static uint8_t orientation_mask = 0x00;          // this cube's orientation value, sent as part of its own payload
 
-static uint8_t child_payload[MAX_CHILD_COUNT][MAX_CHILD_PAYLOAD_LEN];   // child_payload[child_index][payload_index] = byte received from child
+static uint8_t child_payload[MAX_CHILD_COUNT][MAX_CHILD_PAYLOAD_LEN]= { };   // child_payload[child_index][payload_index] = byte received from child
 static uint8_t child_payload_len[MAX_CHILD_COUNT] = {0};                // length of the payload received from child[i]
 static bool child_done[MAX_CHILD_COUNT] = {false};                      // child[i] answered with a valid frame this cycle
 
-static uint8_t fb_payload[MAX_PAYLOAD_LEN];   // feedback frame received from the parent in FEEDBACK_INIT, relayed in RELAY_FEEDBACK
+static uint8_t fb_payload[MAX_PAYLOAD_LEN]= {0};   // feedback frame received from the parent in FEEDBACK_INIT, relayed in RELAY_FEEDBACK
 static uint8_t fb_payload_len = 0;
 
 //---------------------------------------------------
@@ -250,6 +250,7 @@ void loop()
     case State::DETECTING:
     {
         handle_detection(child_payload, child_payload_len, child_done);
+        release_all_lines();
         current_state = State::BUILD_SEND_PAYLOAD;
         break;
     }
