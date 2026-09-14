@@ -151,6 +151,7 @@ static State current_state = State::IDLE; // current state; advanced by exactly 
 void setup()
 {
     release_all_lines();
+    PORTB.DIRSET = PIN4_bm;
 
     Serial.begin(115200);
 }
@@ -159,6 +160,10 @@ void setup()
 // - runs one state-machine step per call; see the sequence at the top of this file
 void loop()
 {
+    PORTB.OUTSET = PIN4_bm;
+    _delay_us(BAUD_US);
+    PORTB.OUTCLR = PIN4_bm;
+
     
     switch (current_state){
 
@@ -188,6 +193,7 @@ void loop()
         {
             if (stop_received()){
                 current_state = State:: STOPPING;
+                SER_PRINT("x");
             }
             else{
                 SER_PRINT("x");
@@ -213,7 +219,7 @@ void loop()
             handle_detection(child_payload, child_payload_len, child_done);
             release_all_lines();
             current_state = State:: BUILD_PAYLOAD;
-            //pc_reply_retry_count = 0; //is this location correct??
+            pc_reply_retry_count = 0; //is this location correct??
 
             break;
         }

@@ -101,7 +101,7 @@
 // - switches for where SER_PRINT/SER_PRINTLN output goes
 //-----------------------------------------------------------
 #define SERIAL_WRITING 1
-#define SERIAL_DEBUG   1
+#define SERIAL_DEBUG   0
 #define SERIAL_DEBUG_END 0
 
 //for debugging feedback
@@ -140,6 +140,8 @@
 //-----------------------------------------------------------
 //#define GREEN_LED_PIN            PIN5_bm // pin bitmask for the green LED
 //#define RED_LED_PIN              PIN4_bm // pin bitmask for the red LED
+
+
 
 // contained in FEEDBACK_FRAME - which LED to turn on
 #define LED_GREEN           0x01
