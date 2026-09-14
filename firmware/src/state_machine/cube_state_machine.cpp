@@ -179,7 +179,7 @@ void setup()
 
     // LEDs initially off.
     //PORTB.OUTCLR = GREEN_LED_PIN | RED_LED_PIN;
-
+    _delay_us(200);
     Serial.begin(115200);
     Serial.println("cube_state_machine started");
 }

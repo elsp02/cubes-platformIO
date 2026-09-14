@@ -52,12 +52,29 @@
 
     while (Serial.available() > 0) {
         if (Serial.read() == PC_CMD_STOP) {
+            Serial.print("x");
             return true;
         }
     }
     return false;
 }
 
+//bool stop_received(void)
+//{
+//    bool saw_stop = false;
+//    bool saw_other_byte = false;
+//
+//    while (Serial.available() > 0) {
+//        uint8_t b = Serial.read();
+//        if (b == PC_CMD_STOP) {
+//            saw_stop = true;
+//        } else {
+//            saw_other_byte = true;
+//        }
+//    }
+//
+//    return saw_stop && !saw_other_byte;
+//}
 
 // pc_start_signal_received
 // - scans available serial bytes for PC_CMD_START

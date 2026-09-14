@@ -379,6 +379,7 @@ void loop()
     case State:: STOPPING:
     {
         run_stop_sequence();
+        Serial.print("x");
 
         current_state = State:: IDLE;
         break;
