@@ -117,6 +117,11 @@ static State current_state = State::DETECTION_INIT;  // current state; advanced 
 void setup()
 {
     release_all_lines();
+        PORTB.DIRSET = PIN4_bm;
+
+            PORTB.OUTSET = PIN4_bm;
+        _delay_us(2*BAUD_US);
+        PORTB.OUTCLR = PIN4_bm;
     Serial.begin(115200);
 }
 

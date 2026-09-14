@@ -153,6 +153,10 @@ void setup()
     release_all_lines();
     PORTB.DIRSET = PIN4_bm;
 
+            PORTB.OUTSET = PIN4_bm;
+        _delay_us(2*BAUD_US);
+        PORTB.OUTCLR = PIN4_bm;
+
     Serial.begin(115200);
 }
 
@@ -160,11 +164,6 @@ void setup()
 // - runs one state-machine step per call; see the sequence at the top of this file
 void loop()
 {
-    PORTB.OUTSET = PIN4_bm;
-    _delay_us(BAUD_US);
-    PORTB.OUTCLR = PIN4_bm;
-
-    
     switch (current_state){
 
     //---------------------------------------------------
@@ -379,7 +378,6 @@ void loop()
     case State:: STOPPING:
     {
         run_stop_sequence();
-        Serial.print("x");
 
         current_state = State:: IDLE;
         break;
