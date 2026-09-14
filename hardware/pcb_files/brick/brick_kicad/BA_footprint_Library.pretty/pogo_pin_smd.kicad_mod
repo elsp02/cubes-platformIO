@@ -1,0 +1,76 @@
+(footprint "pogo_pin_smd"
+	(version 20260206)
+	(generator "pcbnew")
+	(generator_version "10.0")
+	(layer "F.Cu")
+	(property "Reference" "REF**"
+		(at 0.5 -2 0)
+		(unlocked yes)
+		(layer "F.SilkS")
+		(uuid "ec6dfe19-ccb4-4ecb-a628-414a7e37774f")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.1)
+			)
+		)
+	)
+	(property "Value" "pogo_pin_smd"
+		(at 0 1.5 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(uuid "1a12d4f1-40ba-4530-bcc6-fe9dfef0a917")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "c1e22644-7362-4a1f-a0cf-9fb6a29881de")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "f5a9592b-1396-4436-be9b-13f11a8aee18")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(attr smd)
+	(duplicate_pad_numbers_are_jumpers no)
+	(pad "1" smd circle
+		(at 0 0)
+		(size 2 2)
+		(layers "F.Cu" "F.Mask" "F.Paste")
+		(uuid "be476369-a0b7-4a35-9c04-2075875ab6ef")
+	)
+	(embedded_fonts no)
+	(model "C:/Users/Elena/OneDrive/Bachelorarbeit/Förderschule/Technik/cubes_platformIO/hardware/pcb_files/smd_pogo_pin_LIB_CPG-64-SMT-B/CPG-64-SMT-B/3D/CPG-64-SMT-B.stp"
+		(offset
+			(xyz -0 1.75 -25.8)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz -0 -90 -0)
+		)
+	)
+)

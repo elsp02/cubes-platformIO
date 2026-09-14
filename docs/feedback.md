@@ -7,6 +7,7 @@ The learning application visualises both the selected target construction and th
 - **local feedback** directly on the physical bricks
 
 The frontend uses Three.js to render the brick models and allows the construction to be rotated and zoomed for inspection from different perspectives.
+For further information see the README of the software [Software README](../software/README.md).
 
 ## Target and Current Construction Visualisation
 Before starting a task, the learner selects a target structure from the available constructions. The selected target can be inspected in a three-dimensional preview.

@@ -1,0 +1,104 @@
+(footprint "pogo_pad_IN"
+	(version 20260206)
+	(generator "pcbnew")
+	(generator_version "10.0")
+	(layer "F.Cu")
+	(property "Reference" "REF**"
+		(at 0 -0.5 0)
+		(unlocked yes)
+		(layer "F.SilkS")
+		(uuid "f430422e-29b1-4a74-9897-89586f932d41")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.1)
+			)
+		)
+	)
+	(property "Value" "female_pogo_IN"
+		(at 0 1 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(uuid "5ba1f1e4-e4da-47fb-b85d-085f3aa567f7")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Datasheet" "https://www.mouser.de/datasheet/3/6118/1/cpg_04_n_b.pdf"
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "d7ef21a8-784a-463d-ad72-973fcc649a3b")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Description" "female pogo pin: upstream orientation contact (docking face)"
+		(at 0 0 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "23b98a2a-a539-40b3-8505-448e110c52e3")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(attr smd)
+	(duplicate_pad_numbers_are_jumpers no)
+	(fp_text user "${REFERENCE}"
+		(at 0 2.5 0)
+		(unlocked yes)
+		(layer "F.Fab")
+		(uuid "7992a19f-01e4-4999-bda8-7e425627873c")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(pad "1" thru_hole oval
+		(at -0.5 -3.5)
+		(size 2.2 2.2)
+		(drill 1.2)
+		(property pad_prop_mechanical)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers yes)
+		(keep_end_layers yes)
+		(uuid "3e67c2fa-13d1-49f9-94da-5c0d04970bb3")
+	)
+	(embedded_fonts no)
+	(model "C:/Users/elena/Downloads/LIB_CPG-04-N-B/CPG-04-N-B/3D/CPG-04-N-B.stp"
+		(hide yes)
+		(offset
+			(xyz -0.5 3.5 -9.1)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz -90 -0 -0)
+		)
+	)
+	(model "C:/Users/Elena/OneDrive/Bachelorarbeit/Förderschule/Technik/cubes_platformIO/hardware/pcb_files/female_pogo_pin_LIB_CPG-04-N-B/CPG-04-N-B/3D/CPG-04-N-B.stp"
+		(offset
+			(xyz -0.5 3.5 -9.1)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz -90 -0 -0)
+		)
+	)
+)

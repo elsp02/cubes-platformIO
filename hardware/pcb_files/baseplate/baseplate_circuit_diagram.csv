@@ -1,7 +1,0 @@
-"Reference","Qty","Value","DNP","Exclude from BOM","Exclude from Board","Footprint","Datasheet"
-"C2","1","100nF","","","","Capacitor_SMD:C_0805_2012Metric_Pad1.18x1.45mm_HandSolder",""
-"J1","1","","","","","",""
-"J2","1","PC Interface?","","","","",""
-"J3","1","DATA_OUT1_for_1_Wire_Communication","","","","",""
-"R1","1","33","","","","",""
-"U1","1","ATtiny1616-S","","","","Package_SO:SOIC-20W_7.5x12.8mm_P1.27mm","http://ww1.microchip.com/downloads/en/DeviceDoc/ATtiny3216_ATtiny1616-data-sheet-40001997B.pdf"

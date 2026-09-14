@@ -1,0 +1,318 @@
+(footprint "Wuerth_WR-WTB_64800311622_1x03_P1.50mm_Vertical"
+	(version 20260206)
+	(generator "pcbnew")
+	(generator_version "10.0")
+	(layer "F.Cu")
+	(descr "Wuerth WR-WTB series connector, 64800311622 (https://katalog.we-online.com/em/datasheet/6480xx11622.pdf)")
+	(tags "connector Wuerth WR-WTB vertical")
+	(property "Reference" "REF**"
+		(at 1.5 -2.5 0)
+		(layer "F.SilkS")
+		(uuid "49fc95bc-2269-4a43-8c30-1248156d94b7")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Value" "Wuerth_WR-WTB_64800311622_1x03_P1.50mm_Vertical"
+		(at 1.5 3.4 0)
+		(layer "F.Fab")
+		(uuid "3acd4bd9-ab91-4c76-a282-9543fe19c8d2")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(property "Datasheet" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "6f862feb-22cb-4522-802a-a4282c9641e9")
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "Description" ""
+		(at 0 0 0)
+		(layer "F.Fab")
+		(hide yes)
+		(uuid "203995c2-05af-441b-8bdc-e0cf52f33559")
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+		)
+	)
+	(property "KiLib_Generator" "connector/Wuerth"
+		(at 0 0 0)
+		(layer "F.SilkS")
+		(hide yes)
+		(uuid "6a1385a2-5347-4bad-9c9b-5845192663de")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(attr through_hole)
+	(duplicate_pad_numbers_are_jumpers no)
+	(fp_line
+		(start -1.91 -1.71)
+		(end -1.91 -0.46)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "87ffcac8-7bd2-47e9-8f80-3eeb37f35cdd")
+	)
+	(fp_line
+		(start -1.61 -0.35)
+		(end -1.41 -0.35)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "45d7c028-c9d9-49a8-9764-fc2867219cf7")
+	)
+	(fp_line
+		(start -1.41 -1.21)
+		(end 4.41 -1.21)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "08106ed7-195c-42a3-ae60-84cb06860778")
+	)
+	(fp_line
+		(start -1.41 -0.35)
+		(end -1.41 -1.21)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "3602f402-1aff-4b04-846b-2444783bcc37")
+	)
+	(fp_line
+		(start -1.41 -0.35)
+		(end -1.41 0.35)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "e899c26d-683c-4e41-af73-1d97bd76e9cc")
+	)
+	(fp_line
+		(start -1.41 0.35)
+		(end -1.61 0.35)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "3368571c-8bbc-4d64-81f4-f24e55a6cb5a")
+	)
+	(fp_line
+		(start -1.41 0.35)
+		(end -1.41 2.11)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "07690737-8e3d-498e-9626-530d91289980")
+	)
+	(fp_line
+		(start -1.41 2.11)
+		(end 4.41 2.11)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "ddf1578c-6580-4023-ba54-5aa5296000bf")
+	)
+	(fp_line
+		(start -0.66 -1.71)
+		(end -1.91 -1.71)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "6340f397-c24e-4cde-a478-bad10855bb83")
+	)
+	(fp_line
+		(start 4.41 -1.21)
+		(end 4.41 -0.35)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "a106c633-74a5-4e6a-8cfa-5c69dd56a54d")
+	)
+	(fp_line
+		(start 4.41 -0.35)
+		(end 4.41 0.35)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "c14f30f5-bfe8-4c4e-98e0-3ee880f55748")
+	)
+	(fp_line
+		(start 4.41 -0.35)
+		(end 4.61 -0.35)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "3b33c8cb-be2a-468b-9c80-f7e522a34d91")
+	)
+	(fp_line
+		(start 4.41 0.35)
+		(end 4.61 0.35)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "bd4a3a8d-b088-4ea0-b456-1c1e2a2a4650")
+	)
+	(fp_line
+		(start 4.41 2.11)
+		(end 4.41 0.35)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(layer "F.SilkS")
+		(uuid "a5875e27-a5bb-4afb-890f-3947e592b54d")
+	)
+	(fp_rect
+		(start -1.61 -1.41)
+		(end 4.61 2.31)
+		(stroke
+			(width 0.12)
+			(type solid)
+		)
+		(fill no)
+		(layer "F.SilkS")
+		(uuid "52f39eb0-f5ee-4cf1-8a96-3fd3ada08862")
+	)
+	(fp_rect
+		(start -2 -1.8)
+		(end 5 2.7)
+		(stroke
+			(width 0.05)
+			(type solid)
+		)
+		(fill no)
+		(layer "F.CrtYd")
+		(uuid "01934e9a-8aca-4696-894c-11e4bbd2cf52")
+	)
+	(fp_line
+		(start -1 -1.3)
+		(end 0 -0.3)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "717fef82-7f5d-4d90-9195-d2dd7b4462c3")
+	)
+	(fp_line
+		(start 0 -0.3)
+		(end 1 -1.3)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(layer "F.Fab")
+		(uuid "98ba2d6f-60a7-4b03-8a9d-59c03198d191")
+	)
+	(fp_rect
+		(start -1.5 -1.3)
+		(end 4.5 2.2)
+		(stroke
+			(width 0.1)
+			(type solid)
+		)
+		(fill no)
+		(layer "F.Fab")
+		(uuid "8e98a446-36cb-4d50-ad38-376129abd720")
+	)
+	(fp_text user "${REFERENCE}"
+		(at 1.5 1.5 0)
+		(layer "F.Fab")
+		(uuid "c589d915-6dbd-48d2-8d76-4e87cd72ee9b")
+		(effects
+			(font
+				(size 1 1)
+				(thickness 0.15)
+			)
+		)
+	)
+	(pad "1" thru_hole roundrect
+		(at 0 0)
+		(size 1.17 1.87)
+		(drill 0.87)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(roundrect_rratio 0.213675)
+		(uuid "73f2b6b4-7221-4069-baf7-ae6f9796ca05")
+	)
+	(pad "2" thru_hole oval
+		(at 1.5 0)
+		(size 1.17 1.87)
+		(drill 0.87)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "6a2bc69d-331c-4363-8335-42275458e3d7")
+	)
+	(pad "3" thru_hole oval
+		(at 3 0)
+		(size 1.17 1.87)
+		(drill 0.87)
+		(layers "*.Cu" "*.Mask")
+		(remove_unused_layers no)
+		(uuid "c806c0da-e4c1-44ce-be17-46c3de549d97")
+	)
+	(embedded_fonts no)
+	(model "${KICAD10_3DMODEL_DIR}/Connector_Wuerth.3dshapes/Wuerth_WR-WTB_64800311622_1x03_P1.50mm_Vertical.step"
+		(offset
+			(xyz 0 0 2.2)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz -0 -0 -180)
+		)
+	)
+	(model "C:/Users/Elena/OneDrive/Bachelorarbeit/Förderschule/Technik/cubes_platformIO/hardware/pcb_files/connectors_WR-WTB_1.50/connectors_WR-WTB-1.5_064800311622 (rev1).stp"
+		(offset
+			(xyz 1.5 -0.5 2.25)
+		)
+		(scale
+			(xyz 1 1 1)
+		)
+		(rotate
+			(xyz -0 -0 -180)
+		)
+	)
+)

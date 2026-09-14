@@ -15,8 +15,6 @@ firmware/
 │   └── wire_bus.h                    # Single-wire byte and frame interface
 └── src/      
     ├── state_machine/                # Current baseplate and cube implementation
-    ├── firmware_baseplate/           # Previous baseplate entry point; oldVersions/ = superseded
-    ├── firmware_cube/                # Previous cube entry point; old_versions/ = superseded
     ├── firmware_test/                # Minimal UART handshake test
     └── lib/                          # Shared implementation used by all entry points
 ```
@@ -26,16 +24,13 @@ firmware/
 ## Firmware targets
 | Environment | Device | Entry point | Status |
 |:--|:--|:--|:--|
-| `uart_baseplate_state_machine` | Baseplate | `state_machine/baseplate_state_machine2.cpp` | **Current.** Successor of `uart_baseplate`, implemented as an explicit state machine. |
-| `baseplate_state_machine_debug` | Baseplate | `state_machine/baseplate_state_machine_debug.cpp` | Standalone variant of the above: no PC connection, cycles the predefined feedback patterns from `feedback.h`. |
-| `uart_cube_state_machine` | Active brick | `state_machine/cube_state_machine.cpp` | **Current.** Successor of `uart_cube`, implemented as an explicit state machine; pairs with `uart_baseplate_state_machine`. |
-| `uart_cube` | Active brick | `firmware_cube/final_uart_main_cube.cpp` | Previous version; pairs with `uart_baseplate`. |
-| `uart_test` | Baseplate or test board | `firmware_test/main_uart_handshake.cpp` | Minimal bidirectional UART handshake, no topology or feedback logic. |
-| `Upload_UPDI` | Utility | — | Shared serial-UPDI upload configuration. |
-| `set_fuses` | Utility | — | Configures brown-out detection, EEPROM preservation, and the UPDI pin. |
+| `uart_baseplate_state_machine` | Baseplate | `state_machine/baseplate_state_machine2.cpp` | firmware of the baseplate, implemented as an explicit state machine |
+| `baseplate_state_machine_debug` | Baseplate | `state_machine/baseplate_state_machine_debug.cpp` | Standalone variant of the above: no PC connection, short debug codes printed |
+| `uart_cube_state_machine` | Active brick | `state_machine/cube_state_machine.cpp` | firmware of a brick, implemented as an explicit state machine; pairs with `uart_baseplate_state_machine` |
+| `uart_test` | Baseplate or test board | `firmware_test/main_uart_handshake.cpp` | Minimal bidirectional UART handshake, no topology or feedback logic |
+| `Upload_UPDI` | Utility | — | Shared serial-UPDI upload configuration |
+| `set_fuses` | Utility | — | Configures brown-out detection, EEPROM preservation, and the UPDI pin |
 
-`src/firmware_baseplate/oldVersions/` and `src/firmware_cube/old_versions/` hold earlier iterations kept for reference; they are not selected by any current
-build environment.
 
 ## Configure an active brick or the baseplate
 ### brick

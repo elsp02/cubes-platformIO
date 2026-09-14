@@ -1,0 +1,4 @@
+(sym_lib_table
+	(version 7)
+	(lib (name "verushc") (type "KiCad") (uri "${KICAD10_SYMBOL_DIR}/4xxx_IEEE.kicad_sym") (options "") (descr ""))
+)

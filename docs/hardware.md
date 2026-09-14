@@ -1,4 +1,4 @@
->**TODO**: Design and Manufacturing Files, Schaltplan Baseplate, 3d modell mit allem integrierten,
+>**TODO**:  3d modell mit allem integrierten, sagen baseplate kein pcb angefertigt
 
 # Hardware
 ## Overview
@@ -14,7 +14,7 @@ Two brick geometries were implemented:
 | Brick Type | Geometry | Connection Faces |
 |---|---|---|
 | Cube brick | Approx. 40 mm × 40 mm × 40 mm | One docking face and five receiving faces |
-| Smashed brick | Half-height brick | One docking face and one opposing receiving face |
+| Smashed brick | Half-height brick | One docking face and one receiving face |
 
 
 <center>
@@ -136,9 +136,9 @@ The baseplate communicates with the host computer using its hardware USART and t
 PCB layout and the schematic are listed at the end of this document.
 
 ### Power Supply
-The complete brick structure is supplied centrally with 5 V DC through the baseplate. Power is forwarded through every connected brick. The building bricks therefore contain no individual batteries or rechargeable cells.
+The complete brick structure is supplied centrally with 5V DC through the baseplate. Power is forwarded through every connected brick. The building bricks therefore contain no individual batteries or rechargeable cells.
 
-In the implemented prototype, the 5 V supply is provided from the host computer through the USB-to-TTL UART adapter.
+In the implemented prototype, the 5V supply is provided from the host computer through the USB-to-TTL UART adapter.
 
 
 ## Pin Assignment
@@ -188,15 +188,12 @@ The repository contains the files required to document and reproduce the develop
 | Content | Repository Location |
 |---|---|
 | CAD files | [hardware/CAD_files](../hardware/CAD_files) |
-| KiCad project | `[PATH]` |
-| Brick and baseplate Circuit schematic | [hardware/pcb_files](.../hardware/pcb_files) |
-| PCB layout | `[PATH]` |
-| Gerber files? | `[PATH]` |
-| Bill of materials | [hardware/pcb_files](.../hardware/pcb_files) |
+| PCB files and schematics| [hardware/pcb_files](.../hardware/pcb_files) |
+| Bill of materials brick | [hardware/pcb_files/brick](.../hardware\pcb_files\brick\14-09-26_brick_BOM_total.xlsx) |
+| Bill of materials baseplate | [hardware/pcb_files/baseplate](.../hardware\pcb_files\baseplate\14-09-26_baseplate_BOM_total.xlsx) |
 
 # Prototype Status
-Eight physical prototype bricks were manufactured. The mechanical interaction and handling of the bricks were evaluated with the intended target group, while the integrated electronic construction-detection system was not sufficiently reliable for a complete end-to-end evaluation.  
-No standardised durability or product-safety certification was conducted.
+Eight physical prototype bricks were manufactured. No standardised durability or product-safety certification was conducted.
 
 
 

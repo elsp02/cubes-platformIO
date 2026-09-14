@@ -35,18 +35,19 @@ The system consists of three main components:
 │   ├── communication-protocol.md
 │   ├── feedback.md
 │   ├── hardware.md
-│   ├── timing-definitions.md
+│   ├── language_c.md
 │
 ├── figures/
 │
 ├── firmware/
 │   ├── include/
-│   │   └── include/
 │   └── src/
 │        ├── lib/
-│        ├── firmware_baseplate/
-│        ├── firmware_cube/
+│        ├── firmware_test/
 │        └── state_machine/
+│         ├── baseplate_state_machine_debug.cpp
+│         ├── baseplate_state_machine2.cpp
+│         └── cube_state_machine.cpp
 │
 ├── software/
 │   ├── backend/
@@ -77,6 +78,9 @@ Detailed technical documentation is provided separately:
 
 Addtional information regarding the feedback output and visualisation is provided in [Feedback and Visualisation](docs/feedback.md).
 
+Firmware and Software Folders do also have additional README files [Firmware README](firmware/README.md), [Software README](software/README.md), as well as the backend [backend README](software/threejs_visualization/backend/README.md) 
+and the frontend [frontend README](software/threejs_visualization/frontend/README.md)
+
 (Furthermore, the bachelor thesis includes the complete design rationale, theoretical background, requirement analysis, implementation details and evaluation.)
 
 
@@ -84,8 +88,6 @@ Addtional information regarding the feedback output and visualisation is provide
 to operate the complete physical prototype, the following hard- and software is required:
 
 ### Prototype Hardware
->**TODO**: adjust link to correct one
-
 The building bricks and baseplate both include an ATtiny1616 and are custom developed components. Their mechanical and electronic design files are included in this repository in the [hardware](hardware/) and explained in [Hardware](docs/hardware.md)
 
 ### Additional Hardware
@@ -106,7 +108,7 @@ Setup instructions are available in the
 - modern web browser
 
 **Python dependencies**:  
-- `pyserial` (UART communication, e.g. [handshake_test.py](software/uart_test/handshake_test.py), [binary_serial_reader.py](software/threejs_visualization/backend/binary_serial_reader.py))
+- `pyserial` (UART communication, [binary_serial_reader.py](software/threejs_visualization/backend/binary_serial_reader.py))
 - `websockets` (backend WebSocket server, [ws_server.py](software/threejs_visualization/backend/ws_server.py))
 
 Python dependencies can be installed via:  
