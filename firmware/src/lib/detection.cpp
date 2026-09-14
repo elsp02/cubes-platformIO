@@ -47,7 +47,7 @@ bool poll_child(const wire_t *w, uint8_t *data_out, uint8_t max_child_payload_le
 
     *acked_out = true;
 
-    SER_PRINT("CA");
+    //SER_PRINT("CA");
     /*
      * 3. ACK received, now wait for childs DATA FRAME.
      */
@@ -98,7 +98,7 @@ void handle_detection(
         bool retry_needed = false; //true if any child still has attempts left after this round
 
         for (uint8_t i = 0; i < child_count; i++) {  //child loop, iterates through children
-            SER_PRINTLN("RC");
+            //SER_PRINTLN("RC");
 
             if (child_done[i]) {
                 continue;

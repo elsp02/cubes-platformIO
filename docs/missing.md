@@ -13,3 +13,8 @@ code
 
 - sagen welche files in welchem env genutzt werden z.b. geedback in baseplate und feedback cube in cube oder poll child bei beidem
 - DATA FRAME data frame etc anpassen
+
+
+turnaround höher setzen
+brown out reset
+timeout

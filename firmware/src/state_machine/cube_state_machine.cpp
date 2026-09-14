@@ -78,13 +78,13 @@ static void wait_for_valid_upstream_cmd(
         uint8_t b = 0;
 
         if (!rx_byte_frame(w, &b)) { // no valid byte received within timeout
-            SER_PRINT("y");
+            //SER_PRINT("y");
             continue;
         }
 
         if (b != CMD_STATUS) {
             release_all_lines();
-            SER_PRINT("p");
+            //SER_PRINT("p");
             continue;
         }
 

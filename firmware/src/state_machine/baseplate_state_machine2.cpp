@@ -384,6 +384,21 @@ void loop()
         break;
     }
 
+    //---------------------------------------------------
+    // default
+    // - current_state somehow holds a value outside the defined State enum
+    //   (e.g. SRAM corruption from a brief voltage dip when a brick is
+    //   inserted, not severe enough to trigger a clean reset) - without
+    //   this, no case matches, loop() does nothing, forever, with no
+    //   recovery path (no default = the whole thing needs a power-cycle)
+    // -> recover into DETECTION_INIT instead of freezing permanently
+    //--------------------------------------------------
+    default:
+    {
+        current_state = State:: DETECTION_INIT;
+        break;
+    }
+
 }
 }
 

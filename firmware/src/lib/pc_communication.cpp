@@ -16,7 +16,7 @@
 // - waits for one byte from the PC, with a millis() timeout
  bool wait_for_pc_byte(uint8_t *out, unsigned long timeout_ms)
 {
-    unsigned long timeout_us = timeout_ms * 10000UL;
+    unsigned long timeout_us = timeout_ms * 1000UL;
     unsigned long waited_us = 0;
     const unsigned long check_interval_us = 100UL;
 

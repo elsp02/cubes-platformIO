@@ -160,9 +160,8 @@ def iter_trees_from_binary_serial(
         last_payload: Optional[bytes] = None         # snapshot of last answered payload
         last_feedback_frame: Optional[bytes] = None  # its frame, resent on heartbeats
 
-        # tracks whether the baseplate has answered START at all yet, so
-        # a lost START (see the resend logic below) can be detected
-        got_first_sync = False
+        # tracks consecutive idle timeouts with no frame at all - used to
+        # detect a lost/forgotten START and resend it (see below)
         idle_timeouts_since_start = 0
 
         try:
@@ -179,20 +178,25 @@ def iter_trees_from_binary_serial(
                     if verbose:
                         print("Idle: no data received in the last second.")
 
-                    # START can be swallowed by the firmware's STOP handling
-                    # if a session restarts too quickly; since a real START
-                    # always produces a frame in its first cycle, 3 idle
-                    # timeouts with no sync yet means it got lost -> resend it
-                    if not got_first_sync:
-                        idle_timeouts_since_start += 1
-                        if idle_timeouts_since_start >= 3:
-                            ser.write(bytes([CMD_START]))
-                            idle_timeouts_since_start = 0
-                            print("No frame since START - START sent again.")
+                    # A lost START (session restarted too quickly, the
+                    # firmware's STOP handling swallowed it) and the
+                    # baseplate silently falling back to IDLE mid-session
+                    # (e.g. a noise byte on the line misread as STOP) look
+                    # identical from here: no more frames ever arrive.
+                    # Resend START after a few seconds of silence in both
+                    # cases - harmless if the baseplate is genuinely just
+                    # idle between real detections (it only reacts to
+                    # START anyway), but recovers a lost/dropped session
+                    # without needing a manual restart.
+                    idle_timeouts_since_start += 1
+                    if idle_timeouts_since_start >= 5:
+                        ser.write(bytes([CMD_START]))
+                        idle_timeouts_since_start = 0
+                        print("No frame for 3s - START (re)sent.")
 
                     continue            # keep scanning for the next SYNC
 
-                got_first_sync = True   # baseplate is talking, START arrived
+                idle_timeouts_since_start = 0   # real data arrived - reset the idle counter
 
                 # 2. receive payload
                 payload = rx_frame(ser)
