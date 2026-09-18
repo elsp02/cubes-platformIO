@@ -7,7 +7,7 @@
 		(at 0 -0.5 0)
 		(unlocked yes)
 		(layer "F.SilkS")
-		(uuid "f430422e-29b1-4a74-9897-89586f932d41")
+		(uuid "f07c6a38-bacb-4cb1-96b2-799077506ed4")
 		(effects
 			(font
 				(size 1 1)
@@ -19,7 +19,7 @@
 		(at 0 1 0)
 		(unlocked yes)
 		(layer "F.Fab")
-		(uuid "5ba1f1e4-e4da-47fb-b85d-085f3aa567f7")
+		(uuid "6c550cba-b3f4-40ea-b8ab-3a56bb68cc19")
 		(effects
 			(font
 				(size 1 1)
@@ -32,7 +32,7 @@
 		(unlocked yes)
 		(layer "F.Fab")
 		(hide yes)
-		(uuid "d7ef21a8-784a-463d-ad72-973fcc649a3b")
+		(uuid "1bd4f20e-5523-4789-a196-b706e476ac6b")
 		(effects
 			(font
 				(size 1 1)
@@ -45,7 +45,7 @@
 		(unlocked yes)
 		(layer "F.Fab")
 		(hide yes)
-		(uuid "23b98a2a-a539-40b3-8505-448e110c52e3")
+		(uuid "a04ae110-607a-4de7-87ba-8140d6960bc6")
 		(effects
 			(font
 				(size 1 1)
@@ -59,7 +59,7 @@
 		(at 0 2.5 0)
 		(unlocked yes)
 		(layer "F.Fab")
-		(uuid "7992a19f-01e4-4999-bda8-7e425627873c")
+		(uuid "9a98b0b1-10e8-4efd-87aa-640aced63846")
 		(effects
 			(font
 				(size 1 1)
@@ -75,7 +75,7 @@
 		(layers "*.Cu" "*.Mask")
 		(remove_unused_layers yes)
 		(keep_end_layers yes)
-		(uuid "3e67c2fa-13d1-49f9-94da-5c0d04970bb3")
+		(uuid "60dfcb4b-c4af-4a63-9197-ffc060f5d0b5")
 	)
 	(embedded_fonts no)
 	(model "C:/Users/elena/Downloads/LIB_CPG-04-N-B/CPG-04-N-B/3D/CPG-04-N-B.stp"
@@ -90,7 +90,7 @@
 			(xyz -90 -0 -0)
 		)
 	)
-	(model "C:/Users/Elena/OneDrive/Bachelorarbeit/Förderschule/Technik/cubes_platformIO/hardware/pcb_files/female_pogo_pin_LIB_CPG-04-N-B/CPG-04-N-B/3D/CPG-04-N-B.stp"
+	(model "C:/Users/Elena/OneDrive/Bachelorarbeit/Förderschule/Technik/cubes_platformIO/hardware/pcb_files/female_pogo_pin_LIB_CPG-04-N-B/CPG-04-N-B.stp"
 		(offset
 			(xyz -0.5 3.5 -9.1)
 		)

@@ -7,7 +7,7 @@
 		(at 0.5 -2 0)
 		(unlocked yes)
 		(layer "F.SilkS")
-		(uuid "ec6dfe19-ccb4-4ecb-a628-414a7e37774f")
+		(uuid "8bb3bdb0-62fb-40de-8e83-7c464a01275a")
 		(effects
 			(font
 				(size 1 1)
@@ -19,7 +19,7 @@
 		(at 0 1.5 0)
 		(unlocked yes)
 		(layer "F.Fab")
-		(uuid "1a12d4f1-40ba-4530-bcc6-fe9dfef0a917")
+		(uuid "e255a2c2-1d34-47cd-bfff-8294cadf1552")
 		(effects
 			(font
 				(size 1 1)
@@ -32,7 +32,7 @@
 		(unlocked yes)
 		(layer "F.Fab")
 		(hide yes)
-		(uuid "c1e22644-7362-4a1f-a0cf-9fb6a29881de")
+		(uuid "7e2c531e-f46e-499b-9e18-4dc01c0953cd")
 		(effects
 			(font
 				(size 1 1)
@@ -45,7 +45,7 @@
 		(unlocked yes)
 		(layer "F.Fab")
 		(hide yes)
-		(uuid "f5a9592b-1396-4436-be9b-13f11a8aee18")
+		(uuid "ce722a09-5036-43f7-8890-b0d3d0fab035")
 		(effects
 			(font
 				(size 1 1)
@@ -59,10 +59,10 @@
 		(at 0 0)
 		(size 2 2)
 		(layers "F.Cu" "F.Mask" "F.Paste")
-		(uuid "be476369-a0b7-4a35-9c04-2075875ab6ef")
+		(uuid "d834e561-e41d-4e64-80e6-f7f4ced5383b")
 	)
 	(embedded_fonts no)
-	(model "C:/Users/Elena/OneDrive/Bachelorarbeit/Förderschule/Technik/cubes_platformIO/hardware/pcb_files/smd_pogo_pin_LIB_CPG-64-SMT-B/CPG-64-SMT-B/3D/CPG-64-SMT-B.stp"
+	(model "C:/Users/Elena/OneDrive/Bachelorarbeit/Förderschule/Technik/cubes_platformIO/hardware/pcb_files/smd_pogo_pin_LIB_CPG-64-SMT-B/CPG-64-SMT-B.stp"
 		(offset
 			(xyz -0 1.75 -25.8)
 		)

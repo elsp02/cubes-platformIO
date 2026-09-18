@@ -119,11 +119,11 @@ const SMASHED_TOP_DISTANCE = CUBE_SIZE / 2.0 + GAP;
 
 const PORT_GEOMETRY = {
     [TYPE_CUBE]: {
-        0: { direction: new THREE.Vector3(-1.0, 0.0, 0.0),  distance: PITCH, attachment: rotationY(-Math.PI / 2.0) },   //  parent -x port
-        1: { direction: new THREE.Vector3(0.0, -1.0, 0.0), distance: PITCH, attachment: rotationX(Math.PI / 2.0) },  //  parent -y port
+        0: { direction: new THREE.Vector3(-1.0, 0.0, 0.0),  distance: PITCH, attachment: rotationY(-Math.PI / 2.0).multiply(rotationZ(Math.PI)) },   //  parent -x port
+        1: { direction: new THREE.Vector3(0.0, -1.0, 0.0), distance: PITCH, attachment: rotationX(Math.PI / 2.0).multiply(rotationZ(-Math.PI / 2.0)) },  //  parent -y port
         2: { direction: new THREE.Vector3(0.0, 0.0, 1.0),  distance: PITCH, attachment: new THREE.Quaternion() },  //  parent +z port -> identity: already aligned
         3: { direction: new THREE.Vector3(1.0, 0.0, 0.0), distance: PITCH, attachment: rotationY(Math.PI / 2.0) },   //  parent x port
-        4: { direction: new THREE.Vector3(0.0, 1.0, 0.0),  distance: PITCH, attachment: rotationX(-Math.PI/2.0) },     //  parent y port
+        4: { direction: new THREE.Vector3(0.0, 1.0, 0.0),  distance: PITCH, attachment: rotationX(-Math.PI/2.0).multiply(rotationZ(Math.PI / 2.0)) },     //  parent y port
     },
 
     [TYPE_SMASHED]: {

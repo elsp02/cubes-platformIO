@@ -1,6 +1,7 @@
 # Backend
 This directory contains the Python backend of the learning application. It
 bridges the baseplate's serial link and the three.js frontend's WebSocket connection: 
+- deserializing the serialized tree provided by the baseplate
 - reconstructing the detected construction
 - comparing it against the selected target
 - deriving feedback for both the browser and the physical bricks

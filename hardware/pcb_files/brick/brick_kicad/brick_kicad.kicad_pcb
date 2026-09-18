@@ -863,7 +863,7 @@
 				(xyz 1 1 1)
 			)
 			(rotate
-				(xyz 0 0 -180)
+				(xyz -0 -0 -180)
 			)
 		)
 		(model "C:/Users/Elena/OneDrive/Bachelorarbeit/Förderschule/Technik/cubes_platformIO/hardware/pcb_files/connectors_WR-WTB_1.50/connectors_WR-WTB-1.5_064800311622 (rev1).stp"
@@ -874,7 +874,7 @@
 				(xyz 1 1 1)
 			)
 			(rotate
-				(xyz 0 0 -180)
+				(xyz -0 -0 -180)
 			)
 		)
 	)
@@ -1987,7 +1987,7 @@
 				(xyz 1 1 1)
 			)
 			(rotate
-				(xyz 0 0 -180)
+				(xyz -0 -0 -180)
 			)
 		)
 		(model "C:/Users/Elena/OneDrive/Bachelorarbeit/Förderschule/Technik/cubes_platformIO/hardware/pcb_files/connectors_WR-WTB_1.50/connectors_WR-WTB-1.5_064800311622 (rev1).stp"
@@ -1998,7 +1998,7 @@
 				(xyz 1 1 1)
 			)
 			(rotate
-				(xyz 0 0 -180)
+				(xyz -0 -0 -180)
 			)
 		)
 	)
@@ -2330,7 +2330,7 @@
 				(xyz 1 1 1)
 			)
 			(rotate
-				(xyz 0 0 -180)
+				(xyz -0 -0 -180)
 			)
 		)
 		(model "C:/Users/Elena/OneDrive/Bachelorarbeit/Förderschule/Technik/cubes_platformIO/hardware/pcb_files/connectors_WR-WTB_1.50/connectors_WR-WTB-1.5_064800311622 (rev1).stp"
@@ -2341,7 +2341,7 @@
 				(xyz 1 1 1)
 			)
 			(rotate
-				(xyz 0 0 -180)
+				(xyz -0 -0 -180)
 			)
 		)
 	)
@@ -2849,7 +2849,7 @@
 				(xyz 1 1 1)
 			)
 			(rotate
-				(xyz 0 90 0)
+				(xyz -0 90 -0)
 			)
 		)
 	)
@@ -3346,7 +3346,7 @@
 				(xyz 1 1 1)
 			)
 			(rotate
-				(xyz 0 0 -180)
+				(xyz -0 -0 -180)
 			)
 		)
 		(model "C:/Users/Elena/OneDrive/Bachelorarbeit/Förderschule/Technik/cubes_platformIO/hardware/pcb_files/connectors_WR-WTB_1.50/connectors_WR-WTB-1.5_064800311622 (rev1).stp"
@@ -3357,7 +3357,7 @@
 				(xyz 1 1 1)
 			)
 			(rotate
-				(xyz 0 0 -180)
+				(xyz -0 -0 -180)
 			)
 		)
 	)
@@ -3788,10 +3788,10 @@
 				(xyz 1 1 1)
 			)
 			(rotate
-				(xyz -90 0 0)
+				(xyz -90 -0 -0)
 			)
 		)
-		(model "C:/Users/Elena/OneDrive/Bachelorarbeit/Förderschule/Technik/cubes_platformIO/hardware/pcb_files/female_pogo_pin_LIB_CPG-04-N-B/CPG-04-N-B/3D/CPG-04-N-B.stp"
+		(model "C:/Users/Elena/OneDrive/Bachelorarbeit/Förderschule/Technik/cubes_platformIO/hardware/pcb_files/female_pogo_pin_LIB_CPG-04-N-B/CPG-04-N-B.stp"
 			(offset
 				(xyz -0.5 3.5 -9.1)
 			)
@@ -3799,7 +3799,7 @@
 				(xyz 1 1 1)
 			)
 			(rotate
-				(xyz -90 0 0)
+				(xyz -90 -0 -0)
 			)
 		)
 	)
@@ -4065,10 +4065,10 @@
 				(xyz 1 1 1)
 			)
 			(rotate
-				(xyz -90 0 0)
+				(xyz -90 -0 -0)
 			)
 		)
-		(model "C:/Users/Elena/OneDrive/Bachelorarbeit/Förderschule/Technik/cubes_platformIO/hardware/pcb_files/female_pogo_pin_LIB_CPG-04-N-B/CPG-04-N-B/3D/CPG-04-N-B.stp"
+		(model "C:/Users/Elena/OneDrive/Bachelorarbeit/Förderschule/Technik/cubes_platformIO/hardware/pcb_files/female_pogo_pin_LIB_CPG-04-N-B/CPG-04-N-B.stp"
 			(offset
 				(xyz -0.5 3.5 -9.1)
 			)
@@ -4076,7 +4076,7 @@
 				(xyz 1 1 1)
 			)
 			(rotate
-				(xyz -90 0 0)
+				(xyz -90 -0 -0)
 			)
 		)
 	)
@@ -4177,10 +4177,10 @@
 				(xyz 1 1 1)
 			)
 			(rotate
-				(xyz -90 0 0)
+				(xyz -90 -0 -0)
 			)
 		)
-		(model "C:/Users/Elena/OneDrive/Bachelorarbeit/Förderschule/Technik/cubes_platformIO/hardware/pcb_files/female_pogo_pin_LIB_CPG-04-N-B/CPG-04-N-B/3D/CPG-04-N-B.stp"
+		(model "C:/Users/Elena/OneDrive/Bachelorarbeit/Förderschule/Technik/cubes_platformIO/hardware/pcb_files/female_pogo_pin_LIB_CPG-04-N-B/CPG-04-N-B.stp"
 			(offset
 				(xyz -0.5 3.5 -9.1)
 			)
@@ -4188,7 +4188,7 @@
 				(xyz 1 1 1)
 			)
 			(rotate
-				(xyz -90 0 0)
+				(xyz -90 -0 -0)
 			)
 		)
 	)
@@ -5716,10 +5716,10 @@
 				(xyz 1 1 1)
 			)
 			(rotate
-				(xyz -90 0 0)
+				(xyz -90 -0 -0)
 			)
 		)
-		(model "C:/Users/Elena/OneDrive/Bachelorarbeit/Förderschule/Technik/cubes_platformIO/hardware/pcb_files/female_pogo_pin_LIB_CPG-04-N-B/CPG-04-N-B/3D/CPG-04-N-B.stp"
+		(model "C:/Users/Elena/OneDrive/Bachelorarbeit/Förderschule/Technik/cubes_platformIO/hardware/pcb_files/female_pogo_pin_LIB_CPG-04-N-B/CPG-04-N-B.stp"
 			(offset
 				(xyz -0.5 3.5 -9.1)
 			)
@@ -5727,7 +5727,7 @@
 				(xyz 1 1 1)
 			)
 			(rotate
-				(xyz -90 0 0)
+				(xyz -90 -0 -0)
 			)
 		)
 	)
@@ -5828,10 +5828,10 @@
 				(xyz 1 1 1)
 			)
 			(rotate
-				(xyz -90 0 0)
+				(xyz -90 -0 -0)
 			)
 		)
-		(model "C:/Users/Elena/OneDrive/Bachelorarbeit/Förderschule/Technik/cubes_platformIO/hardware/pcb_files/female_pogo_pin_LIB_CPG-04-N-B/CPG-04-N-B/3D/CPG-04-N-B.stp"
+		(model "C:/Users/Elena/OneDrive/Bachelorarbeit/Förderschule/Technik/cubes_platformIO/hardware/pcb_files/female_pogo_pin_LIB_CPG-04-N-B/CPG-04-N-B.stp"
 			(offset
 				(xyz -0.5 3.5 -9.1)
 			)
@@ -5839,7 +5839,7 @@
 				(xyz 1 1 1)
 			)
 			(rotate
-				(xyz -90 0 0)
+				(xyz -90 -0 -0)
 			)
 		)
 	)
@@ -6171,7 +6171,7 @@
 				(xyz 1 1 1)
 			)
 			(rotate
-				(xyz 0 0 -180)
+				(xyz -0 -0 -180)
 			)
 		)
 		(model "C:/Users/Elena/OneDrive/Bachelorarbeit/Förderschule/Technik/cubes_platformIO/hardware/pcb_files/connectors_WR-WTB_1.50/connectors_WR-WTB-1.5_064800311622 (rev1).stp"
@@ -6182,7 +6182,7 @@
 				(xyz 1 1 1)
 			)
 			(rotate
-				(xyz 0 0 -180)
+				(xyz -0 -0 -180)
 			)
 		)
 	)
@@ -6808,15 +6808,15 @@
 				(xyz 0 0 0)
 			)
 		)
-		(model "C:/Users/elena/Downloads/3dmodels/ICLED_SMD_Wurth.3dshapes/U_Wurth_WL-ICLED_1313210530000.step"
+		(model "C:/Users/Elena/OneDrive/Bachelorarbeit/Förderschule/Technik/cubes_platformIO/hardware/pcb_files/WL-ICLED_wuerth/WL-ICLED_1313210530000.stp"
 			(offset
-				(xyz 0 0 0)
+				(xyz 0 0.2 0.5)
 			)
 			(scale
 				(xyz 1 1 1)
 			)
 			(rotate
-				(xyz 0 0 0)
+				(xyz -90 -0 -0)
 			)
 		)
 	)
@@ -7053,12 +7053,6 @@
 		(path "/c47521ad-5a46-43aa-afdb-238133c66067")
 		(sheetname "/")
 		(sheetfile "brick_kicad.kicad_sch")
-		(units
-			(unit
-				(name "A")
-				(pins "1" "3" "2" "4")
-			)
-		)
 		(attr smd)
 		(duplicate_pad_numbers_are_jumpers no)
 		(fp_line
@@ -7258,27 +7252,27 @@
 			(uuid "c65686a0-c8ae-4ddb-9389-c451ef20ac43")
 		)
 		(embedded_fonts no)
-		(model "${WE_3DMODEL_DIR}/ICLED_SMD_Wurth.3dshapes/U_Wurth_WL-ICLED_1313210530000.step"
-			(hide yes)
+		(model "C:/Users/Elena/OneDrive/Bachelorarbeit/Förderschule/Technik/cubes_platformIO/hardware/pcb_files/WL-ICLED_wuerth/WL-ICLED_1313210530000.stp"
 			(offset
-				(xyz 0 0 0)
+				(xyz 0 0.2 0.5)
 			)
 			(scale
 				(xyz 1 1 1)
 			)
 			(rotate
-				(xyz 0 0 0)
+				(xyz -90 -0 -0)
 			)
 		)
-		(model "C:/Users/elena/Downloads/3dmodels/ICLED_SMD_Wurth.3dshapes/U_Wurth_WL-ICLED_1313210530000.step"
+		(model "C:/Users/Elena/OneDrive/Bachelorarbeit/Förderschule/Technik/cubes_platformIO/hardware/pcb_files/WL-ICLED_wuerth/WL-ICLED_1313210530000.stp"
+			(hide yes)
 			(offset
-				(xyz 0 0 0)
+				(xyz 0 0.2 0.5)
 			)
 			(scale
 				(xyz 1 1 1)
 			)
 			(rotate
-				(xyz 0 0 0)
+				(xyz -90 -0 -0)
 			)
 		)
 	)
@@ -7357,15 +7351,15 @@
 			(uuid "e7501728-7db6-41aa-ae44-b583add5b1df")
 		)
 		(embedded_fonts no)
-		(model "C:/Users/Elena/OneDrive/Bachelorarbeit/Förderschule/Technik/cubes_platformIO/hardware/pcb_files/smd_pogo_pin_LIB_CPG-64-SMT-B/CPG-64-SMT-B/3D/CPG-64-SMT-B.stp"
+		(model "C:/Users/Elena/OneDrive/Bachelorarbeit/Förderschule/Technik/cubes_platformIO/hardware/pcb_files/smd_pogo_pin_LIB_CPG-64-SMT-B/CPG-64-SMT-B.stp"
 			(offset
-				(xyz 0 1.75 -25.8)
+				(xyz -0 1.75 -25.8)
 			)
 			(scale
 				(xyz 1 1 1)
 			)
 			(rotate
-				(xyz 0 -90 0)
+				(xyz -0 -90 -0)
 			)
 		)
 	)
@@ -7638,24 +7632,24 @@
 		(model "${WE_3DMODEL_DIR}/ICLED_SMD_Wurth.3dshapes/U_Wurth_WL-ICLED_1313210530000.step"
 			(hide yes)
 			(offset
-				(xyz 0 0 0)
+				(xyz 0 0.2 0.5)
 			)
 			(scale
 				(xyz 1 1 1)
 			)
 			(rotate
-				(xyz 0 0 0)
+				(xyz -90 -0 -0)
 			)
 		)
-		(model "C:/Users/elena/Downloads/3dmodels/ICLED_SMD_Wurth.3dshapes/U_Wurth_WL-ICLED_1313210530000.step"
+		(model "C:/Users/Elena/OneDrive/Bachelorarbeit/Förderschule/Technik/cubes_platformIO/hardware/pcb_files/WL-ICLED_wuerth/WL-ICLED_1313210530000.stp"
 			(offset
-				(xyz 0 0 0)
+				(xyz 0 0.2 0.5)
 			)
 			(scale
 				(xyz 1 1 1)
 			)
 			(rotate
-				(xyz 0 0 0)
+				(xyz -90 -0 -0)
 			)
 		)
 	)
@@ -8622,18 +8616,18 @@
 				(xyz 1 1 1)
 			)
 			(rotate
-				(xyz 0 0 0)
+				(xyz -90 -0 -0)
 			)
 		)
-		(model "C:/Users/elena/Downloads/3dmodels/ICLED_SMD_Wurth.3dshapes/U_Wurth_WL-ICLED_1313210530000.step"
+		(model "C:/Users/Elena/OneDrive/Bachelorarbeit/Förderschule/Technik/cubes_platformIO/hardware/pcb_files/WL-ICLED_wuerth/WL-ICLED_1313210530000.stp"
 			(offset
-				(xyz 0 0 0)
+				(xyz 0 0.2 0.5)
 			)
 			(scale
 				(xyz 1 1 1)
 			)
 			(rotate
-				(xyz 0 0 0)
+				(xyz -90 -0 -0)
 			)
 		)
 	)

@@ -20,7 +20,7 @@ namespace {
     constexpr uint8_t RGB_LED_DATA_PIN = PIN_PB5;
     constexpr uint8_t RGB_LED_COUNT = 4; // 4-LED strip, all LEDs always show the same color
     uint8_t rgb_pixel_buffer[RGB_LED_COUNT * 3] = {0};
-    tinyNeoPixel rgb_led(RGB_LED_COUNT, RGB_LED_DATA_PIN, NEO_RGB + NEO_KHZ800, rgb_pixel_buffer);
+    tinyNeoPixel rgb_led(RGB_LED_COUNT, RGB_LED_DATA_PIN, NEO_GRB + NEO_KHZ800, rgb_pixel_buffer);
 
     void rgb_led_init()
     {
