@@ -270,10 +270,10 @@ platine inklusive vcc konstruktion
 - MCU
 - PCB
 - Pogo Pins - jede mechanische verbindung is complemented by an electrical interface using recessed spring loaded low resistance contacts which are arranged rotationally symmetriylly to support connections in multiple orientations
-- lokales Feedback LEDs
+- lokale Feedback LEDs
 - Stromversorgungs konstruktion - 5V (kein damage)
 baseplate?
-anordnung pogo pins? symmetrisch rotational?
+anordnung pogo pins? symmetrisch rotational? erklärung konstruktion vcc mit ringmagnet
 
 
 
@@ -300,7 +300,7 @@ oder
         -> kein normales protokoll sondern ein eigenes bit banging protocoll 
         (warum kein normales - attiny nur updi one wire möglich, wenn normales uart dann viel mehr kontakte, warum nicht one wire data protokoll übernommen - erklärung?)
         (- open drain like behavior: remains released high in its idle state and is actively pulled low only during transmission/kommunikation)
-- Kommunikation wird immer vom parent initiiert - request response prinzip
+(- Kommunikation wird immer vom parent initiiert - request response prinzip)
 
 
 
@@ -412,6 +412,7 @@ wie wird das ergebnis des konstruktions vergleich wieder an den Lernenden zurüc
 ## physisches feedback
 - es wird ja noch ein feedback frame über die baseplate an die bricks gesendet
 - dieses feedback frame enthält die IDs und die LED States der angesprochenen bricks 
+    -> rekurisve weiterleitung über baseplate an alle bricks so wie bei detection erkennung 
     -> ein brick schaut ob seine ID enthalten ist und schaltet die LED je nach state entweder auf grün (korrekt platziert) oder rot
     -> wenn id nicht enthalten ist, wird LED ausgeschaltet
 -> dadurch kann das feedback direkt an dem brick ausgegeben werden, auf den es sich bezieht

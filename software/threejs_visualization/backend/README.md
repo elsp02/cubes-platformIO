@@ -57,8 +57,28 @@ started from the frontend.
 
 
 ## compare
-was für infos hat man nach der comparison dann mit dem das frontend dann sachen anzeigen kann und interpretation davon 
+`compare_core.compare()` walks the detected `CubeNode` tree together with the
+target `TargetNode` tree and produces a `CompareEntry` tree. `feedback_output
+.build_evaluated_tree()` turns that into the plain JSON sent to the browser as
+`{"type": "evaluated_tree", "tree": ...}`.
 
+Every node in that tree carries:
+
+| Field | Meaning |
+|:--|:--|
+| `status` | `correct` / `wrong` / `attachable` / `blocked` / `unexpected` |
+| `error_mask` | bitmask of what's wrong (type/orientation/port/parent/unexpected) |
+| `node_id`, `orientation` | the physically detected cube at this slot, or `null` if nothing is built there |
+| `expected_type`, `expected_orientation`, `expected_port` | what the target wants at this slot, or `null` if there is no valid target correspondence (e.g. an unexpected cube) |
+| `children` | nested evaluated entries, one per target slot plus any extra/misplaced physical cubes |
+
+The frontend (`tree_builder.js` + `scene_glb.js`) interprets `status` as follows:
+- `correct` -> cube rendered with a green pulsing outline
+- `wrong` / `unexpected` -> cube rendered with a red pulsing outline
+- `attachable` -> no physical cube yet; rendered as a semi-transparent "ghost"
+  using the expected type/orientation, showing where to build next
+- `blocked` -> not rendered at all (its parent isn't correct yet, so nothing
+  here can be built either)
 
 ## Session lifecycle
 One session = one browser tab = one open COM port. `ws_server.py` enforces
