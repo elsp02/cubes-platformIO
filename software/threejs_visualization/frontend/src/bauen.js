@@ -13,6 +13,7 @@ import { showLoader, hideLoader } from "./animation/loader_bauen.js";
 import { initScene, redrawTree, clearTree } from "./visualization/scene_glb.js";
 import { TARGET_TREES, countBlocks } from "./target-tree/index.js";
 import { updateProgress } from "./progress_bar.js";
+import { openEndDialog } from "./animation/end_dialog.js";
 
 const params = new URLSearchParams(window.location.search);
 const treeId = params.get("tree");
@@ -31,15 +32,33 @@ if (!targetEntry) {
     // total block count never changes during a session -> compute once
     const totalBlocks = countBlocks(targetEntry.tree);
 
+    // true once the "fully built" dialog has been shown, so it doesn't
+    // reopen on every tree update while the construction stays complete;
+    // reset if the count drops below total (e.g. a cube gets removed)
+    let completionDialogShown = false;
+
+    function endSessionAndReturn() {
+        sendMessage({ type: "end_session" });
+        window.location.href = "index.html";
+    }
+
     document.getElementById("zurück-button-dashboard").addEventListener("click", () => {
-    sendMessage({ type: "end_session" });
-    window.location.href = "index.html";
+        openEndDialog("Wirklich beenden?", endSessionAndReturn, true);
     });
 
     connectWebSocket( //exported function from ws_client.js
         (tree) => {
             const { correctCount } = redrawTree(tree);
             updateProgress(correctCount, totalBlocks);
+
+            if (correctCount === totalBlocks) {
+                if (!completionDialogShown) {
+                    completionDialogShown = true;
+                    openEndDialog("Fertig, gut gemacht!", endSessionAndReturn, false);
+                }
+            } else {
+                completionDialogShown = false;
+            }
         },
         () => {
             // connection lost: never show stale build state

@@ -188,15 +188,11 @@
     transition: all 0.3s ease; /* Smooth transition for hover effect */
 }
 
-#ok-button:hover img{
+.haken:hover img{
     content: url('img/haken_hover.png');
 }
 
-#zurück-button:hover img{
-    content: url('img/kreuz_hover.png');
-}
-
-#zurück-button-dashboard:hover img{
+.kreuz:hover img{
     content: url('img/kreuz_hover.png');
 }
 
@@ -314,7 +310,8 @@ preview----------------------------*/
     display: flex;
 }
 
-#preview{
+#preview,
+#end-dialog{
     width: 70%;
     background-color: #acabaa;
     border:2px solid #acabaa;
@@ -322,6 +319,16 @@ preview----------------------------*/
     padding-inline: var(--page-padding);
     padding-block: var(--page-padding);
     gap: var(--page-padding);
+}
+
+.hidden{
+    display: none;
+}
+
+/* single remaining button (allowCancel: false) - center it instead of
+   the space-between layout meant for two buttons */
+#end-button-container.center{
+    justify-content: center;
 }
 
 /*-------------------------------------
