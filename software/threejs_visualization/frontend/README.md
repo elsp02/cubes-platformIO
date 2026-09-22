@@ -1,4 +1,52 @@
-ToDo
+>html und wichitge datein nochmal erklären, in directory fehlt assets und img ordner
+# Frontend
+This directory contains the three.js frontend of the learning application. It
+connects to the Python backend over WebSocket, renders the detected construction next to the target tree, and shows live build feedback during the building task.
 
-. (Started with `npm run dev`
-  (Vite) from `threejs_visualization/frontend/`.)
+## Directory Structure
+```text
+frontend/
+├── index.html, bauen.html, bauen_vergleich.html   # dashboard, live build view
+├── style.css                                       # shared styling
+└── src/
+    ├── ws_client.js             # WebSocket connection to the backend
+    ├── layout.js                # cube position/rotation geometry
+    ├── progress_bar.js          # build-progress bar
+    ├── bauen.js                 # entry module: bauen.html
+    ├── target-tree/index.js     # collects target-tree JSON definitions
+    ├── visualization/           # tree_builder + scene_environment
+    └── animation/               # UI interactions
+```
+
+## Data flow
+```text
+ws_client.js (WebSocket) --> bauen.js --> scene_glb.js (+ tree_builder.js, layout.js)
+                                       --> comparison_view.js (bauen_vergleich.html only)
+```
+
+## Compare
+The frontend (`tree_builder.js` + `scene_glb.js`) interprets the `status` of a brick (node) as follows:
+
+| Field | Meaning |
+|:--|:--|
+| `correct` | cube rendered with a green pulsing outline |
+| `wrong` / `unexpected` | cube rendered with a red pulsing outline |
+| `attachable`| no physical cube yet; rendered as a semi-transparent "ghost" |
+| `blocked` | not rendered at all |
+
+## Configuration
+`ws_client.js` hard-codes the backend address at the top of the file:
+
+| Constant | Meaning |
+|:--|:--|
+| `WEBSOCKET_URL` | address of `ws_server.py` (default `ws://localhost:8765`) |
+| `RECONNECT_DELAY_MS` | delay before retrying a dropped connection |
+
+## Running
+```bash
+npm install
+npm run dev
+```
+Opens on `http://localhost:5173`. The backend (`ws_server.py`) must be
+running and the baseplate connected for a build session to show live data
+(see [backend/README.md](../backend/README.md#running)).

@@ -5,10 +5,8 @@ This directory contains everything that runs on the PC side of the learning appl
 ```text
 software/
 ├── threejs_visualization/     # the learning application
-│   ├── backend/               # Python: serial link to the baseplate, comparison, WebSocket server
-│   └── frontend/              # three.js: target selection, 3D visualization, feedback
-└── uart_test/                 # standalone PC-side test script
-    └── handshake_test.py      # exercises the baseplate <-> PC UART handshake in isolation
+    ├── backend/               # Python: serial link to the baseplate, comparison, WebSocket server
+    └── frontend/              # three.js: target selection, 3D visualization, feedback
 ```
 
 ## threejs_visualization

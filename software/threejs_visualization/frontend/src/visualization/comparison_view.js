@@ -29,12 +29,14 @@ import {
 } from "./tree_builder.js";
 import { addSceneEnvironment, placeGroundUnderBox } from "./scene_environment.js";
 
-// same colors/timing as scene_glb.js's STATUS_APPEARANCE - kept in sync
-// manually since the two views are independent rendering pipelines
+// same colors as scene_glb.js's STATUS_APPEARANCE - kept in sync
+// manually since the two views are independent rendering pipelines.
+// pulsePeriod: 0 = static glow (OutlinePass only pulses when > 0),
+// unlike the live view on the right, which keeps pulsing
 const HALO_APPEARANCE = {
-    correct:    { edgeColor: 0x117E2F, edgeStrength: 10, edgeGlow: 3.0, edgeThickness: 10, pulsePeriod: 4 },  // green
-    wrong:      { edgeColor: 0xcc2222, edgeStrength: 10, edgeGlow: 3.0, edgeThickness: 10, pulsePeriod: 2 },  // red
-    unexpected: { edgeColor: 0xcc2222, edgeStrength: 10, edgeGlow: 3.0, edgeThickness: 10, pulsePeriod: 2 },  // red
+    correct:    { edgeColor: 0x117E2F, edgeStrength: 5, edgeGlow: 0.5, edgeThickness: 2, pulsePeriod: 0 },  // green
+    wrong:      { edgeColor: 0xcc2222, edgeStrength: 5, edgeGlow: 0.5, edgeThickness: 2, pulsePeriod: 0 },  // red
+    unexpected: { edgeColor: 0xcc2222, edgeStrength: 5, edgeGlow: 0.5, edgeThickness: 2, pulsePeriod: 0 },  // red
 };
 
 export function createComparisonView(container) {
@@ -70,11 +72,7 @@ export function createComparisonView(container) {
         ONE: THREE.TOUCH.ROTATE,
         TWO: THREE.TOUCH.DOLLY_ROTATE,
     };
-    controls.autoRotate = true;
-    controls.autoRotateSpeed = 2.0;
-    controls.addEventListener("start", () => {
-        controls.autoRotate = false;
-    });
+    // static camera, same as the live view on the right - no auto-rotate
 
     renderer.domElement.style.touchAction = "none";
     renderer.domElement.addEventListener(
@@ -155,7 +153,7 @@ export function createComparisonView(container) {
         correctSelection = [];
         wrongSelection = [];
 
-        cubeGroup.add(buildTreeGroup(rootNode, decorateCube, { skipBlocked: false }));
+        cubeGroup.add(buildTreeGroup(rootNode, decorateCube, { skipBlocked: false, showRootMarker: true }));
 
         outlineCorrect.selectedObjects = correctSelection;
         outlineWrong.selectedObjects = wrongSelection;

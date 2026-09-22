@@ -1,9 +1,5 @@
-// target_tree_view.js - shared interactive target-tree renderer.
-//
-// Both the dashboard preview and bauen_target.html use this module.
-// Keeping the scene, camera, controls and tree construction here makes
-// the selected target tree look exactly the same in both places; only
-// the size of the supplied container differs.
+// target_tree_view.js - interactive target-tree renderer.
+
 
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
@@ -12,6 +8,9 @@ import { loadCubeTemplate, buildTreeGroup, fitCameraToBox } from "./tree_builder
 import { addSceneEnvironment, placeGroundUnderBox } from "./scene_environment.js";
 import { TARGET_TREES } from "../target-tree/index.js";
 
+// createTargetTreeView
+// - sets up an independent scene/camera/renderer/OrbitControls for the
+//   given container; returns { showTree } to load a target tree into it
 export function createTargetTreeView(container) {
     if (!container) {
         throw new Error("Container für die Target-Tree-Ansicht wurde nicht gefunden.");
@@ -28,6 +27,7 @@ export function createTargetTreeView(container) {
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
     container.appendChild(renderer.domElement);
 
+     // resizeToContainer
     function resizeToContainer() {
         const width = container.clientWidth || 1;
         const height = container.clientHeight || 1;
@@ -39,25 +39,28 @@ export function createTargetTreeView(container) {
 
     resizeToContainer();
 
+    // keep the renderer/camera in sync if the container itself is resized
     const resizeObserver = new ResizeObserver(resizeToContainer);
     resizeObserver.observe(container);
 
     const { ground } = addSceneEnvironment(scene);
 
     const controls = new OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-    controls.enablePan = false;
-    controls.maxPolarAngle = Math.PI / 2;
+    controls.enableDamping = true;          // smooths out orbit/zoom motion
+    controls.enablePan = false;             // only rotate/zoom, no dragging the target around
+    controls.maxPolarAngle = Math.PI / 2;   // can't orbit below the ground plane
     controls.touches = {
         ONE: THREE.TOUCH.ROTATE,
         TWO: THREE.TOUCH.DOLLY_ROTATE,
     };
-    controls.autoRotate = true;
+    controls.autoRotate = true;  // slowly spins the tree until the user interacts
     controls.autoRotateSpeed = 2.0;
     controls.addEventListener("start", () => {
-        controls.autoRotate = false;
+        controls.autoRotate = false;    // stop auto-rotating as soon as the user takes control
     });
 
+    // prevent page scroll/pinch-zoom from hijacking touch/wheel input
+    // meant for orbiting/zooming the camera
     renderer.domElement.style.touchAction = "none";
     renderer.domElement.addEventListener(
         "wheel",
@@ -68,6 +71,9 @@ export function createTargetTreeView(container) {
     let currentTreeGroup = null;
     const cubeTemplateReady = loadCubeTemplate();
 
+    // showTree
+    // - loads the given target tree by id and fits the camera to it
+    // - false if the id is unknown
     async function showTree(treeId) {
         const entry = TARGET_TREES.find((candidate) => candidate.id === treeId);
         if (!entry) {
@@ -82,6 +88,8 @@ export function createTargetTreeView(container) {
         }
 
         currentTreeGroup = buildTreeGroup(entry.tree);
+        // to also show the root marker (frame + front arrow) here:
+        // currentTreeGroup = buildTreeGroup(entry.tree, null, { showRootMarker: true });
         scene.add(currentTreeGroup);
 
         const box = new THREE.Box3().setFromObject(currentTreeGroup);
@@ -95,6 +103,8 @@ export function createTargetTreeView(container) {
         return true;
     }
 
+    // animate
+    // - render loop, driven by requestAnimationFrame
     function animate() {
         requestAnimationFrame(animate);
         controls.update();

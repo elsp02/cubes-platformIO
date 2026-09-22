@@ -1,13 +1,13 @@
-// page while connecting with server - dissapears when connected
-// ???? what if connection breaks? - maybe text with reload window
+// loader_page.js - loading screen for index.html ( dashboard)
+
 const MIN_LOADER_TIME = 3000; // ms
 
-//adress components
+
 const loader = document.getElementById("loader");
 const page = document.getElementById("dashboard");
 const loaderGif = document.getElementById("loader-gif");
 
-//get start time (for e.g breaking connecting attempt)
+
 const startTime = performance.now();
 
 // Lock scrolling as long as loader is visible
@@ -20,7 +20,7 @@ if (typeof gsap !== "undefined"){
     gsap.fromTo(loaderGif, {opacity:0}, {opacity: 1, duration: 1, ease: "power2.out"}); //gif fade in within 1 sec 
 }
 
-// condition when to remove loader window (currently time dependent)- change this to condition server connected
+// wait for window.load, then hide once MIN_LOADER_TIME has elapsed in total
 window.addEventListener("load", ()=>{
     const elapsed = performance.now() -startTime;
     const remaining = Math.max(0, MIN_LOADER_TIME-elapsed);
@@ -31,6 +31,8 @@ window.addEventListener("load", ()=>{
   }, remaining);
 })
 
+// hideLoader
+// - fades the loader out and the dashboard in, then removes the loader from the DOM
 function hideLoader (){
     //allow scrolling again
     document.documentElement.style.overflow = "";
@@ -39,27 +41,6 @@ function hideLoader (){
   const i = gsap.timeline({
     onComplete: () => {
       loader.remove();
-
-      // resync lenis
-      // (je nachdem, wie ich Lenis initialisierst, heißt die Variable evtl. anders)
-      if (window.lenis) {
-        window.lenis.resize();
-        window.lenis.scrollTo(window.lenis.scroll, { immediate: true }); // stabilisiert den State
-      }
-
-      // don´t need this because no scroll trigger
-      if (typeof ScrollTrigger !== "undefined") {
-        ScrollTrigger.refresh(true);
-      }
-
-      // auto fresh hook
-      if (window.__AUTO_SHOW_REFRESH__) {
-        window.__AUTO_SHOW_REFRESH__();
-      }
-
-      if (window.startStickerSpins) {
-        window.startStickerSpins();
-      }
     }
   });
 

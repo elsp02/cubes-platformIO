@@ -1,12 +1,7 @@
-// end_dialog.js - confirmation overlay for bauen.html. Same visual
-// pattern as the dashboard's preview overlay (blurred background, a
-// centered box, Kreuz/Haken buttons).
-//
-// Used for two cases that share one dialog:
-//   - the user clicks the header X mid-build ("Wirklich beenden?",
-//     both buttons: Kreuz cancels and closes the dialog, Haken confirms)
-//   - the construction is fully built ("Fertig, gut gemacht!", only
-//     the Haken button - there is nothing to cancel)
+// end_dialog.js - confirmation overlay for bauen.html 
+// Used for when 
+//    - building process is aborted
+//    - building process is finished - fully built
 
 const overlay = document.getElementById("end-overlay");
 const messageEl = document.getElementById("end-message");
@@ -16,13 +11,17 @@ const confirmButton = document.getElementById("end-confirm-button");
 
 let onConfirm = null;
 
+// closeEndDialog
+// - closes the overlay and clears the pending confirm callback
 export function closeEndDialog() {
     overlay.classList.remove("is-open");
     onConfirm = null;
 }
 
-// allowCancel = false hides the Kreuz button and centers the
-// remaining Haken button (used for the "fully built" case)
+// openEndDialog
+// - shows the overlay with the given message; confirmCallback runs on Haken
+// - allowCancel = false hides the Kreuz button and centers the
+//   remaining Haken button (used for the "fully built" case)
 export function openEndDialog(message, confirmCallback, allowCancel = true) {
     messageEl.textContent = message;
     onConfirm = confirmCallback;

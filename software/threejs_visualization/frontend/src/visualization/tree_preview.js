@@ -6,6 +6,8 @@ const previewView = createTargetTreeView(
     document.getElementById("preview-canvas")
 );
 
+// showTargetTreePreview
+// - shows the given tree in the dashboard's preview overlay
 export function showTargetTreePreview(treeId) {
     return previewView.showTree(treeId);
 }

@@ -1,13 +1,12 @@
-// layout.js - pure geometry: where does each cube sit and how is it rotated?
-//
-// Position in the frontend:
-//   ws_client.js receives the tree -> scene_glb.js walks it and asks
-//   THIS FILE for the local pose (position + rotation) of every node.
-//
-// "Local" means relative to the direct parent cube. scene_glb.js nests
-// the three.js objects the same way the tree is nested, so three.js
-// multiplies the local poses up the chain into world positions on its
-// own - no global math is needed here.
+// layout.js
+// - pure geometry: computes each cube's local pose relative to its
+//   direct parent - translation (port direction * distance) and
+//   rotation (attachment rotation + twist rotation, see childQuaternionForPort)
+// - "local" = relative to the direct parent; scene_glb.js nests the
+//   three.js objects the same way the tree is nested
+//   -> three.js chains the local poses into world positions on its own
+// - the WEDGE brick type is not used yet - only a draft (see commented-out TYPE_WEDGE code below)
+
 import * as THREE from "three";
 
 //cube geometry
@@ -31,33 +30,7 @@ export function nodeTypeFromId(nodeId) {
     return nodeId >> TYPE_SHIFT;
 }
 
-/*
-// maps every parent port index to direction in parent cubes local system - need to be changed
-// (a child on port N sits PITCH away from its parent, in this direction)
-export const PORT_DIRECTIONS = {
-    0: new THREE.Vector3(-1.0, 0.0, 0.0),    //  parent -x port
-    1: new THREE.Vector3(0.0,-1.0, 0.0),   //  parent -y port
-    2: new THREE.Vector3(0.0, 0.0, 1.0),    //  parent +z port
-    3: new THREE.Vector3(1.0, 0.0, 0.0),   //  parent x port 
-    4: new THREE.Vector3(0.0, 1.0, 0.0),    //  parent y port 
-};
 
-
-// Rotation that aligns the child cube's -Z side with the selected parent port.
-const ATTACHMENT_ROTATIONS = {
-    0: rotationY(-Math.PI / 2.0),       // child -Z -> parent -X port
-    1: rotationX(-Math.PI / 2.0),      // child -Z -> parent -Y port
-    2: new THREE.Quaternion(),         // child -Z -> parent +Z port (identity: already aligned)
-    3: rotationY(Math.PI / 2.0),       // child -Z -> parent -X port
-    4: rotationX(Math.PI/2.0)         // child -Z -> parent +Y port
-}; //example: if child is connected to port 0 -> rotate -90 around Y axis
-*/
-
-// A cube's rotation is composed of TWO parts:
-//   1. attachment rotation - fixed per port, turns the child so its
-//      -Z face (the connector side) points at the parent port
-//   2. twist rotation - the detected orientation value, an extra
-//      0/90/180/270 degree turn around the child's own Z axis
 // rotation around X axis - used when the child hangs on a +/-Y port
 function rotationX(angleRad) {
     return new THREE.Quaternion().setFromAxisAngle(
@@ -103,15 +76,10 @@ function rotationZ(angleRad) {
 // the bounding-box center, for the half-height smashed cube the origin
 // lies at its TOP face. This keeps every cube-as-child calculation
 // identical across types; only the parent-side face offsets differ.
-//
-// WEDGE geometry (matches cube_model_z_pyramide.glb): the square
-// vertical face is on +Y, the 45 degree slope falls towards -Y, so the
-// slope's outward normal is (0, -1, 1)/sqrt(2); the triangle faces are
-// +/-X. The slope face of a right isosceles triangle inscribed in the
-// unit square passes through the bounding-box center, so a child on
-// the slope sits only CUBE_SIZE/2 + GAP away from the wedge center -
-// closer than PITCH.
+
+// wedge slope distance
 const SLOPE_DISTANCE = CUBE_SIZE / 2.0 + GAP;
+
 // SMASHED geometry (matches cube_model_z_smashed.glb): half height,
 // body from -0.5 to 0 in Z, so its top face lies AT origin height and
 // a child on top sits only CUBE_SIZE/2 + GAP above the origin.
@@ -142,9 +110,8 @@ const PORT_GEOMETRY = {
 };
 //--------------------
 
-//
-// shared lookup with a precise error message; every caller needs both
-// checks, so they live in one place
+// portGeometry
+// - shared lookup with a precise error message; every caller needs both checks
 function portGeometry(parentType, port) {
     const typeTable = PORT_GEOMETRY[parentType];
 
@@ -162,27 +129,7 @@ function portGeometry(parentType, port) {
 }
 
 
-/*
-// converts detected orientation value into rotation matrix
-// values: 0=0°, 1=90°, 2=180°, 3=270° around Z axis
-export function orientationToTwist(orientation) {
-    // % 4 is a safety guard: the firmware only sends 0-3, but if a
-    // corrupt value ever slipped through, it would otherwise become a
-    // silent >360° rotation instead of an obviously wrong pose
-    const normalizedOrientation = orientation % 4;
-    return rotationZ(normalizedOrientation * Math.PI / 2.0);
-}
-
-// converts detected orientation value into rotation matrix
-// values: 0=90°, 1=180°, 2=270°, 3=0° around Z axis
-export function orientationToTwist(orientation) {
-    const normalizedOrientation = orientation % 4;
-
-    return rotationZ(
-        ((normalizedOrientation + 1) % 4) * Math.PI / 2.0
-    );
-}*/
-
+// orientationToTwist
 // converts detected orientation value into rotation matrix
 // values: 0=90°, 1=0°, 2=-90°, 3=-180° around Z axis
 export function orientationToTwist(orientation) {
@@ -195,7 +142,11 @@ export function orientationToTwist(orientation) {
     return rotationZ(angle);
 }
 
-//calculates complete rotation of child cube: attachment rotation combined with twist rotation
+// childQuaternionForPort
+// - a cube's rotation is composed of two parts: 
+//     1. the fixed per-port  attachment rotation (points the child's -Z connector 
+// face at the  parent port) 
+//    2. the twist rotation (the detected orientation value)
 export function childQuaternionForPort(port, orientation,parentType) {
     const attachmentQuaternion = portGeometry(parentType, port).attachment;
 
@@ -224,7 +175,8 @@ export function rootQuaternionFromOrientation(orientation) {
 //----------------- actual pose calculation functions -----------------
 // called in scene_glb.js (addCubeRecursive)
 
-// Calculate local pose of the root relative to scene - no parent port, -Z always facing down to -Z axis.
+// localPoseForRoot
+// - no parent port, -Z always faces down to -Z axis
 export function localPoseForRoot(rootNode) {
     return {
         position: new THREE.Vector3(0.0, 0.0, 0.0),
@@ -233,10 +185,11 @@ export function localPoseForRoot(rootNode) {
 }
 
 
-// Calculate local pose of a child relative to its direct parent:
-// position = port direction scaled to the port's distance, rotation =
-// attachment + twist. parentType decides which port table applies -
-// the same port number means a different face on a different cube type.
+// localPoseForChild
+// - position = port direction scaled to the port's distance
+// - rotation = attachment + twist
+// - parentType decides which port table applies -> same port number
+//   means a different face on a different cube type
 export function localPoseForChild(childNode,parentType) {
     if (childNode.port === null || childNode.port === undefined) {
         throw new Error(`Child cube ${childNode.id} has no port value.`);

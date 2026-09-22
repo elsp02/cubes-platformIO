@@ -1,18 +1,11 @@
 // scene_glb.js - the actual 3D view: builds the three.js scene and
 // renders the evaluated tree with the exported GLB cube model.
-//
-// Position in the frontend:
-//   bauen.js calls initScene() once at startup, then redrawTree(tree)
-//   for every tree that ws_client.js receives. The tree itself is built
-//   by the shared tree_builder.js (same code as thumbnails/preview);
-//   this file adds everything only the live view needs: camera, lights,
-//   ground, controls and the per-cube status colors.
+
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
 // post-processing: OutlinePass draws a soft glowing halo along the
-// cubes' visible silhouette (with built-in pulsation); the composer
-// chains it behind the normal render (same setup as test/src/scene_test.js)
+// cubes' visible silhouette (with built-in pulsation)
 import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
 import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
 import { OutlinePass } from "three/addons/postprocessing/OutlinePass.js";
@@ -43,20 +36,17 @@ let outlineCorrect;  // green pulsing halo around correct cubes
 let outlineWrong;    // red pulsing halo around wrong/unexpected cubes
 
 // models collected per redraw, then assigned to the outline passes
-// (one pass can only have ONE color/pulse, so one list per status group)
 let correctSelection = [];
 let wrongSelection = [];
 
 let latestTree = null;    // last received tree, kept for a redraw after the model loads
 let cameraFitted = false; // fitCameraToBox only on the FIRST tree, afterwards the user's OrbitControls position stays untouched
 
-// container element the scene renders into; null = legacy fullscreen
-// mode (renderer on <body>, sized to the window - used by index2.html)
+// container element the scene renders into
 let viewContainer = null;
 
-// current drawing size: the container's inner size, or the window size
-// in fullscreen mode ("|| 1" avoids a zero-size renderer/aspect while
-// the container is still laying out)
+// viewSize
+// - the container's inner size, or the window size in fullscreen mode
 function viewSize() {
     if (viewContainer) {
         return {
@@ -110,11 +100,8 @@ function addRenderer(){
 
 }
 
-// post-processing chain: normal render -> green outlines -> red
-// outlines -> color output. scene_test.js shows ONE cube and re-uses a
-// single OutlinePass; here many cubes with different statuses are
-// visible at once, and one pass has only one color/pulse - so there is
-// one pass per status group, each with its own selection list.
+// addComposer
+// post-processing chain: normal render -> green outlines -> red outlines -> color output
 function addComposer() {
     const { width, height } = viewSize();
     const size = new THREE.Vector2(width, height);
@@ -131,7 +118,8 @@ function addComposer() {
     composer.addPass(new OutputPass()); // color-space correction, must be last
 }
 
-// one configured OutlinePass; edge parameters come from STATUS_APPEARANCE
+// makeOutlinePass
+// - one configured OutlinePass; edge parameters come from STATUS_APPEARANCE
 function makeOutlinePass(size, appearance) {
     const pass = new OutlinePass(size, scene, camera);
 
@@ -150,9 +138,9 @@ function makeOutlinePass(size, appearance) {
     return pass;
 }
 
-// add axes (x=red, y=green, z=blue) and a ground grid for orientation
-// (debug only - not called in the normal scene, so the live view looks
-// exactly like thumbnails and preview)
+// addHelpers
+// - axes (x=red, y=green, z=blue) and a ground grid for orientation
+// - debug only - not called in the normal scene
 function addHelpers() {
     const axes = new THREE.AxesHelper(2);
     scene.add(axes);
@@ -162,8 +150,9 @@ function addHelpers() {
     scene.add(grid);
 }
 
-//OrbitControls allow mouse / touch interaction
-// touchscreen: One finger usually rotates, two fingers zoom/pan.
+// addControls
+// - OrbitControls allow mouse/touch interaction
+// - touchscreen: one finger rotates, two fingers zoom/pan
 function addControls(){
     controls = new OrbitControls(camera, renderer.domElement);
     // Kamera nie unter die Bodenebene kippen lassen (Z-up: PI/2 = horizontal)
@@ -175,8 +164,9 @@ function addControls(){
 
 }
 
-//resize handling for when the container / browser window changes size,
-//the camera aspect ratio must be updated. Otherwise the image becomes stretched.
+// onResize
+// - resize handling for when the container/browser window changes size
+// - camera aspect ratio must be updated, otherwise the image stretches
 function onResize() {
     const { width, height } = viewSize();
 
@@ -187,9 +177,10 @@ function onResize() {
     composer.setSize(width, height); // propagates to all passes incl. the outlines
 }
 
+// animate
 // render loop: requestAnimationFrame schedules this function again for
-// the next display frame (~60x per second), so the scene stays
-// interactive (OrbitControls) even when no new tree arrives
+// the next display frame (~60x per second)
+// -> scene stays interactive (OrbitControls) even when no new tree arrives
 function animate() {
     requestAnimationFrame(animate);
 
@@ -203,6 +194,8 @@ function animate() {
 // container: element to render into (e.g. #main-tree-canvas on
 // bauen.html); without it the scene fills the whole window (index2.html)
 //------------------------------------------------------------
+
+// initScene
 export function initScene(container = null){
     viewContainer = container;
 
@@ -214,10 +207,8 @@ export function initScene(container = null){
     addControls();
     addComposer();
 
-// shared environment (background, lights, shadow ground) - identical
-// to tree_thumbnail.js and tree_preview.js. The composer renders into
-// a texture, so the explicit background color is also what keeps the
-// canvas from being unreliably transparent.
+// shared environment (background, lights, shadow ground) 
+// -> identical to tree_thumbnail.js and tree_preview.js
     ({ ground } = addSceneEnvironment(scene));
 
 // cubeGroup = contains the complete cube construction
@@ -227,8 +218,8 @@ export function initScene(container = null){
     cubeGroup.name = "cubeGroup";
     scene.add(cubeGroup);
 
-// shared GLB loading from tree_builder.js; if a tree arrived before the
-// model finished loading, draw it now
+// shared GLB loading from tree_builder.js; 
+// if a tree arrived before the model finished loading, draw it now
     loadCubeTemplate()
         .then(() => {
             console.log("Cube model loaded.");
@@ -238,9 +229,7 @@ export function initScene(container = null){
         })
         .catch((error) => console.error("Could not load cube model:", error));
 
-//keep renderer and camera in sync with the drawing size: the container
-//is watched directly (same pattern as tree_preview.js), fullscreen mode
-//keeps the window listener
+//keep renderer and camera in sync with the drawing size
     if (viewContainer) {
         new ResizeObserver(onResize).observe(viewContainer);
     } else {
@@ -255,24 +244,18 @@ export function initScene(container = null){
 // status appearance (live view only - thumbnails/preview stay untinted)
 // ------------------------------------------------------------
 
-// mirror of the physical LEDs plus ghost slots; "blocked" is not listed
-// because blocked slots are not rendered at all (tree_builder skips them).
-// correct/wrong/unexpected: body stays original, a glowing halo pulses
-//   around the cube's silhouette (edgeStrength = brightness, edgeGlow =
-//   how far the glow bleeds, edgeThickness in px, pulsePeriod in
-//   seconds per pulse) - values tuned in test/src/scene_test.js.
-// attachable: ghost slot, just semi-transparent, no coloring.
+// mirror of the physical LEDs + ghost slots
+// correct/wrong/unexpected: glowing halo pulses around the cube's silhouette
+// attachable: ghost slot - semi-transparent, no coloring.
 const STATUS_APPEARANCE = {
-    correct:    { edgeColor: 0x117E2F, edgeStrength: 10, edgeGlow: 3.0, edgeThickness: 10, pulsePeriod: 4 },  // green
-    wrong:      { edgeColor: 0xcc2222, edgeStrength: 10, edgeGlow: 3.0, edgeThickness: 10, pulsePeriod: 2 },  // red
-    unexpected: { edgeColor: 0xcc2222, edgeStrength: 10, edgeGlow: 3.0, edgeThickness: 10, pulsePeriod: 2 },  // red
+    wrong:      { edgeColor: 0xcc2222, edgeStrength: 5, edgeGlow: 2, edgeThickness: 2, pulsePeriod: 4 },  // red
+    unexpected: { edgeColor: 0xcc2222, edgeStrength: 5, edgeGlow: 2, edgeThickness: 2, pulsePeriod: 4 },  // red
+    correct:    { edgeColor: 0x117E2F, edgeStrength: 5, edgeGlow: 2, edgeThickness: 2, pulsePeriod: 4 },  // green
     attachable: { opacity: 0.8 },
 };
 
-// makes ghost slots semi-transparent; materials must be cloned,
-// because clone(true) on an Object3D copies meshes but SHARES their
-// materials - without cloning them, fading one cube would fade
-// every cube in the scene
+// applyStatusAppearance
+// makes ghost slots semi-transparent
 function applyStatusAppearance(visualModel, view) {
     const appearance = STATUS_APPEARANCE[view.status];
 
@@ -286,8 +269,8 @@ function applyStatusAppearance(visualModel, view) {
             return;
         }
 
-        // a mesh can have one material or an array of them; treat both
-        // the same by always working on an array
+        // a mesh can have one material or an array of them
+        // -> treat both the same by always working on an array
         const materials = Array.isArray(object.material)
             ? object.material
             : [object.material];
@@ -308,6 +291,7 @@ function applyStatusAppearance(visualModel, view) {
     });
 }
 
+// decorateCube
 // decorate hook for tree_builder: everything only the live view needs
 // per cube - a readable name + userData for debugging in the browser
 // console (scene.getObjectByName), ghost transparency and the halo
@@ -327,9 +311,7 @@ function decorateCube(cubeObject, view) {
     applyStatusAppearance(cubeObject, view);
 
     // statuses with a halo color go into the matching outline pass.
-    // children[0] is the cube's GLB model - at this point it is the
-    // ONLY child (child cubes are attached after decorate), and taking
-    // the whole group would make the entire subtree glow along
+    // children[0] is the cube's GLB model
     const appearance = STATUS_APPEARANCE[view.status];
     if (appearance !== undefined && appearance.edgeColor !== undefined) {
         const selection = view.status === "correct"
@@ -344,8 +326,9 @@ function decorateCube(cubeObject, view) {
 // Tree rendering
 // ------------------------------------------------------------
 
-// removes all cubes from the scene (used when the server connection is lost,
-// so the display never shows stale data)
+// clearTree
+// - removes all cubes from the scene 
+// (used when the server connection is lost, so the display never shows stale data)
 export function clearTree() {
     latestTree = null;
     cameraFitted = false; // next tree starts a fresh session -> refit the camera
@@ -357,9 +340,9 @@ export function clearTree() {
     outlineWrong.selectedObjects = [];
 }
 
-
-// full redraw: throw away all cube objects and rebuild them from the
-// tree (simple and always correct; fine at this scale of a few cubes)
+// redrawTree
+// full redraw: throws away all cube objects and rebuild them from the
+// tree
 export function redrawTree(rootNode) {
     latestTree = rootNode; //von hier wird der evaluated tree zum visualisieren gelesen
 
@@ -376,12 +359,14 @@ export function redrawTree(rootNode) {
     wrongSelection = [];
 
     cubeGroup.add(buildTreeGroup(rootNode, decorateCube));
+    // to also show the root marker (frame + front arrow) here:
+    // cubeGroup.add(buildTreeGroup(rootNode, decorateCube, { showRootMarker: true }));
 
     outlineCorrect.selectedObjects = correctSelection;
     outlineWrong.selectedObjects = wrongSelection;
 
-    // shadow plane exactly under the current construction (same helper
-    // as thumbnails/preview, so the ground behaves identically everywhere)
+    // shadow plane exactly under the current construction 
+    // -> same helper as thumbnails/preview
     const box = new THREE.Box3().setFromObject(cubeGroup);
     placeGroundUnderBox(ground, box);
 

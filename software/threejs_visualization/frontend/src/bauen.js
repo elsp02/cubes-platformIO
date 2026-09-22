@@ -1,12 +1,11 @@
 // bauen.js - entry module for bauen.html.
 //
 // 1. Reads the tree/level the user picked on the dashboard (URL params set
-// by tree_selection.js)
-// 2. connects to the websocket server and drives the loader with the connection state. 
-// On every (re)connect the full target tree JSON is sent as a start_session message - the server
-// 3. Every evaluated tree the server sends back is rendered into #main-tree-canvas.
-//
-// Later steps: wire the X button (end_session).
+//    by tree_selection.js)
+// 2. Connects to the websocket server and drives the loader with the
+//    connection state; on every (re)connect the full target tree JSON is
+//    sent as a start_session message
+// 3. Every evaluated tree the server sends back is rendered into #main-tree-canvas
 
 import { connectWebSocket, sendMessage } from "./ws_client.js";
 import { showLoader, hideLoader } from "./animation/loader_bauen.js";
@@ -15,6 +14,7 @@ import { createComparisonView } from "./visualization/comparison_view.js";
 import { TARGET_TREES, countBlocks } from "./target-tree/index.js";
 import { updateProgress } from "./progress_bar.js";
 import { openEndDialog } from "./animation/end_dialog.js";
+import "./animation/split_toggle.js";
 
 const params = new URLSearchParams(window.location.search);
 const treeId = params.get("tree");
@@ -30,16 +30,14 @@ if (!targetEntry) {
 } else {
     initScene(document.getElementById("main-tree-canvas"));
 
-    // only present on bauen_vergleich.html - bauen.html stays exactly
-    // as before when this element doesn't exist
     const comparisonContainer = document.getElementById("comparison-tree-canvas");
     const comparisonView = comparisonContainer ? createComparisonView(comparisonContainer) : null;
 
     // total block count never changes during a session -> compute once
     const totalBlocks = countBlocks(targetEntry.tree);
 
-    // true once the "fully built" dialog has been shown, so it doesn't
-    // reopen on every tree update while the construction stays complete;
+    // true once the "fully built" dialog has been shown
+    // -> doesn't reopen on every tree update while the construction stays complete
     // reset if the count drops below total (e.g. a cube gets removed)
     let completionDialogShown = false;
 

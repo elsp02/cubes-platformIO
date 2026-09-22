@@ -14,3 +14,8 @@ code
 - sagen welche files in welchem env genutzt werden z.b. geedback in baseplate und feedback cube in cube oder poll child bei beidem
 - DATA FRAME data frame etc anpassen
 
+- brick - cube name
+- pyramide
+- deutsche varibalen, begriffe etc
+- comparison_vie.js in scene_glb_left oder so umbenennen
+

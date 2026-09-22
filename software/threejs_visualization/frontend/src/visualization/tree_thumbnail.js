@@ -1,4 +1,5 @@
-// renders all target trees and snapshots it for card visualization
+// tree_thumbnail.js - renders every target tree once and snapshots it
+// as a PNG, to build the dashboard's target-tree cards
 
 import * as THREE from "three";
 
@@ -12,8 +13,11 @@ const THUMBNAIL_HEIGHT = 600;
 
 //--------------------------------------------------------
 // Thumbnail rendering
+// - one throwaway WebGL scene per tree, rendered once to a PNG data URL
+//--------------------------------------------------------
 
-//builds small scene around construction
+// renderTreeToImage
+// - builds a small scene around the tree and snapshots it as a PNG data URL
 function renderTreeToImage(treeDefinition) {
     const renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(THUMBNAIL_WIDTH, THUMBNAIL_HEIGHT, false);
@@ -22,12 +26,14 @@ function renderTreeToImage(treeDefinition) {
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
     //initialize scene with the shared environment (background, lights,
-    //shadow ground), so the thumbnail looks exactly like preview + live view
+    //shadow ground) -> thumbnail looks exactly like preview + live view
     const scene = new THREE.Scene();
     const { ground } = addSceneEnvironment(scene);
 
     //add Tree construction
     const treeGroup = buildTreeGroup(treeDefinition);
+    // to also show the root marker (frame + front arrow) here:
+    // const treeGroup = buildTreeGroup(treeDefinition, null, { showRootMarker: true });
     scene.add(treeGroup);
 
     // ground directly under the lowest cube, receives the shadows
@@ -46,8 +52,6 @@ function renderTreeToImage(treeDefinition) {
 
     renderer.render(scene, camera);
 
-    // must happen in the SAME tick as render(): the browser may clear
-    // the WebGL drawing buffer afterwards (no preserveDrawingBuffer)
     const dataUrl = renderer.domElement.toDataURL("image/png");
 
     renderer.dispose(); // free the WebGL context right away
@@ -55,10 +59,12 @@ function renderTreeToImage(treeDefinition) {
     return dataUrl;
 }
 
-//---------------------------------------------------
+//--------------------------------------------------------
+// Card creation
+//--------------------------------------------------------
 
-//MAIN MAIN Function
-// calls all functions and creates an image for the cards. one card per entry in TARGET_TREES (created in target_trees/index.js)
+// showTargetTreeThumbnails
+// - creates one dashboard card per entry in TARGET_TREES (target-tree/index.js)
 async function showTargetTreeThumbnails() {
     try {
         await loadCubeTemplate();
@@ -75,10 +81,6 @@ async function showTargetTreeThumbnails() {
             const img = document.createElement("img");
             img.src = dataUrl;
             img.alt = `Zielbaum: ${name}`;
-
-            //const label = document.createElement("p");
-            //label.className = "typo-handwriting";
-            //label.textContent = name;
 
             card.append(img);
             scrollContainer.append(card);

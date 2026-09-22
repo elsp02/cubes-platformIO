@@ -1,10 +1,9 @@
-// tree_selection.js - lets the user double-click a target-tree card,
-// pick a level, and open that tree's live preview page.
+// tree_selection.js - lets the user 
+//    - click a target-tree card
+//    - pick a level
+//    - and open that tree's live preview page
 //
-// Uses event delegation on the parent containers (.scroll-container,
-// #level-container) instead of wiring each card individually, since
-// the cards are created asynchronously by selected_tree_visualization.js
-// and may not exist yet when this script runs.
+// Level selection is not used yet -  only a draft (see commented out code below)
 
 import { showTargetTreePreview } from "../visualization/tree_preview.js";
 
@@ -12,7 +11,7 @@ const scrollContainer = document.querySelector("#scroll-container-dashboard");
 const levelWindow = document.getElementById("preview-overlay");
 const levelContainer = document.getElementById("level-container");
 const okButton = document.getElementById("ok-button");
-const zurueckButton = document.getElementById("zurück-button");
+const backButton = document.getElementById("zurück-button");
 const dotsContainer = document.getElementById("dots-container");
 
 let cards = [];
@@ -22,6 +21,8 @@ let scrollTicking = false;
 let selectedTreeId = null;
 let selectedLevel = null;
 
+// resetSelection
+// - clears the current tree/level selection
 function resetSelection() {
     selectedTreeId = null;
     selectedLevel = null;
@@ -32,8 +33,9 @@ function resetSelection() {
     // }
 }
 
-//--------------------------------
-// find whichever card's center is closest to the container's center
+// updateActiveCard
+// - finds whichever card's center is closest to the container's center
+//   -> marks it as active
 function updateActiveCard() {
     if (cards.length === 0) {
         return;
@@ -60,7 +62,8 @@ function updateActiveCard() {
     dots.forEach((dot, index) => dot.classList.toggle("is-active", index === closestIndex));
 }
 
-// throttle scroll updates to one per animation frame
+// onScroll
+// - throttles scroll updates to one per animation frame
 function onScroll() {
     if (scrollTicking) {
         return;
@@ -72,7 +75,8 @@ function onScroll() {
     });
 }
 
-// build the dots once the cards exist, then start tracking scroll position
+// initCarousel
+// - builds the dots once the cards exist, then starts tracking scroll position
 function initCarousel() {
     cards = Array.from(scrollContainer.querySelectorAll(".card"));
     if (cards.length === 0) {
@@ -96,9 +100,9 @@ function initCarousel() {
 }
 
 document.addEventListener("cards-ready", initCarousel);
-//initCarousel();
-//------------------------------------
-// double-click a card -> remember its tree id, open the level window
+
+
+// click a card -> remember its tree id, open the level window
 scrollContainer.addEventListener("click", (event) => {
     const card = event.target.closest(".card");
     if (!card) {
@@ -125,9 +129,8 @@ scrollContainer.addEventListener("click", (event) => {
 //     selectedLevel = level.id.replace("level-", "");
 // });
 
-// OK -> navigate to the live build page (connects to the WebSocket
-// server for real cube comparison). bauen_target.html remains available
-// as the server-free target-tree preview.
+// OK -> navigate to the live build page -> connects to the WebSocket server 
+// for real cube comparison
 okButton.addEventListener("click", () => {
     if (selectedTreeId === null) {
         console.warn("Pick a construction before continuing.");
@@ -138,11 +141,11 @@ okButton.addEventListener("click", () => {
     // originally required selectedLevel too:
     // const params = new URLSearchParams({ tree: selectedTreeId, level: selectedLevel });
     const params = new URLSearchParams({ tree: selectedTreeId });
-    window.location.href = `bauen.html?${params}`;
+    window.location.href = `bauen_vergleich.html?${params}`;
 });
 
-// zurück -> close the window, let the user pick another card
-zurueckButton.addEventListener("click", () => {
+// back -> close the window, let the user pick another card
+backButton.addEventListener("click", () => {
     levelWindow.classList.remove("is-open");
     resetSelection();
 });

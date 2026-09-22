@@ -9,6 +9,7 @@ export const SCENE_BACKGROUND_COLOR = 0xb9b9b9;
 // how dark the cube shadows appear on the ground (0 = invisible, 1 = black)
 const SHADOW_OPACITY = 0.1;
 
+// addSceneEnvironment
 // Adds background + lights + ground to the scene.
 export function addSceneEnvironment(scene) {
     scene.background = new THREE.Color(SCENE_BACKGROUND_COLOR);
@@ -36,7 +37,8 @@ export function addSceneEnvironment(scene) {
     return { ground, topLight };
 }
 
-// top of the ground plane exactly at the bottom of the construction
+// placeGroundUnderBox
+// - moves the ground plane's top exactly to the bottom of the construction
 export function placeGroundUnderBox(ground, box) {
     ground.position.z = box.min.z - 0.001;
 }

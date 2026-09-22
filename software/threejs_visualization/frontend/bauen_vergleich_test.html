@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<!-- TEMPORARY test page - feeds bauen_vergleich_test.js's hardcoded fake
+     tree into both containers, no backend/websocket needed. Delete this
+     file and src/bauen_vergleich_test.js once the layout is confirmed. -->
+<html lang=" de">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+        <title>BA CUBES</title>
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+            rel="stylesheet"
+        >
+        <link rel="stylesheet" href="https://unpkg.com/lenis@1.3.17/dist/lenis.css">
+        <link rel="stylesheet" href="style.css" />
+    </head>
+    <body>
+        <main>
+            <section class="main-section" id="loader">
+                    <img id="loader-gif"
+                        src="img/gif/brick_loader.gif"
+                        alt=""
+                        width="470"
+                        height="470"
+                        decoding="async"
+                        >
+                        <p class="typo-title-section" id="status">verbinden</p>
+                </section>
+
+            <div class="main-container" id="bauen">
+                <section class="header-footer-section" id="header-bauen">
+                    <div id="progress-bar">
+                        <div id="progress-bar-fill"></div>
+                    </div>
+                    <div class="button kreuz" id="zurück-button-dashboard">
+                        <img src="img/kreuz.png">
+                    </div>
+                </section>
+
+                <section class="main-section" id="main-tree-window">
+                    <div class="split-tree-container">
+                        <div class="tree-container" id="comparison-tree">
+                            <div class="canvas" id="comparison-tree-canvas"></div>
+                        </div>
+                        <div class="tree-container" id="main-tree-compare">
+                            <div class="canvas" id="main-tree-canvas"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="header-footer-section" id="footer-bauen">
+                </section>
+
+                <section class="overlay" id="end-overlay">
+                    <section class="main-section" id="end-dialog">
+                        <p class="typo-title-section" id="end-message"></p>
+                        <div class="small-container-row" id="end-button-container">
+                            <div class="button kreuz" id="end-cancel-button">
+                                <img src="img/kreuz.png">
+                            </div>
+                            <div class="button haken" id="end-confirm-button">
+                                <img src="img/haken.png">
+                            </div>
+                        </div>
+                    </section>
+                </section>
+            </div>
+        </main>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
+        <script type="module" src="./src/bauen_vergleich_test.js"></script>
+    </body>
+</html>

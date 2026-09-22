@@ -4,8 +4,8 @@
 // the dashboard preview. This page deliberately has no WebSocket or
 // server dependency.
 
-import { TARGET_TREES } from "./target-tree/index.js";
-import { createTargetTreeView } from "./visualization/target_tree_view.js";
+import { TARGET_TREES } from "../src/target-tree/index.js";
+import { createTargetTreeView } from "../src/visualization/target_tree_view.js";
 
 const params = new URLSearchParams(window.location.search);
 const treeId = params.get("tree");

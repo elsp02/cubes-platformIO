@@ -363,9 +363,9 @@ tree---------------------------------*/
 
 /*-----------------------------------------
 bauen------------------------------------*/
-#statusanzeige{
+#progress-bar{
     background-color: var(--background-color);
-    width: 90%;
+    width: 95%;
     height: 1rem;
     align-self: center;
     border-radius: 999px;
@@ -388,7 +388,7 @@ bauen------------------------------------*/
 #comparison-tree-canvas{
     width: 100%;
     height: 100%;
-    background-color: #d6882f;
+    
 
 }
 
@@ -406,13 +406,13 @@ bauen------------------------------------*/
 #comparison-tree-canvas canvas {
     display: block;
     width: 100%;
-    /*height:100%*/
+    height: 100%;
     object-fit: contain;
     border-radius: 1rem;
 }
 
 /*-----------------------------------------
-bauen_vergleich - two containers side by side, 50/50 -----------------*/
+bauen_vergleich - two containers side by side, 30/70 -----------------*/
 .split-tree-container{
     display: flex;
     flex-direction: row;
@@ -423,9 +423,29 @@ bauen_vergleich - two containers side by side, 50/50 -----------------*/
 }
 
 .split-tree-container .tree-container{
-    flex: 1;
     height: 100%;
     min-width: 0; /* flex children default to min-width:auto, which can overflow */
+    cursor: pointer;
+    transition: flex 0.35s ease;
+}
+
+/* flex-grow ratios (not fixed %) so the gap between them is handled
+   correctly instead of causing overflow */
+#comparison-tree{
+    flex: 3;
+}
+
+#main-tree-compare{
+    flex: 7;
+}
+
+/* tap/click a side to expand it (see split_toggle.js) */
+.split-tree-container.left-expanded #comparison-tree{
+    flex: 7;
+}
+
+.split-tree-container.left-expanded #main-tree-compare{
+    flex: 3;
 }
 
 #bauen-target-canvas{
