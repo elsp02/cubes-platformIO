@@ -139,8 +139,55 @@ Auf Grundlage dessen kann der Lernende seine Konstruktion entsprechend veränder
 
 Dadurch entsteht ein kontinuierlicher physisch-digitaler Kreislauf aus Bauen, Erkennen, Vergleichen, Feedback und Anpassen
 
-# folie 8 - Ein blickk ins innere
+# folie 8 - Ein blick ins innere
+„Nachdem wir jetzt wissen, wie proBricks grundsätzlich aufgebaut ist, schauen wir uns einen einzelnen Smart Brick etwas genauer an.
 
+## brick geometrie und schnittstellen
+„Um Herstellung und Verbindungserkennung möglichst einfach zu halten, basieren alle Verbindungen auf einer standardisierten quadratischen Schnittstelle mit vier möglichen Orientierungen in 90-Grad-Schritten.“
+
+„Dabei gibt es zwei funktional unterschiedliche Seiten: Jeder Brick besitzt genau eine Docking Face, über die er selbst mit seinem Parent und damit mit der bestehenden Konstruktion verbunden wird.“
+
+„Zusätzlich besitzt er eine oder mehrere Receiving Faces, an die wiederum weitere Child-Bricks angeschlossen werden können.“
+
+„Beim Cube Brick sind neben der Docking Face fünf Receiving Faces vorhanden. Dadurch kann in unterschiedliche Raumrichtungen weitergebaut werden und es entstehen auch verzweigte dreidimensionale Konstruktionen.“
+
+2. TYP
+„Zusätzlich gibt es einen zweiten Brick-Typ, den Smashed Brick. Er ist nur halb so hoch und besitzt neben seiner Docking Face lediglich eine gegenüberliegende Receiving Face.“
+
+„Mit ihm kann deshalb nur linear weitergebaut werden, er erweitert aber die geometrische Vielfalt der möglichen Konstruktionen.“
+
+## magnetische verbindung
+„Die eigentliche Verbindung zwischen zwei Bricks erfolgt durch eine Kombination aus Magneten und geometrischer Führung.“
+
+„Die Magnete ziehen die beiden kompatiblen Seiten zusammen und stabilisieren die Verbindung.“
+
+„Die Führungselemente sorgen gleichzeitig dafür, dass die beiden Bricks eindeutig zueinander ausgerichtet werden.“
+
+„Das hat zwei Vorteile: Zum einen muss der Brick nicht mit hoher Präzision oder Kraft von Hand positioniert werden. Zum anderen werden dadurch auch die später benötigten elektrischen Kontakte zuverlässig zueinander ausgerichtet.“
+
+„Durch diese gerichtete Gestaltung entsteht eine gültige Verbindung immer zwischen der Receiving Face des Parent-Bricks und der Docking Face des Child-Bricks.“
+
+## gehäuse
+„Um zu sehen, was sich im Inneren befindet, zerlegen wir den Brick einmal.“
+
+„Das Gehäuse ist bewusst modular aufgebaut: Es besteht aus einem tragenden Rahmen mit der Docking Face, austauschbaren Seitenelementen mit den Receiving Faces und einem abschließenden Deckel.“
+
+„Auch beim realen Prototyp lassen sich diese Komponenten weitgehend einzeln montieren und wieder demontieren. Das vereinfacht sowohl die Herstellung als auch Wartung und den Austausch einzelner Komponenten.“
+
+## elektronik
+„Im Inneren sitzt die eigentliche Elektronik auf einer eigens entwickelten Platine.“
+
+„Als lokale Steuereinheit verwendet jeder Brick einen ATtiny1616-Mikrocontroller. Hinzu kommen die elektrischen Schnittstellen und mehrere RGB-LEDs, über die später direkt am Brick Feedback ausgegeben werden kann.“
+
+„Die elektrischen Verbindungen werden überwiegend über federnde Pogo-Pins hergestellt. Diese können kleine Fertigungstoleranzen und Bewegungen zwischen zwei verbundenen Bricks ausgleichen.“
+„Auch die Stromversorgung ist direkt in die Verbindung integriert. Ground liegt zentral, während der 5-Volt-Kontakt konzentrisch darum angeordnet ist. Auf der Docking Face wird diese Versorgung unter anderem über einen Neodym-Ring und einen Pogo-Pin auf der Platine realisiert.“
+
+„Durch diese rotationssymmetrische Anordnung bleiben Ground und Versorgung bei allen vier möglichen 90-Grad-Orientierungen verbunden.“
+
+„Die Energie kommt dabei zentral von der Baseplate und wird anschließend von Brick zu Brick weitergegeben. Dadurch benötigt kein Brick eine eigene Batterie.“
+
+## baseplate
+Die Baseplate verwendet dieselbe Receiving-Schnittstelle wie die Bricks und bildet den festen Startpunkt der Konstruktion.
 
 # folie 9 - eine schnittstelle - mehrere Funktionen
 für was sind die ganzen Pogo Pins denn jetzt aber eigentlich?
