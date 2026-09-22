@@ -17,6 +17,7 @@ import {
     localPoseForRoot,
     localPoseForChild,
     nodeTypeFromId,
+    CUBE_SIZE,
     TYPE_CUBE,
     TYPE_SMASHED,
     //TYPE_WEDGE,
@@ -126,6 +127,95 @@ function nodeView(node) {
     };
 }
 
+//--------------------------------------------------------------
+// Root marker
+//
+// A flat frame lying on the ground under the root cube, so it's
+// visually clear which cube is the starting point of the construction.
+// Built from 4 separate edge segments (not one shape-with-hole mesh) so
+// the front edge (-Y side) can carry its own accent color - the same
+// one the front arrow below uses - while the other 3 edges stay the
+// regular marker color.
+const ROOT_MARKER_SIZE = 1.5 * CUBE_SIZE;      // outer edge length
+const ROOT_MARKER_THICKNESS = 0.1 * CUBE_SIZE; // frame width
+const ROOT_MARKER_COLOR = 0x000000;
+const ROOT_FRONT_ACCENT_COLOR = 0x117e2f; // shared by the front edge and the front arrow
+
+// one flat rectangular segment of the frame, spanning [minX,maxX] x [minY,maxY]
+function createEdgeSegment(minX, maxX, minY, maxY, color) {
+    const geometry = new THREE.PlaneGeometry(maxX - minX, maxY - minY);
+    const material = new THREE.MeshBasicMaterial({ color, side: THREE.DoubleSide });
+
+    const segment = new THREE.Mesh(geometry, material);
+    segment.position.set((minX + maxX) / 2, (minY + maxY) / 2, 0);
+
+    return segment;
+}
+
+function createRootMarker() {
+    const outerHalf = ROOT_MARKER_SIZE / 2;
+    const innerHalf = outerHalf - ROOT_MARKER_THICKNESS;
+
+    const marker = new THREE.Group();
+    marker.name = "rootMarker";
+
+    // front/back segments span the full width; left/right fill only the
+    // remaining inner gap so the corners aren't drawn twice
+    marker.add(createEdgeSegment(-outerHalf, outerHalf, -outerHalf, -innerHalf, ROOT_FRONT_ACCENT_COLOR)); // front (-Y)
+    marker.add(createEdgeSegment(-outerHalf, outerHalf, innerHalf, outerHalf, ROOT_MARKER_COLOR));         // back (+Y)
+    marker.add(createEdgeSegment(-outerHalf, -innerHalf, -innerHalf, innerHalf, ROOT_MARKER_COLOR));       // left (-X)
+    marker.add(createEdgeSegment(innerHalf, outerHalf, -innerHalf, innerHalf, ROOT_MARKER_COLOR));         // right (+X)
+
+    // sits flat on the XY plane, just below the root cube's bottom
+    // face (independent of the root's own twist rotation)
+    marker.position.z = -CUBE_SIZE / 2 - 0.002;
+
+    return marker;
+}
+
+//--------------------------------------------------------------
+// Front arrow
+//
+// A flat arrow lying in front of the root marker, on the -Y side,
+// pointing back along +Y towards the brick. -Y is "front" purely by
+// scene convention (no real-world compass tie, no camera tilt/X
+// offset) - it's the fixed reference for how to line up the baseplate.
+const FRONT_ARROW_LENGTH = 0.6 * CUBE_SIZE;
+const FRONT_ARROW_WIDTH = 0.3 * CUBE_SIZE;
+const FRONT_ARROW_GAP = 0.15 * CUBE_SIZE; // empty space between marker edge and arrow tip
+
+function createFrontArrow() {
+    const tipY = -ROOT_MARKER_SIZE / 2 - FRONT_ARROW_GAP; // a bit off the marker's front edge
+    const tailY = tipY - FRONT_ARROW_LENGTH;       // further out in front
+    const headLength = FRONT_ARROW_LENGTH * 0.45;
+    const headStartY = tipY - headLength;
+    const halfWidth = FRONT_ARROW_WIDTH / 2;
+    const shaftHalfWidth = halfWidth * 0.4;
+
+    // points toward +Y (the brick), tail sits out front in -Y
+    const shape = new THREE.Shape();
+    shape.moveTo(-shaftHalfWidth, tailY);
+    shape.lineTo(-shaftHalfWidth, headStartY);
+    shape.lineTo(-halfWidth, headStartY);
+    shape.lineTo(0, tipY);
+    shape.lineTo(halfWidth, headStartY);
+    shape.lineTo(shaftHalfWidth, headStartY);
+    shape.lineTo(shaftHalfWidth, tailY);
+    shape.closePath();
+
+    const geometry = new THREE.ShapeGeometry(shape);
+    const material = new THREE.MeshBasicMaterial({
+        color: ROOT_FRONT_ACCENT_COLOR,
+        side: THREE.DoubleSide,
+    });
+
+    const arrow = new THREE.Mesh(geometry, material);
+    arrow.name = "frontArrow";
+    arrow.position.z = -CUBE_SIZE / 2 - 0.002;
+
+    return arrow;
+}
+
 //represents one cube; the model is picked by the node's cube type
 function createCubeObject(view) {
     const cubeObject = new THREE.Group();
@@ -194,6 +284,8 @@ export function buildTreeGroup(rootNode, decorate = null) {
     treeGroup.name = "targetTreeGroup";
 
     addCubeRecursive(rootNode, treeGroup, true, decorate, null);
+    treeGroup.add(createRootMarker());
+    treeGroup.add(createFrontArrow());
 
     return treeGroup;
 }
