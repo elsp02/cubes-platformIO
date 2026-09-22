@@ -16,8 +16,8 @@ import {
     isCubeTemplateLoaded,
     buildTreeGroup,
     fitCameraToBox,
-} from "./tree_builder.js";
-import { addSceneEnvironment, placeGroundUnderBox } from "./scene_environment.js";
+} from "../core/tree_builder.js";
+import { addSceneEnvironment, placeGroundUnderBox } from "../core/scene_environment.js";
 
 
 // ------------------------------------------------------------

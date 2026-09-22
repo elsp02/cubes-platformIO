@@ -1,4 +1,3 @@
->html und wichitge datein nochmal erklären, in directory fehlt assets und img ordner
 # Frontend
 This directory contains the three.js frontend of the learning application. It
 connects to the Python backend over WebSocket, renders the detected construction next to the target tree, and shows live build feedback during the building task.
@@ -6,22 +5,25 @@ connects to the Python backend over WebSocket, renders the detected construction
 ## Directory Structure
 ```text
 frontend/
-├── index.html, live_build.html, build_reference.html   # dashboard, live build view
-├── style.css                                       # shared styling
+├── index.html               # dashboard: pick a target tree + level
+├── live_build.html          # live build view (single tree)
+├── build_reference.html     # live build view + target reference, side by side
+├── style.css                # shared styling for all pages
+├── assets/                   # exported GLB cube models (one per brick type)
+├── img/                      # UI icons and the loader GIF
 └── src/
-    ├── ws_client.js             # WebSocket connection to the backend
-    ├── layout.js                # cube position/rotation geometry
-    ├── progress_bar.js          # build-progress bar
-    ├── live_build.js             # entry module: live_build.html
-    ├── target-tree/index.js     # collects target-tree JSON definitions
-    ├── visualization/           # tree_builder + scene_environment
-    └── animation/               # UI interactions
-```
-
-## Data flow
-```text
-ws_client.js (WebSocket) --> live_build.js --> live_view.js (+ tree_builder.js, layout.js)
-                                            --> reference_view.js (build_reference.html only)
+    ├── ws_client.js           # WebSocket connection to the backend
+    ├── layout.js               # cube position/rotation geometry
+    ├── live_build.js            # entry module: live_build.html (+ build_reference.html)
+    ├── build_reference_test.js  # TEMPORARY entry module: build_reference_test.html
+    ├── target-tree/
+    │   └── index.js              # collects target-tree JSON definitions
+    ├── visualization/
+    │   ├── core/                  # used everywhere: tree builder, scene environment
+    │   ├── views/                  # live_view, reference_view, target_tree_view
+    │   └── dashboard/               # tree_preview, tree_thumbnail
+    ├── ui/                          # progress_bar, tree_selection, split_toggle
+    └── animation/                    # loader_page, loader_live_build, end_dialog
 ```
 
 ## Compare

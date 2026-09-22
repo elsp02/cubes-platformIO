@@ -20,7 +20,7 @@ import {
     TYPE_CUBE,
     TYPE_SMASHED,
     //TYPE_WEDGE,
-} from "../layout.js";
+} from "../../layout.js";
 
 // one GLB model per cube type; MODEL_SCALE brings the 0.04-unit models to size 1.0
 const CUBE_MODEL_URLS = {

@@ -26,8 +26,8 @@ import {
     isCubeTemplateLoaded,
     buildTreeGroup,
     fitCameraToBox,
-} from "./tree_builder.js";
-import { addSceneEnvironment, placeGroundUnderBox } from "./scene_environment.js";
+} from "../core/tree_builder.js";
+import { addSceneEnvironment, placeGroundUnderBox } from "../core/scene_environment.js";
 
 // same colors as live_view.js's STATUS_APPEARANCE - kept in sync
 // manually since the two views are independent rendering pipelines.

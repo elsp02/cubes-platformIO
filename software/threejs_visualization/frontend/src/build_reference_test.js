@@ -12,10 +12,10 @@
 // expected_orientation instead of node_id for ghost/not-yet-built slots.
 // Topology mirrors target-tree/tree3.json (root + 1 child + 2 grandchildren).
 
-import { initScene, redrawTree } from "./visualization/live_view.js";
-import { createComparisonView } from "./visualization/reference_view.js";
+import { initScene, redrawTree } from "./visualization/views/live_view.js";
+import { createComparisonView } from "./visualization/views/reference_view.js";
 import { hideLoader } from "./animation/loader_live_build.js";
-import "./animation/split_toggle.js";
+import "./ui/split_toggle.js";
 
 const TYPE_CUBE = 0;
 const TYPE_SMASHED = 1;

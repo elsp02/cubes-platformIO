@@ -1,6 +1,6 @@
 // tree_preview.js - dashboard adapter for the shared target-tree view.
 
-import { createTargetTreeView } from "./target_tree_view.js";
+import { createTargetTreeView } from "../views/target_tree_view.js";
 
 const previewView = createTargetTreeView(
     document.getElementById("preview-canvas")

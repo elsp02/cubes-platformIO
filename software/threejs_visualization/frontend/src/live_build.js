@@ -9,12 +9,12 @@
 
 import { connectWebSocket, sendMessage } from "./ws_client.js";
 import { showLoader, hideLoader } from "./animation/loader_live_build.js";
-import { initScene, redrawTree, clearTree } from "./visualization/live_view.js";
-import { createComparisonView } from "./visualization/reference_view.js";
+import { initScene, redrawTree, clearTree } from "./visualization/views/live_view.js";
+import { createComparisonView } from "./visualization/views/reference_view.js";
 import { TARGET_TREES, countBlocks } from "./target-tree/index.js";
-import { updateProgress } from "./progress_bar.js";
+import { updateProgress } from "./ui/progress_bar.js";
 import { openEndDialog } from "./animation/end_dialog.js";
-import "./animation/split_toggle.js";
+import "./ui/split_toggle.js";
 
 const params = new URLSearchParams(window.location.search);
 const treeId = params.get("tree");

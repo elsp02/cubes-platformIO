@@ -1,5 +1,6 @@
-# Modular Mechatronic Smart-Brick System for Tangible Learning in Special Education
+>version fehlt
 
+# Modular Mechatronic Smart-Brick System for Tangible Learning in Special Education
 Repository accompanying the Bachelor thesis:
 
 **Design and Development of a Tangible Learning System for Special Education**
@@ -24,7 +25,6 @@ The system consists of three main components:
 </center>
 
 ## Repository Structure
-> **TODO**: Replace it with actual repository structure (alles was in eckige klammer muss ausgetauscht werden)
 
 ```text
 .
@@ -50,25 +50,23 @@ The system consists of three main components:
 │         └── cube_state_machine.cpp
 │
 ├── software/
-│   ├── backend/
-│   └── frontend/
+│   └── threejs_visualization/
+│     ├── backend/
+│     └── frontend/
 │
-├── hardware/
-│   ├── pcb_files/
-│   ├── [CAD_FILES]
-│   └── [OTHER_HARDWARE_FILES]
-│
-└── [OTHER_RELEVANT_DIRECTORIES]
+└── hardware/
+    ├── pcb_files/
+    └── CAD_files/
+
 ```
 
 |Directory | Description |
 |:--|:--|
 | `docs/` | Technical documentation of the developed system |
 | `firmware/` | Embedded firmware for the building bricks and the baseplate |
-| `software/backend` | Python backend for communication and construction processing |
-| `software/frontend` | Browser-based learning application and 3D visualisation |
+| `software/threejs_visualization/backend` | Python backend for communication and construction processing |
+| `software/threejs_visualization/frontend` | Browser-based learning application and 3D visualisation |
 | `hardware` | Electronic and mechanical design files
-| `[OTHER]` | TODO if required | 
 
 ## Documentation
 Detailed technical documentation is provided separately: 
@@ -204,20 +202,10 @@ A typical construction task follows this sequence:
 The visualised feedback during the construction task inlcuding pyhsical and digital feedback and feedback states is explained in detail in the[Feedback Documentation](docs/feedback.md).
 
 ## Prototype Status
->**TODO**: when final prototype is finished, a revision of this subsection is needed
+//baseplate flashed currently with uart_baseplate_sate_machine env of commit 9cc54fb7
+//cube flashed currently with uart_cube_state_machine env of commit 05d4e983
 
-//baseplate flashed currently with uart_baseplate_sate_machine env of commit 89c1055ab03e6bade8f2c494344d17d41a6eff1b
-//cube flashed currently with uart_cube env of commit 89c1055ab03e6bade8f2c494344d17d41a6eff1b (ungetestet) and b65bacb49b7ec45e51fe05621d1cff7b89f50d17
 This repository contains the proof-of-concept prototype developed for the Bachelor thesis. It is not a production-ready or certified educational product.
-
-At the time of the thesis evaluation:
-
-- the physical interaction concept and learning application had been evaluated with the intended target group;
-- eight physical prototype bricks had been manufactured;
-- the electronic construction-detection and feedback functionality had been implemented but was not sufficiently reliable for an integrated target-group evaluation;
-- differentiated assistance levels were not yet functionally implemented.
-
-The repository should therefore be understood as documentation of the implemented research prototype rather than a finished learning product.
 
 Further information about the evaluation, requirement fulfilment and limitations is provided in the Bachelor thesis.
 

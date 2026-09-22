@@ -5,7 +5,7 @@
 //
 // Level selection is not used yet -  only a draft (see commented out code below)
 
-import { showTargetTreePreview } from "../visualization/tree_preview.js";
+import { showTargetTreePreview } from "../visualization/dashboard/tree_preview.js";
 
 const scrollContainer = document.querySelector("#scroll-container-dashboard");
 const levelWindow = document.getElementById("preview-overlay");

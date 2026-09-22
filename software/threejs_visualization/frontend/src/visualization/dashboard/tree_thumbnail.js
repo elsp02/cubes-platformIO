@@ -3,9 +3,9 @@
 
 import * as THREE from "three";
 
-import { loadCubeTemplate, buildTreeGroup, fitCameraToBox } from "./tree_builder.js";
-import { addSceneEnvironment, placeGroundUnderBox } from "./scene_environment.js";
-import { TARGET_TREES } from "../target-tree/index.js";
+import { loadCubeTemplate, buildTreeGroup, fitCameraToBox } from "../core/tree_builder.js";
+import { addSceneEnvironment, placeGroundUnderBox } from "../core/scene_environment.js";
+import { TARGET_TREES } from "../../target-tree/index.js";
 
 //Resolution/ratio for the thumbnail snapshot to match the 3:4 ratio of the cards
 const THUMBNAIL_WIDTH = 800;

@@ -15,7 +15,9 @@ Two brick geometries were implemented:
 |---|---|---|
 | Cube brick | Approx. 40 mm × 40 mm × 40 mm | One docking face and five receiving faces |
 | Smashed brick | Half-height brick | One docking face and one receiving face |
+| Pyramid brick | - | - |
 
+The pyramid type brick is currently a draft (firmware and software already functional but no physical brick design yet)
 
 <center>
 <img src="../figures/bricks-physisch.jpg" alt="Brick type" style="width: 50%;">

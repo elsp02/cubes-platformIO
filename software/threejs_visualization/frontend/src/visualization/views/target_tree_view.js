@@ -4,9 +4,9 @@
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 
-import { loadCubeTemplate, buildTreeGroup, fitCameraToBox } from "./tree_builder.js";
-import { addSceneEnvironment, placeGroundUnderBox } from "./scene_environment.js";
-import { TARGET_TREES } from "../target-tree/index.js";
+import { loadCubeTemplate, buildTreeGroup, fitCameraToBox } from "../core/tree_builder.js";
+import { addSceneEnvironment, placeGroundUnderBox } from "../core/scene_environment.js";
+import { TARGET_TREES } from "../../target-tree/index.js";
 
 // createTargetTreeView
 // - sets up an independent scene/camera/renderer/OrbitControls for the
