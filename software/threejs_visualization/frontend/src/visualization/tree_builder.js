@@ -249,12 +249,14 @@ function createCubeObject(view) {
 // parentType = cube type of the direct parent; it decides which port
 // geometry table in layout.js applies to this child (port numbers are
 // type-relative). The root has no parent, so parentType is null there.
-function addCubeRecursive(node, parentObject, isRoot, decorate, parentType) {
+function addCubeRecursive(node, parentObject, isRoot, decorate, parentType, skipBlocked) {
     const view = nodeView(node);
 
     // blocked slots (and everything below them) are not buildable yet
-    // -> hidden (target trees have no status, so nothing is skipped there)
-    if (view.status === "blocked") {
+    // -> hidden by default (target trees have no status, so nothing is
+    // skipped there); callers that want the full target structure always
+    // visible (e.g. the comparison view) pass skipBlocked: false
+    if (skipBlocked && view.status === "blocked") {
         return;
     }
 
@@ -274,16 +276,19 @@ function addCubeRecursive(node, parentObject, isRoot, decorate, parentType) {
     parentObject.add(cubeObject);
 
     for (const child of view.children) {
-        addCubeRecursive(child, cubeObject, false, decorate, view.cubeType);
+        addCubeRecursive(child, cubeObject, false, decorate, view.cubeType, skipBlocked);
     }
 }
 
-//recursive main function; decorate is optional per-cube styling
-export function buildTreeGroup(rootNode, decorate = null) {
+//recursive main function; decorate is optional per-cube styling.
+//skipBlocked hides "blocked" nodes and their subtree (the default, used
+//by the live view); pass false to always render the full tree (used by
+//the comparison view, which shows the whole target structure at once)
+export function buildTreeGroup(rootNode, decorate = null, { skipBlocked = true } = {}) {
     const treeGroup = new THREE.Group();
     treeGroup.name = "targetTreeGroup";
 
-    addCubeRecursive(rootNode, treeGroup, true, decorate, null);
+    addCubeRecursive(rootNode, treeGroup, true, decorate, null, skipBlocked);
     treeGroup.add(createRootMarker());
     treeGroup.add(createFrontArrow());
 

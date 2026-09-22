@@ -11,6 +11,7 @@
 import { connectWebSocket, sendMessage } from "./ws_client.js";
 import { showLoader, hideLoader } from "./animation/loader_bauen.js";
 import { initScene, redrawTree, clearTree } from "./visualization/scene_glb.js";
+import { createComparisonView } from "./visualization/comparison_view.js";
 import { TARGET_TREES, countBlocks } from "./target-tree/index.js";
 import { updateProgress } from "./progress_bar.js";
 import { openEndDialog } from "./animation/end_dialog.js";
@@ -28,6 +29,11 @@ if (!targetEntry) {
     window.location.href = "index.html";
 } else {
     initScene(document.getElementById("main-tree-canvas"));
+
+    // only present on bauen_vergleich.html - bauen.html stays exactly
+    // as before when this element doesn't exist
+    const comparisonContainer = document.getElementById("comparison-tree-canvas");
+    const comparisonView = comparisonContainer ? createComparisonView(comparisonContainer) : null;
 
     // total block count never changes during a session -> compute once
     const totalBlocks = countBlocks(targetEntry.tree);
@@ -50,6 +56,7 @@ if (!targetEntry) {
         (tree) => {
             const { correctCount } = redrawTree(tree);
             updateProgress(correctCount, totalBlocks);
+            comparisonView?.redrawTree(tree);
 
             if (correctCount === totalBlocks) {
                 if (!completionDialogShown) {
@@ -63,6 +70,7 @@ if (!targetEntry) {
         () => {
             // connection lost: never show stale build state
             clearTree();
+            comparisonView?.clearTree();
             showLoader();
         },
         () => {
