@@ -26,9 +26,10 @@ function resetSelection() {
     selectedTreeId = null;
     selectedLevel = null;
 
-    for (const level of levelContainer.querySelectorAll(".level")) {
-        level.classList.remove("active");
-    }
+    // level selection currently unused - see #level-container in index.html
+    // for (const level of levelContainer.querySelectorAll(".level")) {
+    //     level.classList.remove("active");
+    // }
 }
 
 //--------------------------------
@@ -110,29 +111,33 @@ scrollContainer.addEventListener("click", (event) => {
 });
 
 // click a level -> select it exclusively
-levelContainer.addEventListener("click", (event) => {
-    const level = event.target.closest(".level");
-    if (!level) {
-        return;
-    }
-
-    for (const other of levelContainer.querySelectorAll(".level")) {
-        other.classList.toggle("active", other === level);
-    }
-
-    selectedLevel = level.id.replace("level-", "");
-});
+// level selection currently unused - see #level-container in index.html
+// levelContainer.addEventListener("click", (event) => {
+//     const level = event.target.closest(".level");
+//     if (!level) {
+//         return;
+//     }
+//
+//     for (const other of levelContainer.querySelectorAll(".level")) {
+//         other.classList.toggle("active", other === level);
+//     }
+//
+//     selectedLevel = level.id.replace("level-", "");
+// });
 
 // OK -> navigate to the live build page (connects to the WebSocket
 // server for real cube comparison). bauen_target.html remains available
 // as the server-free target-tree preview.
 okButton.addEventListener("click", () => {
-    if (selectedTreeId === null || selectedLevel === null) {
-        console.warn("Pick a level before continuing.");
+    if (selectedTreeId === null) {
+        console.warn("Pick a construction before continuing.");
         return;
     }
 
-    const params = new URLSearchParams({ tree: selectedTreeId, level: selectedLevel });
+    // level selection currently unused, so it's left out of the params;
+    // originally required selectedLevel too:
+    // const params = new URLSearchParams({ tree: selectedTreeId, level: selectedLevel });
+    const params = new URLSearchParams({ tree: selectedTreeId });
     window.location.href = `bauen.html?${params}`;
 });
 
