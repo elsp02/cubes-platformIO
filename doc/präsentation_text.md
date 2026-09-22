@@ -6,12 +6,7 @@ Die gezeigte Situation war zunächst eine konkrete Beobachtung aus der Schule. F
 
 In meiner Arbeit stehen insbesondere Lernende mit Unterstützungsbedarf in den Bereichen geistige Entwicklung, Lernen und Autismus-Spektrum Störung im Fokus. Dadurch entsteht schon zwischen diesen drei Bereichen eine sehr heterogene Zielgruppe. Gleichzeitig unterscheiden sich aber auch die Schülerinnen und Schüler innerhalb desselben Unterstützungsbedarfs teilweise stark hinsichtlich ihrer kognitiven, wahrnehmungsbezogenen und motorischen Voraussetzungen.
 
-Trotz dieser Heterogenität lassen sich gemeinsame Herausforderungen im Lern- und Alltagsleben erkennen
-Handlungsplanung und Problemlösen
-Strukturierung von Aufgaben und Lernprozessen
-Aufmerksamkeit und Gedächtnis
-Motorik und Wahrnehmung
-
+„Trotz dieser Heterogenität lassen sich einige gemeinsame Herausforderungen erkennen, die sowohl das Lernen als auch den Alltag beeinflussen können. Dazu gehören zum Beispiel Schwierigkeiten bei der Handlungsplanung und beim Problemlösen, bei der Strukturierung von Aufgaben und Lernprozessen sowie Unterschiede in Aufmerksamkeit und Gedächtnis und motorischen Koordination und Wahrnehmungsverarbeitung
 
 Daraus lassen sich einige gemeinsame Gestaltungsprinzipien ableiten. Besonders relevant für meine Arbeit waren dabei eine **individuelle Anpassung statt standardisierter Anforderungen**, klare und überschaubare Aufgabenstrukturen, ausreichend Zeit und Wiederholungsmöglichkeiten sowie **spielerische und handlungsorientierte Aufgaben**. Gerade für selbstständiges Arbeiten ist außerdem zeitnahes und verständliches Feedback wichtig.“
 
@@ -91,69 +86,24 @@ Diese sieben Anforderungen bilden damit die Leitlinie für die weitere Entwicklu
 Für die automatische Erkennung physischer Konstruktionen gibt es grundsätzlich zwei Ansätze: passive und aktive Brick-Systeme.
 
 ## passiv
-Bei passiven Systemen befinden sich in den Bricks selbst keine aktiven Verarbeitungs- oder Kommunikationskomponenten. Die Konstruktion wird stattdessen durch ein externes Erkennungssystem erfasst. Dies kann auf unterschiedlicher Weise passieren
-
-### DuploTrack
-„Ein Beispiel ist DuploTrack. Hier wird die Konstruktion mit einer RGB-D-Kamera erfasst. Über Farbinformationen und Tiefendaten können die einzelnen LEGO-DUPLO-Steine und ihre räumliche Anordnung erkannt werden.
-
-Der Vorteil ist, dass die Bricks selbst sehr einfach bleiben. Gleichzeitig entsteht aber eine starke Abhängigkeit von der Kamera: Die relevanten Bereiche müssen sichtbar sein und können beispielsweise durch Hände oder andere Bricks verdeckt werden. Zusätzlich muss die Kamera entsprechend positioniert und kalibriert werden.“
-
-### Capstones
-„Ein weiterer passiver Ansatz ist CapStones, das die kapazitiven Sensoren eines normalen Touchscreens nutzt.“
-
-„Die Bricks enthalten interne Leitungen und Verbindungskontakte. Wenn der Nutzer die Konstruktion berührt, wird seine Körperkapazität durch den gesamten Stapel bis zum Touchscreen weitergeleitet. Dadurch kann das Tablet erkennen, wo sich die Konstruktion befindet und wie die Bricks gestapelt sind.“
-
-„Der Vorteil ist, dass dafür keine spezielle externe Tracking-Hardware benötigt wird. Gleichzeitig hat das Prinzip aber klare Grenzen: Die Konstruktion muss berührt werden, damit sie überhaupt erkannt werden kann, und durch die Sensorschwelle des Touchscreens ist die Stapelhöhe auf ungefähr drei bis vier Ebenen begrenzt.“
-
-### RFID
-Eine andere Möglichkeit ist die RFID technologie - also ?funk? so wie die euch bekannten nfc tags bloß im ultra hochfrequenz bereich
-Hier ist ein Projekt die RFIBricks. Hier werden modifizierte UHF-RFID-Tags verwendet. Antenne und RFID-Chip sind voneinander getrennt und werden über leitfähige Magnete verbunden. Erst wenn zwei Bricks physisch miteinander verbunden werden, wird entsprechend antenne und rfid chip verbunden und der reader erkennt die bricks .“
-
-„Die Kontakte befinden sich allerdings nur auf Ober- und Unterseite, da es sonst zu viele tags gibt, die zu einer übermäsßigen komplexität führen würden. Dadurch sind im Wesentlichen nur vertikale Stapel möglich. und der reader ist auch teuer“
+Bei passiven Systemen befinden sich in den Bricks selbst keine aktiven Verarbeitungs- oder Kommunikationskomponenten. Die Konstruktion wird stattdessen durch ein externes Erkennungssystem erfasst. (Dies kann auf unterschiedlicher Weise passieren, zum beispiel mithilfe von kameras, rfid chips oder kapazitiven methoden)
 
 ## aktiv
 „Bei aktiven Bricks befindet sich dagegen Elektronik direkt in jedem Baustein. Die einzelnen Bricks können dadurch selbst Informationen über ihre lokalen Verbindungen erfassen und an das Gesamtsystem weitergeben.“
 
-### i cube
-„Ein besonders interessantes Beispiel ist i-Cube, weil hier sowohl die verbundene Seite als auch die relative Rotation zwischen zwei Bricks erkannt werden kann.“
-
-„Jede Seite eines Bricks besitzt einen induktiven Sender und vier symmetrisch angeordnete induktive Empfänger. Die Sender der einzelnen Flächen werden nacheinander aktiviert. Befindet sich ein weiterer Brick gegenüber, reagiert dort einer der vier Empfänger.“
-
-„Dadurch lässt sich zum einen bestimmen, welche beiden Flächen miteinander verbunden sind, und zum anderen über den ausgelösten Empfänger, wie die beiden Bricks relativ zueinander gedreht sind.“
-
-„Damit ermöglicht i-Cube echte dreidimensionale Konstruktionen inklusive lokaler Orientierung. Der Nachteil ist allerdings der vergleichsweise hohe Hardwareaufwand, da jede Fläche mehrere induktive Komponenten benötigt.“
-
-### roblocks
-„roBlocks verfolgt dagegen einen stärker netzwerkbasierten Ansatz.“
-
-Sobald mehrere Bricks über magnetkontkakte verbunden sind, entsteht daraus ein Ad-hoc-Kommunikationsnetzwerk, über das die Module Informationen über ihre lokalen Verbindungen austauschen.“
-
-„Ein spezieller Comm-Block startet die Topologieerkennung, sammelt die Informationen der verbundenen Bricks und überträgt sie anschließend drahtlos an den Computer.“
-
-„Eine weitere Besonderheit ist die Energieversorgung: Ein separater Power-Block speist die gesamte verbundene Struktur über die Magnetkontakte. Die einzelnen Bricks benötigen dadurch keine eigenen Batterien.“
-
-„Im Gegensatz zu i-Cube kann die Verbindungsschnittstelle allerdings nicht direkt die relative Rotation zweier verbundener Bricks bestimmen. Außerdem werden für die Kommunikation mit dem Computer und die Konstruktionserkennung mit dem Computer spezielle Blöcke benötigt.“
-
-### activeCube
-„Auch ActiveCube arbeitet mit einer zentralen Energieversorgung. Hier übernimmt ein Base-Brick die Stromversorgung der Konstruktion.“
-
-„Die Bricks besitzen auf jeder Seite elektrische Kontakte und bilden nach dem Verbinden ein kabelgebundenes Kommunikationsnetzwerk. Wenn ein neuer Brick angeschlossen wird, melden beide beteiligten Cubes ihre IDs und die jeweils verbundenen Flächen an die Base.“
-
-„Der Computer kombiniert anschließend die einzelnen Verbindungsmeldungen zu einem Baum, der die Topologie der dreidimensionalen Konstruktion beschreibt.“
-
-„ActiveCube kann also sehr gut erkennen, welcher Brick über welche Fläche verbunden ist. Für zusätzliche Informationen zur räumlichen Orientierung werden allerdings weitere Sensoren benötigt.“
-
 ### trade off
-Wie man jetzt hoffentlich erkennen konnte, stellt die Wahl zwischen passiven und aktiven Bausteinen einen Kompromiss zwischen Einfachheit auf Baustein-Ebene und den
+die Wahl zwischen passiven und aktiven Bausteinen stellt daher einen Kompromiss zwischen Einfachheit auf Baustein-Ebene und den
 Erfassungs- und Interaktionsmöglichkeiten auf System-Ebene dar. 
 
 Da es mir schien als ob ich mit passiven systemen nicht meine anforderunen erreichen werde, entschied ich mich für aktive bausteine. 
 
-Die bestehenden Systeme zeigen bereits verschiedene Möglichkeiten, die für meine Arbeit relevant sind
+Drei bestehende Systeme waren für die Entwicklung besonders relevant, weil sie jeweils einzelne Prinzipien zeigen, die ich für proBricks aufgegriffen habe.
 
-- i-Cube zeigt, dass sich Verbindungsfläche und relative Rotation direkt an der Schnittstelle erfassen lassen.
-- roBlocks zeigt, dass Kommunikation und zentrale Energieversorgung durch die verbundene Struktur erfolgen können.
-- ActiveCube zeigt, wie aus lokalen Verbindungsmeldungen eine globale Baumstruktur der Konstruktion aufgebaut werden kann.
+- i-Cube zeigt, dass sich mithilfe symmetrisch angeordneter induktiver Empfänger direkt an den Bausteinflächen sowohl die verbundene Fläche als auch die relative Rotation zwischen zwei Bricks erfassen lassen.
+
+- roBlocks zeigt, dass sowohl die Kommunikation als auch die Energieversorgung über die verbundene Bausteinstruktur selbst erfolgen können. Dadurch sind keine einzelnen Batterien in jedem Brick notwendig und die Struktur bildet gleichzeitig das Kommunikationsnetzwerk.
+
+- ActiveCube zeigt schließlich, wie sich aus lokalen Verbindungsmeldungen einzelner Bricks eine globale Baumstruktur der gesamten Konstruktion aufbauen lässt. Die einzelnen Bricks melden dabei ihre Identität und die jeweils verbundenen Flächen, und der Host setzt diese Informationen zur Gesamttopologie zusammen.
 
 „Keines dieser Systeme kombiniert diese Prinzipien allerdings genau in der Form, die sich aus meinen Anforderungen aus Nutzbarkeit im Klassenzimmer, dredimensionalem Bauen, Barrierefreiheit und automatisiertem Feedback für die Sonderpädagogik ergeben
 
@@ -178,16 +128,113 @@ Sobald die Aufgabe gestartet wird, gibt die Learning Application der Baseplate d
     3. bildet sie die Kommunikationsschnittstelle zwischen dem physischen Brick System und der Learning Application
 
 ### Learning application
-„Die erkannte Konstruktion wird also anschließend an die Learning application weitergeleitet. Dort wird sie digital rekonstruiert und mit der Zielstruktur verglichen.
+„Die erkannte Konstruktion wird also anschließend an die Learning application weitergeleitet. Dort wird sie mit der Zielstruktur verglichen und digital rekonstruiert
 
 so wird der aktuelle Bauzustand dann als dreidimensionales Modell dargestellt
-    -> und aus dem Vergleich live Feedback erzeugt
-        - einerseits direkt in der learning application/anwendung
-        - andererseits/zusätzlich auch noch in den bricks
+    -> und aus dem Vergleich live Feedback erzeugt für die bricks und die learning application zum ausgeben
+        (- einerseits direkt in der learning application/anwendung
+        - andererseits/zusätzlich auch noch in den bricks)
 
 Auf Grundlage dessen kann der Lernende seine Konstruktion entsprechend verändern. also falsche bricks anders verbinden oder neue bricks hinzufügen“
 
 Dadurch entsteht ein kontinuierlicher physisch-digitaler Kreislauf aus Bauen, Erkennen, Vergleichen, Feedback und Anpassen
+
+# folie 8 - Ein blickk ins innere
+
+
+# folie 9 - eine schnittstelle - mehrere Funktionen
+für was sind die ganzen Pogo Pins denn jetzt aber eigentlich?
+
+## lokale räumliche beziehung zw. 2 bricks 
+Wenn sich ein Child-Brick mit seiner Docking Face an eine Receiving Face eines Parent-Bricks anschließt, treffen zwei unterschiedliche elektrische Schnittstellen aufeinander.
+
+Die Receiving Face des Parents besitzt einen einzelnen Kommunikationskontakt. Auf der Docking Face des Child-Bricks befinden sich dagegen vier Orientierungskontakte, die den vier möglichen Rotationen in 90-Grad-Schritten entsprechen.
+
+Je nachdem, wie der Child-Brick gedreht angebracht wird, trifft der einzelne Kontakt des Parents auf genau einen dieser vier Kontakte.
+
+Der Child-Brick kann dadurch erkennen, welcher seiner Orientierungskontakte aktiv ist und daraus seine relative Rotation zum Parent bestimmen.
+
+Der Parent kennt gleichzeitig die verwendete Receiving Face, weil er seine Schnittstellen nacheinander gezielt abfragt. **Aus Receiving Face und relativer Rotation lässt sich damit die lokale räumliche Beziehung zwischen zwei Bricks eindeutig beschreiben.**
+
+Dieser Kontakt wird aber nicht nur zur Orientierungserkennung verwendet, denn sobald die Verbindung hergestellt ist, wird derselbe elektrische Signalpfad anschließend auch für die Datenkommunikation zwischen Parent und Child genutzt.
+
+**Dadurch benötige ich weder einen zusätzlichen Orientierungssensor noch eine separate Datenleitung**
+
+## weitere Kommunikation
+Da zwischen Parent und Child nur diese eine Signalleitung zur Verfügung steht, muss sie abwechselnd für beide Übertragungsrichtungen verwendet werden. Die Kommunikation ist deshalb als bidirektionale Single-Wire-Half-Duplex-Kommunikation umgesetzt.
+
+Die Kommunikation folgt dabei einem Request-Response-Prinzip und wird jeweils vom Parent initiiert -> vlt eher FOLIE 10
+
+## Stromversorgung
+ein weiterer großer Vorteil des Designs:
+„Über dieselbe physische Face to tace Schnittstelle werden außerdem 5 Volt und Ground übertragen.“
+
+„Die Baseplate speist die Konstruktion zentral, und die Versorgung wird anschließend von Brick zu Brick weitergegeben. Dadurch benötigt kein einzelner Brick eine eigene Batterie.
+
+## Conclusio
+eine einzige brick to brick schnittstelle übernimmt damit mechanische verbindung, stromversorgung, verbindungserkennung, rotationserkennung und datenkommunikation 
+-> reduces the need for additional sensing components and avoids external sensing
+infrastructure
+
+---
+lokale räumliche Beziehung zw 2 bricks
+    - orientierungsbestimmung
+    - belegte Receiving faces 
+-> nur eine ? nötig
+
+- kommunikation als bidirektionale Single-Wire-Half-Duplex Kommunikation
+
+
+# folie 10 - von lokaler Verbindung zur Gesamtstruktur 
+mit dieser schnittstelle kann ich aber zunächst nur die Beziehung zwischen zwei direkt miteinander verbundenen bricks bestimmen. Für die digitale Rekonstruktion brauche ich aber natürlich die Struktur der gesamten Konstruktion.
+
+„Ausgangspunkt jedes Erkennungszyklus ist die Baseplate als Wurzel der Konstruktion. Sie fragt zunächst den ersten angeschlossenen Brick ab.“
+
+„Dieser Brick kennt seine lokale Beziehung zur Baseplate und überprüft anschließend seine Receiving Faces nacheinander in einer fest definierten Reihenfolge.“
+
+„Wird an einer dieser Seiten ein Child-Brick gefunden, antwortet dieser nicht einfach sofort nur mit seinen eigenen Daten. Stattdessen wird er selbst zum parent und fragt zunächst wiederum seine eigenen Receiving Faces nach weiteren angeschlossenen child Bricks ab
+
+„Findet er dort erneut einen Brick, setzt sich dieser Vorgang rekursiv fort.“
+
+„Dadurch wird ein Zweig der Konstruktion zunächst bis zum äußersten Brick verfolgt, bevor zum nächsten freien Receiving Face des vorherigen Parents zurückgekehrt wird.“
+
+„Die Erkennung entspricht damit einem Depth-First Search, also einer Tiefensuche.“
+
+„Erst wenn ein Brick seinen vollständigen untergeordneten Teilbaum erfasst hat, gibt er diese Information an seinen Parent zurück.
+
+## serialisierung
+„Damit dieser Teilbaum über die einzelne Kommunikationsleitung übertragen werden kann, muss er in eine lineare Datenstruktur überführt werden.“
+
+„Jeder Brick erzeugt dafür eine Node-Beschreibung mit vier wesentlichen Informationen:
+seinem Identifier, der Brick-Typ und individuelle Instanz enthält,
+seiner relativen Orientierung zum Parent,
+einer Child Mask, die angibt, welche Receiving Faces belegt sind,
+und den Payloads seiner Children.“
+
+„Die Child-Payloads werden dabei immer in einer fest definierten Reihenfolge der Receiving Faces angehängt.“
+
+„Dadurch entsteht eine Preorder-Serialisierung: Zuerst stehen die Informationen des aktuellen Parent-Nodes, danach folgen nacheinander die vollständigen serialisierten Teilbäume seiner Children.“
+
+„Der Parent ergänzt also seine eigenen Informationen um die bereits vollständig gesammelten Child-Payloads und gibt anschließend seinen gesamten Subtree wiederum an seinen eigenen Parent weiter.“
+
+„Dieser Prozess wiederholt sich rekursiv bis zur Baseplate.“
+
+„Die Baseplate erhält damit am Ende eine linearisierte Darstellung der vollständigen Konstruktion, obwohl jeder einzelne Brick selbst nur seine lokale Umgebung kennt.“
+
+
+# folie 11 - probricks name
+„Die globale Topologie entsteht also ausschließlich durch das Zusammenführen lokaler Verbindungsinformationen. Jeder Brick kennt nur seine unmittelbare Umgebung, gemeinsam kann das System aber seine gesamte physische Struktur bestimmen.“
+
+„Und genau daher kommt übrigens auch der Name proBricks. Er ist an den Begriff der Propriozeption angelehnt – also die Fähigkeit, den eigenen Zustand beziehungsweise die eigene räumliche Konfiguration wahrzunehmen.“
+
+„Übertragen auf proBricks bedeutet das: Die Konstruktion wird nicht von einer externen Kamera beobachtet, sondern gewinnt die Information über ihre eigene Struktur aus den Verbindungen zwischen den Bricks selbst.“
+
+(proBricks
+proprioception + bricks
+
+darunter klein:
+
+Erfassung der eigenen physischen Struktur aus lokalen Verbindungen)
 
 # folie 12 - von erkanntem Baum zur digitalen Rekonstruktion
 
@@ -195,7 +242,10 @@ Nachdem die Baseplate die vollständige Konstruktion als serialisierte Datenstru
 
 Die Learning Application besteht in meiner Implementierung aus einem Python-basierten Backend und einem browserbasierten JavaScript-Frontend.
 
-die baseplate leitet die serialisierten Konstruktionsdaten über UART? an das backend der Learning Application weiter. Dort werden die empfangenen Daten zunächst wieder deserialisiert. Ein rekursiver Parser liest die einzelnen Nodes aus und stellt daraus die ursprünglichen Parent-Child-Beziehungen wieder her.
+die baseplate leitet die serialisierten Konstruktionsdaten über UART? an das backend der Learning Application weiter. 
+
+AUS SERIALISIERTEM TREE MIT XXX WIRD DETECTED TREE :::
+Dort werden die empfangenen Daten zunächst wieder deserialisiert. Ein rekursiver Parser liest die einzelnen Nodes aus und stellt daraus die ursprünglichen Parent-Child-Beziehungen wieder her.
 
 Da die Child-Payloads zuvor in einer fest definierten Reihenfolge übertragen wurden, kann das Backend mithilfe der Child Mask wieder eindeutig bestimmen, welches Child an welchem Receiving Face seines Parents angeschlossen ist.
 
