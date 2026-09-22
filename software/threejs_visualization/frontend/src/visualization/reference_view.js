@@ -1,7 +1,7 @@
-// comparison_view.js - the left-hand "target reference" view on
-// bauen_vergleich.html.
+// reference_view.js - the left-hand "target reference" view on
+// build_reference.html.
 //
-// Fed the SAME evaluated tree bauen.js also passes to scene_glb.js for
+// Fed the SAME evaluated tree live_build.js also passes to live_view.js for
 // the live view, but rendered differently:
 //   - nothing is hidden (skipBlocked: false), so the full target
 //     structure is visible from the very first message, ghosts included
@@ -11,7 +11,7 @@
 //
 // Independent scene/camera/renderer/controls/composer, same pattern as
 // target_tree_view.js (own container, own OrbitControls with
-// auto-rotate) - this never touches scene_glb.js's state, so the live
+// auto-rotate) - this never touches live_view.js's state, so the live
 // view on the right keeps working exactly as before.
 
 import * as THREE from "three";
@@ -29,7 +29,7 @@ import {
 } from "./tree_builder.js";
 import { addSceneEnvironment, placeGroundUnderBox } from "./scene_environment.js";
 
-// same colors as scene_glb.js's STATUS_APPEARANCE - kept in sync
+// same colors as live_view.js's STATUS_APPEARANCE - kept in sync
 // manually since the two views are independent rendering pipelines.
 // pulsePeriod: 0 = static glow (OutlinePass only pulses when > 0),
 // unlike the live view on the right, which keeps pulsing
@@ -82,7 +82,7 @@ export function createComparisonView(container) {
     );
 
     // post-processing: normal render -> green outline -> red outline -> output
-    // (same chain as scene_glb.js's addComposer, own instance here)
+    // (same chain as live_view.js's addComposer, own instance here)
     const composer = new EffectComposer(renderer);
     composer.addPass(new RenderPass(scene, camera));
 

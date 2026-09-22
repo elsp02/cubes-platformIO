@@ -1,4 +1,4 @@
-// scene_glb.js - the actual 3D view: builds the three.js scene and
+// live_view.js - the actual 3D view: builds the three.js scene and
 // renders the evaluated tree with the exported GLB cube model.
 
 import * as THREE from "three";
@@ -94,7 +94,7 @@ function addRenderer(){
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-    //Add the renderer to the DOM: into the given container (bauen.html),
+    //Add the renderer to the DOM: into the given container (live_build.html),
     //or directly onto <body> in legacy fullscreen mode (index2.html)
     (viewContainer ?? document.body).appendChild(renderer.domElement);
 
@@ -192,7 +192,7 @@ function animate() {
 //------------------------------------------------------------
 // Scene initialization - main function, called once per page.
 // container: element to render into (e.g. #main-tree-canvas on
-// bauen.html); without it the scene fills the whole window (index2.html)
+// live_build.html); without it the scene fills the whole window
 //------------------------------------------------------------
 
 // initScene

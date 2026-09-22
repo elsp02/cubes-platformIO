@@ -1,4 +1,4 @@
-// bauen.js - entry module for bauen.html.
+// live_build.js - entry module for live_build.html (and build_reference.html).
 //
 // 1. Reads the tree/level the user picked on the dashboard (URL params set
 //    by tree_selection.js)
@@ -8,9 +8,9 @@
 // 3. Every evaluated tree the server sends back is rendered into #main-tree-canvas
 
 import { connectWebSocket, sendMessage } from "./ws_client.js";
-import { showLoader, hideLoader } from "./animation/loader_bauen.js";
-import { initScene, redrawTree, clearTree } from "./visualization/scene_glb.js";
-import { createComparisonView } from "./visualization/comparison_view.js";
+import { showLoader, hideLoader } from "./animation/loader_live_build.js";
+import { initScene, redrawTree, clearTree } from "./visualization/live_view.js";
+import { createComparisonView } from "./visualization/reference_view.js";
 import { TARGET_TREES, countBlocks } from "./target-tree/index.js";
 import { updateProgress } from "./progress_bar.js";
 import { openEndDialog } from "./animation/end_dialog.js";

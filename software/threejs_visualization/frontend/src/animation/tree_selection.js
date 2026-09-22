@@ -141,7 +141,7 @@ okButton.addEventListener("click", () => {
     // originally required selectedLevel too:
     // const params = new URLSearchParams({ tree: selectedTreeId, level: selectedLevel });
     const params = new URLSearchParams({ tree: selectedTreeId });
-    window.location.href = `bauen_vergleich.html?${params}`;
+    window.location.href = `build_reference.html?${params}`;
 });
 
 // back -> close the window, let the user pick another card

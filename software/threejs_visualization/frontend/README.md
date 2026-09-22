@@ -6,13 +6,13 @@ connects to the Python backend over WebSocket, renders the detected construction
 ## Directory Structure
 ```text
 frontend/
-├── index.html, bauen.html, bauen_vergleich.html   # dashboard, live build view
+├── index.html, live_build.html, build_reference.html   # dashboard, live build view
 ├── style.css                                       # shared styling
 └── src/
     ├── ws_client.js             # WebSocket connection to the backend
     ├── layout.js                # cube position/rotation geometry
     ├── progress_bar.js          # build-progress bar
-    ├── bauen.js                 # entry module: bauen.html
+    ├── live_build.js             # entry module: live_build.html
     ├── target-tree/index.js     # collects target-tree JSON definitions
     ├── visualization/           # tree_builder + scene_environment
     └── animation/               # UI interactions
@@ -20,12 +20,12 @@ frontend/
 
 ## Data flow
 ```text
-ws_client.js (WebSocket) --> bauen.js --> scene_glb.js (+ tree_builder.js, layout.js)
-                                       --> comparison_view.js (bauen_vergleich.html only)
+ws_client.js (WebSocket) --> live_build.js --> live_view.js (+ tree_builder.js, layout.js)
+                                            --> reference_view.js (build_reference.html only)
 ```
 
 ## Compare
-The frontend (`tree_builder.js` + `scene_glb.js`) interprets the `status` of a brick (node) as follows:
+The frontend (`tree_builder.js` + `live_view.js`) interprets the `status` of a brick (node) as follows:
 
 | Field | Meaning |
 |:--|:--|

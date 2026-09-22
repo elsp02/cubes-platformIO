@@ -2,7 +2,7 @@
 // - pure geometry: computes each cube's local pose relative to its
 //   direct parent - translation (port direction * distance) and
 //   rotation (attachment rotation + twist rotation, see childQuaternionForPort)
-// - "local" = relative to the direct parent; scene_glb.js nests the
+// - "local" = relative to the direct parent; live_view.js nests the
 //   three.js objects the same way the tree is nested
 //   -> three.js chains the local poses into world positions on its own
 // - the WEDGE brick type is not used yet - only a draft (see commented-out TYPE_WEDGE code below)
@@ -173,7 +173,7 @@ export function rootQuaternionFromOrientation(orientation) {
 
 
 //----------------- actual pose calculation functions -----------------
-// called in scene_glb.js (addCubeRecursive)
+// called in live_view.js (addCubeRecursive)
 
 // localPoseForRoot
 // - no parent port, -Z always faces down to -Z axis

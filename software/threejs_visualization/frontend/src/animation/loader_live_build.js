@@ -1,4 +1,4 @@
-// loader_bauen.js - connection-driven loader for bauen.html.
+// loader_live_build.js - connection-driven loader for live_build.html.
 //
 // Unlike loader_page.js (index.html), this loader is not time-based:
 // it stays visible until the websocket connection is established and
@@ -6,7 +6,7 @@
 // hidden via display:none instead of being removed from the DOM.
 
 const loader = document.getElementById("loader");
-const page = document.getElementById("bauen");
+const page = document.getElementById("live-build");
 
 export function showLoader() {
     loader.style.display = "";

@@ -28,7 +28,7 @@ const RECONNECT_DELAY_MS = 2000;
 let activeSocket = null;
 
 // sendMessage
-// - sends a JSON message to the server (e.g. start_session from bauen.js)
+// - sends a JSON message to the server (e.g. start_session from live_build.js)
 // - false if the connection is not open right now
 export function sendMessage(payload) {
     if (activeSocket && activeSocket.readyState === WebSocket.OPEN) {
@@ -44,7 +44,7 @@ export function sendMessage(payload) {
 //--------------------------------
 
 // connectWebSocket
-// - called from bauen.js to open the connection and receive tree data
+// - called from live_build.js to open the connection and receive tree data
 // - onTreeReceived(tree) fires for every valid tree message
 // - onConnected fires on EVERY successful (re)connect, so the caller can (re)send start_session
 // - onDisconnected (optional) fires when the connection closes or fails

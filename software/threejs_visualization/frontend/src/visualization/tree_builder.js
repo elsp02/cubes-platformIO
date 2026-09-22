@@ -5,8 +5,8 @@
 // Used by 
 //  - tree_thumbnail.js (one-shot thumbnails for the cards)
 //  - tree_preview.js (the live, orbit-able view) 
-//  - scene_glb.js (the live build scene on bauen.html) 
-//  - comparison_vie.js (the second live build scene on bauen.html)
+//  - live_view.js (the live build scene on live_build.html)
+//  - reference_view.js (the target reference view on build_reference.html)
 // -> the same code builds the tree everywhere -> all views are guaranteed to match
 
 import * as THREE from "three";

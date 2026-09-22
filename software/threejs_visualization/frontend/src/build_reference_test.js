@@ -1,7 +1,7 @@
-// bauen_vergleich_test.js - TEMPORARY test entry for bauen_vergleich_test.html.
+// build_reference_test.js - TEMPORARY test entry for build_reference_test.html.
 //
-// Feeds a hardcoded fake "evaluated tree" straight into scene_glb.js and
-// comparison_view.js, bypassing ws_client.js entirely - so the split
+// Feeds a hardcoded fake "evaluated tree" straight into live_view.js and
+// reference_view.js, bypassing ws_client.js entirely - so the split
 // view can be checked visually without a running backend or hardware.
 // Not linked from anywhere else; delete both files once the layout is
 // confirmed.
@@ -12,9 +12,9 @@
 // expected_orientation instead of node_id for ghost/not-yet-built slots.
 // Topology mirrors target-tree/tree3.json (root + 1 child + 2 grandchildren).
 
-import { initScene, redrawTree } from "./visualization/scene_glb.js";
-import { createComparisonView } from "./visualization/comparison_view.js";
-import { hideLoader } from "./animation/loader_bauen.js";
+import { initScene, redrawTree } from "./visualization/live_view.js";
+import { createComparisonView } from "./visualization/reference_view.js";
+import { hideLoader } from "./animation/loader_live_build.js";
 import "./animation/split_toggle.js";
 
 const TYPE_CUBE = 0;

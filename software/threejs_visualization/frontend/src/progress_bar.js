@@ -1,5 +1,5 @@
 // progress_bar.js
-// - fills #progress-bar-fill (inside #progress-bar on bauen.html) to show
+// - fills #progress-bar-fill (inside #progress-bar on live_build.html) to show
 //   how much of the target construction is already built correctly
 
 const fill = document.getElementById("progress-bar-fill");

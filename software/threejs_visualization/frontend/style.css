@@ -102,9 +102,9 @@
     opacity:0
 }
 
-/* bauen.html starts invisible under the loader and is faded in by
-   hideLoader() in loader_bauen.js once the websocket is connected */
-#bauen{
+/* live_build.html starts invisible under the loader and is faded in by
+   hideLoader() in loader_live_build.js once the websocket is connected */
+#live-build{
     opacity:0
 }
 
@@ -375,7 +375,7 @@ bauen------------------------------------*/
 #progress-bar-fill{
     height: 100%;
     width: 0%;
-    background-color: #117E2F; /* gleiches Grün wie der "correct"-Glow in scene_glb.js */
+    background-color: #117E2F; /* gleiches Grün wie der "correct"-Glow in live_view.js */
     border-radius: 999px;
     transition: width 0.35s ease;
 }
@@ -412,7 +412,7 @@ bauen------------------------------------*/
 }
 
 /*-----------------------------------------
-bauen_vergleich - two containers side by side, 30/70 -----------------*/
+build_reference - two containers side by side, 30/70 -----------------*/
 .split-tree-container{
     display: flex;
     flex-direction: row;

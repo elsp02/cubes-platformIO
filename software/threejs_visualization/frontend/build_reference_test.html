@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<!-- TEMPORARY test page - feeds bauen_vergleich_test.js's hardcoded fake
+<!-- TEMPORARY test page - feeds build_reference_test.js's hardcoded fake
      tree into both containers, no backend/websocket needed. Delete this
-     file and src/bauen_vergleich_test.js once the layout is confirmed. -->
+     file and src/build_reference_test.js once the layout is confirmed. -->
 <html lang=" de">
     <head>
         <meta charset="utf-8" />
@@ -30,8 +30,8 @@
                         <p class="typo-title-section" id="status">verbinden</p>
                 </section>
 
-            <div class="main-container" id="bauen">
-                <section class="header-footer-section" id="header-bauen">
+            <div class="main-container" id="live-build">
+                <section class="header-footer-section" id="header-live-build">
                     <div id="progress-bar">
                         <div id="progress-bar-fill"></div>
                     </div>
@@ -51,7 +51,7 @@
                     </div>
                 </section>
 
-                <section class="header-footer-section" id="footer-bauen">
+                <section class="header-footer-section" id="footer-live-build">
                 </section>
 
                 <section class="overlay" id="end-overlay">
@@ -71,6 +71,6 @@
         </main>
 
         <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
-        <script type="module" src="./src/bauen_vergleich_test.js"></script>
+        <script type="module" src="./src/build_reference_test.js"></script>
     </body>
 </html>

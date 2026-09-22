@@ -17,5 +17,5 @@ code
 - brick - cube name
 - pyramide
 - deutsche varibalen, begriffe etc
-- comparison_vie.js in scene_glb_left oder so umbenennen
+- ~~comparison_vie.js in scene_glb_left oder so umbenennen~~ erledigt: comparison_view.js -> reference_view.js, scene_glb.js -> live_view.js
 

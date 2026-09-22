@@ -1,5 +1,5 @@
 // split_toggle.js - lets the user click either half of the split view
-// on bauen_vergleich.html to expand it (toggles .left-expanded on
+// on build_reference.html to expand it (toggles .left-expanded on
 // .split-tree-container; sizes/transition live in style.css)
 
 

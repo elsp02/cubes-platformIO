@@ -1,4 +1,4 @@
-// end_dialog.js - confirmation overlay for bauen.html 
+// end_dialog.js - confirmation overlay for live_build.html
 // Used for when 
 //    - building process is aborted
 //    - building process is finished - fully built
