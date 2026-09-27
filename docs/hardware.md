@@ -1,5 +1,3 @@
->**TODO**:  3d modell mit allem integrierten, sagen baseplate kein pcb angefertigt
-
 # Hardware
 ## Overview
 The physical prototype consists of two types of active bricks and a central baseplate. The components combine a modular 3D-printed housing, magnetic and form-fit connections, electrical contacts and electronics with an ATtiny1616. The building bricks are supplied centrally through the baseplate and therefore do not require individual batteries.
@@ -32,8 +30,6 @@ The docking face connects a brick to the existing construction. Each brick has j
 #### Receiving face
 The receiving face allow additional bricks to be attached through their respective docking face at a brick. The amount of this face in a brick depends on its type.
 
->BILD 3D brick mit pfeilen docking und receiving face oder sogar zwei verbunden
-
 Consequently, a valid connection can only be established between a receiving face of the parent brick and the docking face of the child brick. The cube brick supports linear and branching three-dimensional constructions. The smashed brick supports connections along its local vertical axis.  
 All connection faces use the same square interface geometry and allow four relative orientations in increments of 90°.
 
@@ -51,7 +47,10 @@ This structure allows the electronic components and individual side modules to b
 
 The design and manufacturing files are listed at the end of this document.
 
->BILD auseinandergebaut
+<center>
+<img src="../figures/brick_auseinandergebaut.png" alt="Brick exploded" style="width: 50%;">
+<p> Connection face types and electrical contact arrangement</p>
+</center>
 
 ## Connection
 A valid connection is established between the receiving face of a parent brick and the docking face of a child brick.

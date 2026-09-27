@@ -189,7 +189,7 @@ def iter_trees_from_binary_serial(
                     # START anyway), but recovers a lost/dropped session
                     # without needing a manual restart.
                     idle_timeouts_since_start += 1
-                    if idle_timeouts_since_start >= 5:
+                    if idle_timeouts_since_start >= 3:
                         ser.write(bytes([CMD_START]))
                         idle_timeouts_since_start = 0
                         print("No frame for 3s - START (re)sent.")

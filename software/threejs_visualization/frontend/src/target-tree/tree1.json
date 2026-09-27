@@ -3,7 +3,9 @@
     "orientation": 0,
     "children": [
         { "cube_type": 1, "port": 2, "orientation": 1, "children": [
-            { "cube_type": 1, "port": 0, "orientation": 3, "children": [] }
+            { "cube_type": 1, "port": 0, "orientation": 1, "children": [
+                { "cube_type": 1, "port": 0, "orientation": 1, "children": []}
+            ] }
         ] }
     ]
 }

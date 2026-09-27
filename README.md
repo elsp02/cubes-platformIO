@@ -1,5 +1,3 @@
->version fehlt
-
 # Modular Mechatronic Smart-Brick System for Tangible Learning in Special Education
 Repository accompanying the Bachelor thesis:
 
@@ -210,10 +208,8 @@ This repository contains the proof-of-concept prototype developed for the Bachel
 Further information about the evaluation, requirement fulfilment and limitations is provided in the Bachelor thesis.
 
 ## Version
->**TODO**: adjust tag and commit 
 The version associated with the submitted Bachelor thesis is:
-
-Tag:    [TODO: e.g. v1.0-thesis]  
-Commit: [TODO: FINAL_COMMIT_HASH]  
+Tag:    [prototype_v11_final]  
+Commit: [FINAL_COMMIT]  
 
 Later commits may contain modifications that are not described in the submitted thesis.

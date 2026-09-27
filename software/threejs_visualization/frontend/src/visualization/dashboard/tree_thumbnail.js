@@ -32,8 +32,8 @@ function renderTreeToImage(treeDefinition) {
 
     //add Tree construction
     const treeGroup = buildTreeGroup(treeDefinition);
-    // to also show the root marker (frame + front arrow) here:
-    // const treeGroup = buildTreeGroup(treeDefinition, null, { showRootMarker: true });
+     //to also show the root marker (frame + front arrow) here:
+     //const treeGroup = buildTreeGroup(treeDefinition, null, { showRootMarker: true });
     scene.add(treeGroup);
 
     // ground directly under the lowest cube, receives the shadows

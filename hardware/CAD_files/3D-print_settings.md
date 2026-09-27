@@ -1,6 +1,6 @@
-- gedruckt mit bambu lab h2d und h2s 
-- pla + (amazon link?)
-- 0,4 düse
-- stützmaterial petg
-- schichthöhe 0,1mm
-- reihenfolge der wände außen innen 
+# 3D Printing Settings
+- **Printers:** Bambu Lab H2D and H2S
+- **Nozzle:** 0.4 mm
+- **Support material:** PETG
+- **Layer height:** 0.1 mm
+- **Wall order:** Outer → inner
