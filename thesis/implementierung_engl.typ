@@ -317,7 +317,7 @@ Several validation mechanisms were implemented to prevent incomplete or corrupte
 - The XOR checksum detects changes to the payload or length field.
 - On the computer interface, incomplete or invalid frames are discarded and reception resumes by searching for the next valid SYNC byte.
 
-The baseplate waits up to two seconds for the first byte of the application’s feedback response and allows a maximum interval of 100 ms between bytes within that frame. Detection cycles are currently separated by a delay of 550 ms, in addition to the time required for communication within the connected construction. These values describe the implemented prototype and are not general protocol requirements.
+The baseplate waits up to two seconds for the first byte of the application’s feedback response and allows a maximum interval of 100 ms between bytes within that frame.
 
 
 #figure(
